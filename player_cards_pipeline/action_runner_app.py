@@ -333,8 +333,9 @@ def run_matches_request(run: dict[str, Any], year: str, player: str, after_ts: s
 
 
 def main() -> None:
-    st.set_page_config(page_title="NCAAW Card Action Runner", layout="centered")
-    st.title("NCAAW Card Action Runner")
+    st.set_page_config(page_title="NCAAW Player Card Creator", layout="centered")
+    st.title("NCAAW Player Card Creator")
+    st.caption("Created by @DBCJason")
 
     secrets = st.secrets if hasattr(st, "secrets") else {}
     owner = str(secrets.get("GITHUB_OWNER", "")).strip()
@@ -499,8 +500,7 @@ GITHUB_REF = "main"
                         data_url = f"data:text/html;base64,{b64}"
                         st.markdown(f"- {name}: [Open HTML]({data_url})")
                     else:
-                        aurl = f"https://github.com/{owner}/{repo}/actions/runs/{run_id}/artifacts/{aid_int}"
-                        st.markdown(f"- [{name}]({aurl})")
+                        st.markdown(f"- {name}: HTML preview unavailable (artifact could not be parsed).")
             else:
                 st.info("No artifacts found on this run yet.")
 
