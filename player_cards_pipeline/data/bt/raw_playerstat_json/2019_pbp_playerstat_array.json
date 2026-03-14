@@ -1,0 +1,16 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Verifying Browser...</title>
+    <noscript>
+        <meta http-equiv="refresh" content="0;url=/js_required.html">
+    </noscript>
+</head>
+<body onload="document.forms[0].submit()">
+    <p>Verifying your browser, please wait...</p>
+    <form name="js_test" method="post" action="">
+        <input type="hidden" name="js_test_submitted" value="1">
+    </form>
+</body>
+</html>
