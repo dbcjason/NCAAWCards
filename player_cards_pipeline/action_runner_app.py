@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -372,6 +373,7 @@ GITHUB_REF = "main"
         run_btn = st.button("Run Card Build", type="primary")
     with col2:
         refresh_btn = st.button("Refresh Status")
+    auto_refresh = st.checkbox("Auto-refresh run status", value=True)
 
     if "last_trigger_ts" not in st.session_state:
         st.session_state.last_trigger_ts = None
@@ -468,6 +470,10 @@ GITHUB_REF = "main"
         st.write(f"Status: `{status}` | Conclusion: `{conclusion or 'N/A'}`")
         pct, label = run_progress(status, conclusion)
         st.progress(pct, text=f"Run Progress: {label} ({pct}%)")
+        if auto_refresh and status in {"queued", "in_progress"}:
+            st.caption("Auto-refreshing every 4 seconds while run is active...")
+            time.sleep(4)
+            st.rerun()
 
         if status == "completed":
             arts = get_artifacts(owner, repo, token, run_id)
