@@ -1517,7 +1517,7 @@ def find_rsci_rank(player_name: str, rsci_map: dict[str, int]) -> int | None:
 
 
 DRAFT_BUCKETS: list[tuple[str, int | None, int | None]] = [
-    ("Number one pick", 1, 1),
+    ("Number One Pick", 1, 1),
     ("Top 5", 2, 5),
     ("Top 10", 6, 10),
     ("Top 20", 11, 20),
@@ -3163,7 +3163,7 @@ def build_draft_projection_html(
     # Requested women-card buckets:
     # Number one pick, Top 5, Top 10, Top 20, Outside Top 20.
     if cum_probs[0] >= 0.5:
-        proj_label = "Number one pick"
+        proj_label = "Number One Pick"
     elif cum_probs[1] >= 0.5:
         proj_label = "Top 5"
     elif cum_probs[2] >= 0.5:
@@ -3175,7 +3175,7 @@ def build_draft_projection_html(
 
     # Display cumulative for requested ranges; Outside Top 20 is complement of Top 20.
     display_labels = [
-        "Number one pick",
+        "Number One Pick",
         "Top 5",
         "Top 10",
         "Top 20",
