@@ -69,11 +69,22 @@ def bart_url(bart_prefix: str, path: str) -> str:
 
 
 def refresh_advstats_2026(bt_dir: Path, bart_prefix: str) -> None:
-    url = bart_url(bart_prefix, "getadvstats.php?year=2026&csv=1")
-    txt = fetch_text(url)
-    parsed = [r for r in csv.reader(txt.splitlines()) if r]
+    urls = [
+        bart_url(bart_prefix, "getadvstats.php?year=2026&csv=1"),
+        bart_url(bart_prefix, "getadvstats.php?year=2026"),
+    ]
+    parsed: list[list[str]] = []
+    for url in urls:
+        try:
+            txt = fetch_text(url)
+            parsed = [r for r in csv.reader(txt.splitlines()) if r]
+            if parsed:
+                break
+        except Exception:
+            continue
     if not parsed:
-        raise RuntimeError("Empty advstats response for 2026")
+        print("[warn] Empty advstats response for 2026; skipping advstats refresh")
+        return
 
     # getadvstats.php returns data rows only (no header row).
     h26 = list(BT_ADV_HEADERS)
@@ -222,7 +233,10 @@ def refresh_advgames_2026(bt_dir: Path, bart_prefix: str) -> None:
         raise RuntimeError("Could not fetch 2026 all_advgames JSON")
 
     if used_url.endswith('.gz'):
-        txt = gzip.decompress(payload).decode("utf-8", errors="replace")
+        try:
+            txt = gzip.decompress(payload).decode("utf-8", errors="replace")
+        except Exception:
+            txt = payload.decode("utf-8", errors="replace")
     else:
         txt = payload.decode("utf-8", errors="replace")
 

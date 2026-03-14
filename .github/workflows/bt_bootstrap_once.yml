@@ -18,31 +18,33 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Fetch Bart advstats + playerstat (2010-2025)
+      - name: Fetch Bart advstats + playerstat (2019-2025)
         run: |
           python3 player_cards_pipeline/scripts/fetch_bt_history_2010_2025.py \
-            --year-start 2010 \
+            --year-start 2019 \
             --year-end 2025 \
             --out-dir player_cards_pipeline \
             --bart-prefix ncaaw
 
-      - name: Fetch Bart all_advgames (2010-2026)
+      - name: Normalize baseline filenames
+        run: |
+          cp player_cards_pipeline/data/bt/bt_advstats_2019_2025.csv player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv
+          cp player_cards_pipeline/data/bt/bt_playerstat_2019_2025.csv player_cards_pipeline/data/bt/bt_playerstat_2010_2025.csv
+          cp player_cards_pipeline/data/bt/trank_2019_2025.csv player_cards_pipeline/data/bt/trank_2010_2025.csv
+
+      - name: Fetch Bart all_advgames (2019-2025)
         run: |
           python3 player_cards_pipeline/scripts/fetch_bt_advgames_by_year.py \
-            --year-start 2010 \
-            --year-end 2026 \
+            --year-start 2019 \
+            --year-end 2025 \
             --out-dir player_cards_pipeline/data/bt \
             --bart-prefix ncaaw
 
-      - name: Build 2010-2026 advstats file
-        run: |
-          python3 player_cards_pipeline/scripts/refresh_bart_2026_daily.py --project-root . --bart-prefix ncaaw
-
-      - name: Build self-creation cache (2010-2025)
+      - name: Build self-creation cache (2019-2025)
         run: |
           python3 player_cards_pipeline/scripts/build_self_creation_cache.py \
             --project-root "." \
-            --years 2010-2025
+            --years 2019-2025
 
       - name: Commit and push
         run: |
