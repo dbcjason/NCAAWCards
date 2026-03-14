@@ -196,8 +196,8 @@ GITHUB_REF = "main"
     st.caption(f"Repo: {owner}/{repo} | Workflow: {workflow_file} | Ref: {ref}")
 
     year = st.text_input("Season", value="2026")
-    player = st.text_input("Player", value="TaNiya Latson")
-    team = st.text_input("Team (optional)", value="South Carolina")
+    player = st.text_input("Player", value="")
+    team = st.text_input("Team (optional)", value="")
     output_filename = st.text_input("Output filename (optional)", value="")
     commit_to_repo = st.checkbox("Commit output HTML back to repo", value=False)
 
@@ -213,6 +213,9 @@ GITHUB_REF = "main"
         st.session_state.last_player = ""
 
     if run_btn:
+        if not year.strip() or not player.strip():
+            st.error("Please enter at least Season and Player before running.")
+            st.stop()
         ts = _iso_now()
         ok, msg = dispatch_build(
             owner,
@@ -259,6 +262,8 @@ GITHUB_REF = "main"
         conclusion = str(target_run.get("conclusion") or "")
 
         st.subheader("Latest Run")
+        if st.session_state.last_player and st.session_state.last_year:
+            st.caption(f"Requested: {st.session_state.last_player} ({st.session_state.last_year})")
         st.write(f"Run ID: `{run_id}`")
         st.write(f"Status: `{status}` | Conclusion: `{conclusion or 'N/A'}`")
         if html_url:
