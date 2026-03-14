@@ -106,6 +106,9 @@ def main() -> None:
     ap.add_argument("--json-year", default="2025", help="Source JSON year (script season = json year + 1).")
     ap.add_argument("--script-season", default="2026", help="Target script season.")
     args = ap.parse_args()
+    gender = args.gender.strip().capitalize()
+    json_year = str(args.json_year).strip()
+    script_season = str(args.script_season).strip()
 
     root = Path(args.project_root).resolve()
     manual_root = root / "player_cards_pipeline" / "data" / "manual" / "enriched_players"
@@ -141,6 +144,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-    gender = args.gender.strip().capitalize()
-    json_year = str(args.json_year).strip()
-    script_season = str(args.script_season).strip()
