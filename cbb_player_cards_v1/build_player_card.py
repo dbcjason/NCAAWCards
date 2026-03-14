@@ -2721,15 +2721,17 @@ def build_draft_projection_html(
     bio_lookup: dict[tuple[str, str, str], dict[str, str]],
     rsci_map: dict[str, int],
 ) -> str:
+    league_label = "WNBA" if ENRICHED_GENDER == "Women" else "NBA"
+    model_tag = "wnba" if ENRICHED_GENDER == "Women" else "nba"
     if not bt_rows:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">No Bart Torvik CSV loaded.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">No Bart Torvik CSV loaded.</div></div>'
     target_row = bt_find_target_row(bt_rows, target)
     if not target_row:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">No matching Bart row found for this player/team/season.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">No matching Bart row found for this player/team/season.</div></div>'
 
     ys = norm_season(target.season)
     if not ys.isdigit():
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Invalid season for projection.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Invalid season for projection.</div></div>'
     target_year = int(ys)
 
     metric_keys = [
@@ -2806,7 +2808,7 @@ def build_draft_projection_html(
     t_rsci = rsci_rank_to_score(find_rsci_rank(target.player, rsci_map))
 
     if len(target_vec) < 6:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Not enough data to build projection.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Not enough data to build projection.</div></div>'
 
     def feature_components(
         vec: dict[str, float],
@@ -2876,7 +2878,7 @@ def build_draft_projection_html(
         )
 
     if len(candidates_raw) < 500:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Insufficient historical sample for projection.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Insufficient historical sample for projection.</div></div>'
 
     def corr(xs: list[float], ys: list[float]) -> float:
         if len(xs) < 10 or len(ys) < 10 or len(xs) != len(ys):
@@ -2902,7 +2904,7 @@ def build_draft_projection_html(
         / "player_cards_pipeline"
         / "data"
         / "models"
-        / "stat_draft_weights_v1.json"
+        / f"stat_draft_weights_{model_tag}_v1.json"
     )
 
     learned_weights: dict[str, float] = {}
@@ -2945,7 +2947,7 @@ def build_draft_projection_html(
             try:
                 model_path.parent.mkdir(parents=True, exist_ok=True)
                 payload = {
-                    "model": "stat_draft_projection",
+                    "model": f"stat_draft_projection_{model_tag}",
                     "version": 1,
                     "created_utc": datetime.now(timezone.utc).isoformat(),
                     "feature_count": len(learned_weights),
@@ -2956,12 +2958,12 @@ def build_draft_projection_html(
                 pass
 
     if not learned_weights:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Unable to learn feature weights for projection.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Unable to learn feature weights for projection.</div></div>'
 
     target_comps = feature_components(target_vec, t_age, t_hgt, t_rsci)
     target_score = score_from_components(target_comps, learned_weights)
     if target_score is None:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Not enough core metrics to build projection.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Not enough core metrics to build projection.</div></div>'
 
     for c in candidates_raw:
         c["score"] = score_from_components(c["comps"], learned_weights)
@@ -2972,7 +2974,7 @@ def build_draft_projection_html(
         if c["pick"] is not None and int(c["bucket"]) < drafted_bucket_count and c.get("score") is not None
     ]
     if len(drafted_candidates) < 350:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Not enough drafted history to build projection.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Not enough drafted history to build projection.</div></div>'
 
     # Step 1: drafted-only comps for conditional pick-range distribution.
     drafted_candidates.sort(key=lambda c: abs(float(c["score"]) - float(target_score)))
@@ -2997,7 +2999,7 @@ def build_draft_projection_html(
 
     total_w = sum(w for w, _, _ in drafted_neighbor_weights)
     if total_w <= 0:
-        return '<div class="panel"><h3>Statistical NBA Draft Projection</h3><div class="shot-meta">Could not compute projection weights.</div></div>'
+        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Could not compute projection weights.</div></div>'
 
     # Drafted-only conditional bucket mix.
     drafted_bucket_w = [0.0 for _ in range(drafted_bucket_count)]
@@ -3129,7 +3131,7 @@ def build_draft_projection_html(
 
     return f"""
       <div class="panel draft-proj-panel">
-        <h3>Statistical NBA Draft Projection</h3>
+        <h3>Statistical {league_label} Draft Projection</h3>
         <div class="draft-proj-main">{html.escape(proj_label)}</div>
         <div class="draft-proj-sub">Drafted: {100.0 * drafted_prob:.1f}% | Top 20: {100.0 * top20_prob:.1f}%</div>
         <div class="draft-odds-grid">
@@ -3166,21 +3168,10 @@ def _bio_age_height_for_row(row: dict[str, str], bio_lookup: dict[tuple[str, str
 
     age_val: float | None = None
     if bio:
-        age_s = age_on_june25_for_season(bio.get("dob", ""), season)
-        if age_s != "N/A":
-            age_val = to_float(age_s)
-        if age_val is None:
-            age_val = to_float(bio.get("age", ""))
+        age_val = to_float(bio.get("age", ""))
     if age_val is None:
         # Fallback to BT age fields when bio lookup is missing/incomplete.
         age_val = bt_num(row, ["DD Age", " DD Age", "Age", " age", "age"])
-    if age_val is None:
-        # Fallback to BT DOB when age fields are absent.
-        bt_dob = bt_get(row, ["dob", "DOB"])
-        if bt_dob.strip():
-            age_s = age_on_june25_for_season(bt_dob, season)
-            if age_s != "N/A":
-                age_val = to_float(age_s)
 
     height_val: float | None = None
     if bio:
@@ -3266,26 +3257,16 @@ def build_player_comparisons_html(
         year = norm_season(bt_get(r, ["year"]))
         return metric_pct_map.get((year, key), {}).get(id(r))
 
-    age_by_row: dict[int, float] = {}
     hgt_by_row: dict[int, float] = {}
     for r in bt_rows_pool:
-        age_v, h_v = _bio_age_height_for_row(r, bio_lookup)
-        if age_v is not None and math.isfinite(age_v):
-            age_by_row[id(r)] = age_v
+        _age_v, h_v = _bio_age_height_for_row(r, bio_lookup)
         if h_v is not None and math.isfinite(h_v):
             hgt_by_row[id(r)] = h_v
 
-    age_pct_map: dict[str, dict[int, float]] = {}
     hgt_pct_map: dict[str, dict[int, float]] = {}
     for year, rows in by_year.items():
-        age_items = [(id(r), age_by_row[id(r)]) for r in rows if id(r) in age_by_row]
         hgt_items = [(id(r), hgt_by_row[id(r)]) for r in rows if id(r) in hgt_by_row]
-        age_pct_map[year] = build_pct_lookup(age_items)
         hgt_pct_map[year] = build_pct_lookup(hgt_items)
-
-    def age_pct_for_row(r: dict[str, str]) -> float | None:
-        year = norm_season(bt_get(r, ["year"]))
-        return age_pct_map.get(year, {}).get(id(r))
 
     def hgt_pct_for_row(r: dict[str, str]) -> float | None:
         year = norm_season(bt_get(r, ["year"]))
@@ -3296,18 +3277,12 @@ def build_player_comparisons_html(
         p = metric_pct_for_row(target_row, k)
         if p is not None:
             target_vec[k] = p
-    tp_age = age_pct_for_row(target_row)
     tp_hgt = hgt_pct_for_row(target_row)
-    target_age_raw = age_by_row.get(id(target_row))
-    if tp_age is not None:
-        target_vec["age_pct"] = tp_age
     if tp_hgt is not None:
         target_vec["height_pct"] = tp_hgt
 
     if len(target_vec) < 8:
         return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">Not enough data to compute comparisons.</div></div>'
-    if target_age_raw is None or not math.isfinite(target_age_raw):
-        return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">Missing target age for strict +/-1 year age comps.</div></div>'
 
     def similarity(other: dict[str, str]) -> float | None:
         # Exclude exact same player-season.
@@ -3317,15 +3292,6 @@ def build_player_comparisons_html(
             and norm_season(bt_get(other, ["year"])) == norm_season(target.season)
         ):
             return None
-
-        # Hard age window for comps: only compare within +/- 1.0 years.
-        # Strict rule: if target has age, candidate must also have age and be in-range.
-        if target_age_raw is not None and math.isfinite(target_age_raw):
-            other_age_raw = age_by_row.get(id(other))
-            if other_age_raw is None or not math.isfinite(other_age_raw):
-                return None
-            if abs(float(other_age_raw) - float(target_age_raw)) > 1.0:
-                return None
 
         keys = list(metric_keys)
         ov: dict[str, float] = {}
@@ -3338,10 +3304,6 @@ def build_player_comparisons_html(
                 continue
             ov[k] = pv
 
-        if "age_pct" in target_vec:
-            pv = age_pct_for_row(other)
-            if pv is not None:
-                ov["age_pct"] = pv
         if "height_pct" in target_vec:
             pv = hgt_pct_for_row(other)
             if pv is not None:
@@ -3467,12 +3429,9 @@ def render_card(
     team = stats.team
     season = stats.season
 
-    age = age_on_june25_for_season(bio.get("dob", ""), season)
-    if age == "N/A":
-        age = bio.get("age", "") or "N/A"
     height = format_height(bio.get("height", ""))
     position = bio.get("position", "") or "N/A"
-    subtitle = f"{team} | {season} | Position: {position} | Age: {age} | Height: {height}"
+    subtitle = f"{team} | {season} | Position: {position} | Height: {height}"
 
     # Use full event-derived FG totals for header stats, not only plotted (x/y) shots.
     shot_makes = shot_header_makes if shot_header_makes is not None else stats.fgm
@@ -4301,8 +4260,6 @@ def main() -> None:
             bio["position"] = pos_from_bt
         if not (bio.get("height", "") or "").strip():
             bio["height"] = bt_get(target_bt_row, ["ht"])
-        if not (bio.get("dob", "") or "").strip():
-            bio["dob"] = bt_get(target_bt_row, ["dob"])
         if not (bio.get("age", "") or "").strip():
             bt_age = bt_num(target_bt_row, ["DD Age", " DD Age", "Age", " age", "age"])
             if bt_age is not None and math.isfinite(bt_age):
