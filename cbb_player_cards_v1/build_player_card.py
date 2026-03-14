@@ -1501,12 +1501,12 @@ def find_rsci_rank(player_name: str, rsci_map: dict[str, int]) -> int | None:
 
 
 DRAFT_BUCKETS: list[tuple[str, int | None, int | None]] = [
-    ("1st Pick", 1, 1),
+    ("Number one pick", 1, 1),
     ("Top 5", 2, 5),
-    ("Lottery", 6, 14),
-    ("Late 1st Round", 21, 30),
-    ("2nd Round", 31, 60),
-    ("Undrafted/Return to School", None, None),
+    ("Top 10", 6, 10),
+    ("Top 20", 11, 20),
+    ("Outside Top 20", 21, 60),
+    ("Undrafted", None, None),
 ]
 
 
@@ -1531,11 +1531,11 @@ def draft_bucket_index_for_pick(pick: int | None) -> int:
         return 0
     if 2 <= pick <= 5:
         return 1
-    if 6 <= pick <= 14:
+    if 6 <= pick <= 10:
         return 2
-    if 21 <= pick <= 30:
+    if 11 <= pick <= 20:
         return 3
-    if 31 <= pick <= 60:
+    if 21 <= pick <= 60:
         return 4
     return len(DRAFT_BUCKETS) - 1
 
@@ -3032,7 +3032,7 @@ def build_draft_projection_html(
     )
     # Positive tilt => earlier picks, negative tilt => later picks.
     tilt = (top_signal - 0.5) * 1.1
-    # For buckets [1st, Top5, Lottery, Late1st, 2nd]
+    # For buckets [Number one, Top5, Top10, Top20, Outside Top20]
     bucket_axis = [2.0, 1.0, 0.0, -1.0, -2.0]
     if drafted_bucket_count == len(bucket_axis):
         tilted = []
@@ -3058,8 +3058,7 @@ def build_draft_projection_html(
     probs.append(max(0.0, 1.0 - drafted_prob))
 
     drafted_prob = sum(probs[:drafted_bucket_count])
-    # Buckets through Late 1st Round.
-    first_round_prob = sum(probs[:4])
+    top20_prob = sum(probs[:4])
     target_yr_raw = norm_text(bt_get(target_row, ["yr"]))
     target_return_profile = (
         ("fr" in target_yr_raw)
@@ -3070,47 +3069,45 @@ def build_draft_projection_html(
         or ("junior" in target_yr_raw)
         or (t_age is not None and math.isfinite(t_age) and t_age < 22.0)
     )
-    target_pick = parse_pick_number(bt_get(target_row, ["pick"]))
-    undrafted_is_return_school = (
-        t_age is None or (math.isfinite(t_age) and t_age < 22.0)
-    )
-
-    def display_bucket_label(lbl: str) -> str:
-        if lbl == "Undrafted/Return to School" and not undrafted_is_return_school:
-            return "Undrafted"
-        return lbl
-
     # Projected range should be based on cumulative draft-range probability,
-    # not single disjoint bucket maxima (which over-selects Undrafted/Return).
+    # not single disjoint bucket maxima.
     cum_probs: list[float] = []
     csum = 0.0
     for i in range(drafted_bucket_count):
         csum += probs[i]
         cum_probs.append(csum)
 
-    if probs[drafted_bucket_count] >= 0.5:
-        proj_label = "Undrafted/Return to School"
-    elif cum_probs[0] >= 0.5:
-        proj_label = "1st Pick"
+    # Requested women-card buckets:
+    # Number one pick, Top 5, Top 10, Top 20, Outside Top 20.
+    if cum_probs[0] >= 0.5:
+        proj_label = "Number one pick"
     elif cum_probs[1] >= 0.5:
         proj_label = "Top 5"
     elif cum_probs[2] >= 0.5:
-        proj_label = "Lottery"
+        proj_label = "Top 10"
     elif cum_probs[3] >= 0.5:
-        proj_label = "Late 1st Round"
+        proj_label = "Top 20"
     else:
-        proj_label = "2nd Round"
+        proj_label = "Outside Top 20"
 
-    proj_label = display_bucket_label(proj_label)
-    # Display cumulative odds for draft ranges; keep undrafted as standalone.
-    display_probs = list(probs)
-    for i in range(drafted_bucket_count):
-        display_probs[i] = cum_probs[i]
-    display_probs[drafted_bucket_count] = probs[drafted_bucket_count]
+    # Display cumulative for requested ranges; Outside Top 20 is complement of Top 20.
+    display_labels = [
+        "Number one pick",
+        "Top 5",
+        "Top 10",
+        "Top 20",
+        "Outside Top 20",
+    ]
+    display_probs = [
+        cum_probs[0],
+        cum_probs[1],
+        cum_probs[2],
+        cum_probs[3],
+        max(0.0, min(1.0, 1.0 - cum_probs[3])),
+    ]
 
     rows_html = ""
-    for i, (lbl, _a, _b) in enumerate(DRAFT_BUCKETS):
-        lbl_disp = display_bucket_label(lbl)
+    for i, lbl_disp in enumerate(display_labels):
         pct = 100.0 * display_probs[i]
         rows_html += (
             f'<div class="draft-odd-row">'
@@ -3123,7 +3120,7 @@ def build_draft_projection_html(
       <div class="panel draft-proj-panel">
         <h3>Statistical NBA Draft Projection</h3>
         <div class="draft-proj-main">{html.escape(proj_label)}</div>
-        <div class="draft-proj-sub">Drafted: {100.0 * drafted_prob:.1f}% | 1st Round: {100.0 * first_round_prob:.1f}%</div>
+        <div class="draft-proj-sub">Drafted: {100.0 * drafted_prob:.1f}% | Top 20: {100.0 * top20_prob:.1f}%</div>
         <div class="draft-odds-grid">
           {rows_html}
         </div>
