@@ -75,10 +75,22 @@ def main() -> None:
 
     for year in range(args.year_start, args.year_end + 1):
         # 1) Advstats CSV
-        csv_url = bart_url(args.bart_prefix, f"getadvstats.php?year={year}&csv=1")
+        adv_urls = [
+            bart_url(args.bart_prefix, f"getadvstats.php?year={year}&csv=1"),
+            bart_url(args.bart_prefix, f"getadvstats.php?year={year}"),
+            bart_url("", f"getadvstats.php?year={year}&csv=1"),
+        ]
         try:
-            text = fetch_text(csv_url)
-            h, rows = parse_advstats_text(text)
+            h: list[str] = []
+            rows: list[list[str]] = []
+            used_url = ""
+            for csv_url in adv_urls:
+                text = fetch_text(csv_url)
+                h_try, rows_try = parse_advstats_text(text)
+                if h_try and rows_try:
+                    h, rows = h_try, rows_try
+                    used_url = csv_url
+                    break
             if h and not adv_header:
                 adv_header = h + ["bt_fetch_year"]
             if h and not trank_header:
@@ -98,7 +110,10 @@ def main() -> None:
                     yw = csv.DictWriter(yf, fieldnames=trank_header)
                     yw.writeheader()
                     yw.writerows([{k: row.get(k, "") for k in trank_header} for row in year_rows])
-            print(f"[ok] advstats {year} rows={len(rows)}")
+            if rows:
+                print(f"[ok] advstats {year} rows={len(rows)} url={used_url}")
+            else:
+                print(f"[warn] advstats {year} empty across attempted URLs")
         except Exception as e:
             print(f"[warn] advstats {year} failed: {e}")
 

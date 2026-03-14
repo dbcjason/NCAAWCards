@@ -5,6 +5,7 @@ import argparse
 import csv
 import gzip
 import json
+from gzip import BadGzipFile
 from pathlib import Path
 from urllib.request import Request, urlopen
 
@@ -74,8 +75,13 @@ def main() -> None:
             print(f'[warn] no advgames payload for {year}')
             continue
 
+        text = ""
         if used and used.endswith('.gz'):
-            text = gzip.decompress(payload).decode('utf-8', errors='replace')
+            try:
+                text = gzip.decompress(payload).decode('utf-8', errors='replace')
+            except BadGzipFile:
+                # Some endpoints occasionally return plain text/HTML at .gz URL.
+                text = payload.decode('utf-8', errors='replace')
         else:
             text = payload.decode('utf-8', errors='replace')
 
@@ -84,8 +90,36 @@ def main() -> None:
         try:
             arr = json.loads(text)
         except Exception as e:
-            print(f'[warn] bad json year={year}: {e}')
-            continue
+            print(f'[warn] bad json year={year}: {e}; retrying alternate endpoint')
+            alt_urls = [
+                bart_url(args.bart_prefix, f'{year}_all_advgames.json'),
+                bart_url(args.bart_prefix, f'{year}_all_advgames.json.gz'),
+                bart_url('', f'{year}_all_advgames.json'),
+                bart_url('', f'{year}_all_advgames.json.gz'),
+            ]
+            arr = None
+            for au in alt_urls:
+                try:
+                    p2 = fetch_bytes(au)
+                    if au.endswith('.gz'):
+                        try:
+                            t2 = gzip.decompress(p2).decode('utf-8', errors='replace')
+                        except BadGzipFile:
+                            t2 = p2.decode('utf-8', errors='replace')
+                    else:
+                        t2 = p2.decode('utf-8', errors='replace')
+                    a2 = json.loads(t2)
+                    if isinstance(a2, list):
+                        text = t2
+                        arr = a2
+                        (raw_dir / f'{year}_all_advgames.json').write_text(text, encoding='utf-8')
+                        print(f'[ok] recovered year={year} from {au}')
+                        break
+                except Exception:
+                    continue
+            if not isinstance(arr, list):
+                print(f'[warn] skipping year={year}; no valid advgames JSON payload')
+                continue
 
         rows: list[dict[str, str]] = []
         for item in arr:
