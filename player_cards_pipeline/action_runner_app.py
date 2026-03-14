@@ -2,18 +2,20 @@
 from __future__ import annotations
 
 import json
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
+import csv
 
 import streamlit as st
 
 
 DEFAULT_WORKFLOW_FILE = "build_player_card.yml"
 DEFAULT_REF = "main"
+ROOT = Path(__file__).resolve().parent
 
 
 def _iso_now() -> str:
@@ -25,6 +27,49 @@ def _parse_iso(ts: str) -> datetime:
     if ts.endswith("Z"):
         ts = ts[:-1] + "+00:00"
     return datetime.fromisoformat(ts)
+
+
+def _norm_year(raw: str) -> str:
+    s = str(raw or "").strip()
+    if not s:
+        return ""
+    if "/" in s:
+        tail = s.split("/")[-1]
+        if len(tail) == 2 and tail.isdigit():
+            return f"20{tail}"
+    if "-" in s:
+        tail = s.split("-")[-1]
+        if len(tail) == 2 and tail.isdigit():
+            return f"20{tail}"
+    return s
+
+
+def load_team_player_index() -> dict[str, dict[str, list[str]]]:
+    files = [
+        ROOT / "data" / "bt" / "bt_advstats_2010_2025.csv",
+        ROOT / "data" / "bt" / "bt_advstats_2019_2025.csv",
+        ROOT / "data" / "bt" / "bt_advstats_2026.csv",
+        ROOT / "data" / "bt" / "bt_advstats_2010_2026.csv",
+    ]
+    idx: dict[str, dict[str, set[str]]] = {}
+    for p in files:
+        if not p.exists():
+            continue
+        with p.open("r", encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                y = _norm_year(row.get("year", ""))
+                if y not in {"2021", "2022", "2023", "2024", "2025", "2026"}:
+                    continue
+                team = (row.get("team") or "").strip()
+                player = (row.get("player_name") or "").strip()
+                if not team or not player:
+                    continue
+                idx.setdefault(y, {}).setdefault(team, set()).add(player)
+
+    out: dict[str, dict[str, list[str]]] = {}
+    for y, team_map in idx.items():
+        out[y] = {t: sorted(list(players)) for t, players in team_map.items()}
+    return out
 
 
 def github_api(
@@ -153,6 +198,22 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
     return [a for a in arts if isinstance(a, dict)]
 
 
+def run_progress(status: str, conclusion: str) -> tuple[int, str]:
+    s = (status or "").strip().lower()
+    c = (conclusion or "").strip().lower()
+    if s == "queued":
+        return 20, "Queued"
+    if s == "in_progress":
+        return 65, "Running"
+    if s == "completed":
+        if c == "success":
+            return 100, "Completed"
+        return 100, f"Completed ({conclusion or 'unknown'})"
+    if s:
+        return 35, s.replace("_", " ").title()
+    return 0, "Not started"
+
+
 def run_matches_request(run: dict[str, Any], year: str, player: str, after_ts: str | None) -> bool:
     title = str(run.get("display_title") or "")
     if year not in title and player.lower() not in title.lower():
@@ -193,11 +254,16 @@ GITHUB_REF = "main"
         )
         st.stop()
 
-    st.caption(f"Repo: {owner}/{repo} | Workflow: {workflow_file} | Ref: {ref}")
+    index = load_team_player_index()
+    years = [y for y in ["2021", "2022", "2023", "2024", "2025", "2026"] if y in index]
+    if not years:
+        years = ["2021", "2022", "2023", "2024", "2025", "2026"]
 
-    year = st.text_input("Season", value="2026")
-    player = st.text_input("Player", value="")
-    team = st.text_input("Team (optional)", value="")
+    year = st.selectbox("Season", years, index=len(years) - 1)
+    teams = sorted(index.get(year, {}).keys())
+    team = st.selectbox("Team", teams) if teams else st.selectbox("Team", [""])
+    players = index.get(year, {}).get(team, []) if team else []
+    player = st.selectbox("Player", players) if players else st.selectbox("Player", [""])
     output_filename = st.text_input("Output filename (optional)", value="")
     commit_to_repo = st.checkbox("Commit output HTML back to repo", value=False)
 
@@ -257,7 +323,6 @@ GITHUB_REF = "main"
             target_run = runs[0]
 
         run_id = int(target_run.get("id"))
-        html_url = str(target_run.get("html_url") or "")
         status = str(target_run.get("status") or "")
         conclusion = str(target_run.get("conclusion") or "")
 
@@ -266,8 +331,8 @@ GITHUB_REF = "main"
             st.caption(f"Requested: {st.session_state.last_player} ({st.session_state.last_year})")
         st.write(f"Run ID: `{run_id}`")
         st.write(f"Status: `{status}` | Conclusion: `{conclusion or 'N/A'}`")
-        if html_url:
-            st.markdown(f"[Open Run in GitHub]({html_url})")
+        pct, label = run_progress(status, conclusion)
+        st.progress(pct, text=f"Run Progress: {label} ({pct}%)")
 
         if status == "completed":
             arts = get_artifacts(owner, repo, token, run_id)
