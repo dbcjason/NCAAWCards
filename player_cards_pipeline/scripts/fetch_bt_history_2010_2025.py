@@ -32,6 +32,20 @@ def bart_url(prefix: str, path: str) -> str:
 
 
 def parse_advstats_text(text: str) -> tuple[list[str], list[list[str]]]:
+    raw = text.strip()
+    # Some Bart variants can return JSON arrays instead of CSV text.
+    if raw.startswith("["):
+        try:
+            arr = json.loads(raw)
+            if isinstance(arr, list):
+                rows: list[list[str]] = []
+                for item in arr:
+                    if isinstance(item, list):
+                        rows.append([str(v) if v is not None else "" for v in item])
+                if rows:
+                    return list(BT_ADV_HEADERS), rows
+        except Exception:
+            pass
     rows = [r for r in csv.reader(text.splitlines()) if r]
     if not rows:
         return [], []
@@ -97,7 +111,7 @@ def main() -> None:
                 trank_header = list(h)
                 if "trank_year" not in trank_header:
                     trank_header.append("trank_year")
-            if h:
+            if h and len(rows) >= 200:
                 year_rows: list[dict[str, str]] = []
                 for r in rows:
                     rr = r + [""] * max(0, len(h) - len(r))
@@ -110,10 +124,10 @@ def main() -> None:
                     yw = csv.DictWriter(yf, fieldnames=trank_header)
                     yw.writeheader()
                     yw.writerows([{k: row.get(k, "") for k in trank_header} for row in year_rows])
-            if rows:
+            if rows and len(rows) >= 200:
                 print(f"[ok] advstats {year} rows={len(rows)} url={used_url}")
             else:
-                print(f"[warn] advstats {year} empty across attempted URLs")
+                print(f"[warn] advstats {year} empty/invalid across attempted URLs")
         except Exception as e:
             print(f"[warn] advstats {year} failed: {e}")
 
