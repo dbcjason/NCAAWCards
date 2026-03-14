@@ -45,6 +45,7 @@ jobs:
             player_cards_pipeline/data/bt
             player_cards_pipeline/data/manual/bio
             player_cards_pipeline/data/manual/rsci
+            player_cards_pipeline/data/manual/wnba_draft
             player_cards_pipeline/data/manual/enriched_players/by_script_season
             player_cards_pipeline/data/manual/pbp_metrics
             player_cards_pipeline/data/manual/plays_by_year

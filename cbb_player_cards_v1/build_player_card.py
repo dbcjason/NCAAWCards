@@ -1558,6 +1558,28 @@ def rsci_rank_to_score(rank: int | None) -> float | None:
     return max(0.0, min(100.0, 101.0 - float(rank)))
 
 
+def load_wnba_draft_lookup(path: Path) -> dict[str, int]:
+    out: dict[str, int] = {}
+    if not path.exists():
+        return out
+    with path.open("r", encoding="utf-8-sig", newline="") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if not row or len(row) < 3:
+                continue
+            pick = parse_pick_number(row[0] if len(row) > 0 else "")
+            name = row[2] if len(row) > 2 else ""
+            if pick is None:
+                continue
+            key = norm_player_name(name)
+            if not key:
+                continue
+            prev = out.get(key)
+            if prev is None or pick < prev:
+                out[key] = pick
+    return out
+
+
 def build_advanced_html(
     target: PlayerGameStats,
     lebron_rows: list[dict[str, str]],
@@ -2720,6 +2742,7 @@ def build_draft_projection_html(
     bt_rows: list[dict[str, str]],
     bio_lookup: dict[tuple[str, str, str], dict[str, str]],
     rsci_map: dict[str, int],
+    wnba_draft_map: dict[str, int] | None = None,
 ) -> str:
     league_label = "WNBA" if ENRICHED_GENDER == "Women" else "NBA"
     model_tag = "wnba" if ENRICHED_GENDER == "Women" else "nba"
@@ -2855,7 +2878,11 @@ def build_draft_projection_html(
         if yi < 2010 or yi >= target_year:
             continue
 
-        pick = parse_pick_number(bt_get(r, ["pick"]))
+        pick: int | None = None
+        if ENRICHED_GENDER == "Women" and wnba_draft_map:
+            pick = wnba_draft_map.get(norm_player_name(bt_get(r, ["player_name"])))
+        if pick is None:
+            pick = parse_pick_number(bt_get(r, ["pick"]))
         age, hgt = row_age_height(r)
 
         vec: dict[str, float] = {}
@@ -4201,6 +4228,7 @@ def main() -> None:
     ap.add_argument("--advgames-csv", default="", help="Optional per-game labeled advgames CSV for BPM trend.")
     ap.add_argument("--pbp-metrics-csv", default="", help="Optional player metrics CSV derived from ncaahoopR pbp logs.")
     ap.add_argument("--rsci-csv", default="", help="Optional RSCI rankings CSV path.")
+    ap.add_argument("--wnba-draft-csv", default="", help="Optional WNBA draft CSV path (pick in col 1, player in col 3).")
     ap.add_argument("--gender", default="Women", help="Enriched dataset gender token: Women or Men.")
     ap.add_argument("--bt-playerstat-json", default="", help="Optional Bart playerstat JSON file path or URL.")
     ap.add_argument(
@@ -4257,6 +4285,25 @@ def main() -> None:
     # NCAAW cards currently do not use RSCI.
     rsci_map: dict[str, int] = {}
     stage("Skipped RSCI for NCAAW")
+    wnba_draft_map: dict[str, int] = {}
+    if ENRICHED_GENDER == "Women":
+        draft_csv = args.wnba_draft_csv.strip()
+        if not draft_csv:
+            default_draft_csv = (
+                Path(__file__).resolve().parent.parent
+                / "player_cards_pipeline"
+                / "data"
+                / "manual"
+                / "wnba_draft"
+                / "wnba_draft.csv"
+            )
+            if default_draft_csv.exists():
+                draft_csv = str(default_draft_csv)
+        if draft_csv:
+            try:
+                wnba_draft_map = load_wnba_draft_lookup(Path(draft_csv))
+            except Exception:
+                wnba_draft_map = {}
 
     if bt_rows:
         inject_enriched_fields_into_bt_rows(bt_rows)
@@ -4368,7 +4415,7 @@ def main() -> None:
         team_impact_html = build_team_impact_html(target, bt_rows)
         shot_diet_html = build_shot_diet_html(target, bt_rows)
         player_comparisons_html = build_player_comparisons_html(target, bt_rows, bio_lookup, top_n=5)
-        draft_projection_html = build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map)
+        draft_projection_html = build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map, wnba_draft_map)
         act_pps, exp_pps, pps_oe, pps_oe_pct = pps_over_expected_from_enriched(target)
         if pps_oe is not None:
             if pps_oe_pct is not None:
