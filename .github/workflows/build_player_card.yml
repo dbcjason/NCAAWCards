@@ -97,7 +97,18 @@ jobs:
 
           bt = cfg.get('bt_advstats_csv', '').strip()
           if bt:
-              env_lines.append(f"BT_CSV={resolve_from_repo(bt)}")
+              bt_path = Path(resolve_from_repo(bt))
+              if not bt_path.exists():
+                  candidates = [
+                      root / 'player_cards_pipeline' / 'data' / 'bt' / 'bt_advstats_2010_2025.csv',
+                      root / 'player_cards_pipeline' / 'data' / 'bt' / 'bt_advstats_2019_2025.csv',
+                      root / 'player_cards_pipeline' / 'data' / 'bt' / 'bt_advstats_2026.csv',
+                  ]
+                  for c in candidates:
+                      if c.exists():
+                          bt_path = c
+                          break
+              env_lines.append(f"BT_CSV={str(bt_path)}")
 
           adv = adv_map.get(year, '').strip()
           if adv:
