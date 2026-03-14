@@ -3035,8 +3035,16 @@ def build_draft_projection_html(
         c for c in candidates_raw
         if c["pick"] is not None and int(c["bucket"]) < drafted_bucket_count and c.get("score") is not None
     ]
-    if len(drafted_candidates) < 350:
-        return f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3><div class="shot-meta">Not enough drafted history to build projection.</div></div>'
+    min_drafted_required = 350
+    if ENRICHED_GENDER == "Women":
+        # WNBA historical draft sample is much smaller than NBA.
+        min_drafted_required = 30
+    if len(drafted_candidates) < min_drafted_required:
+        return (
+            f'<div class="panel"><h3>Statistical {league_label} Draft Projection</h3>'
+            f'<div class="shot-meta">Not enough drafted history to build projection '
+            f'({len(drafted_candidates)} found; need {min_drafted_required}).</div></div>'
+        )
 
     # Step 1: drafted-only comps for conditional pick-range distribution.
     drafted_candidates.sort(key=lambda c: abs(float(c["score"]) - float(target_score)))
