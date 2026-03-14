@@ -125,6 +125,11 @@ def norm_text(v: Any) -> str:
 def norm_team(v: Any) -> str:
     s = norm_text(v)
     s = re.sub(r"[^a-z0-9]+", "", s)
+    aliases = {
+        "connecticut": "uconn",
+        "universityofconnecticut": "uconn",
+    }
+    s = aliases.get(s, s)
     return s
 
 
