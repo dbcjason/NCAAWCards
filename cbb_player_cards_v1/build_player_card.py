@@ -61,6 +61,10 @@ def enriched_gender_token(raw: str) -> str:
     return "Men"
 
 
+def enriched_gender_candidates(raw: str) -> list[str]:
+    return [enriched_gender_token(raw)]
+
+
 @dataclass
 class PlayerGameStats:
     player: str
@@ -293,17 +297,20 @@ def load_enriched_lookup_for_script_season(
         return {}
 
     year = int(ys)
-    g = enriched_gender_token(ENRICHED_GENDER)
-    preferred = base_dir / f"players_all_{g}_scriptSeason_{year}_fromJsonYear_{year-1}.json"
-    candidates: list[Path] = [preferred] if preferred.exists() else sorted(
-        base_dir.glob(f"players_all_{g}_scriptSeason_{year}_fromJsonYear_*.json")
-    )
-    if not candidates:
-        return {}
-
-    try:
-        obj = json.loads(candidates[0].read_text(encoding="utf-8"))
-    except Exception:
+    obj = None
+    for g in enriched_gender_candidates(ENRICHED_GENDER):
+        preferred = base_dir / f"players_all_{g}_scriptSeason_{year}_fromJsonYear_{year-1}.json"
+        candidates: list[Path] = [preferred] if preferred.exists() else sorted(
+            base_dir.glob(f"players_all_{g}_scriptSeason_{year}_fromJsonYear_*.json")
+        )
+        if not candidates:
+            continue
+        try:
+            obj = json.loads(candidates[0].read_text(encoding="utf-8"))
+            break
+        except Exception:
+            continue
+    if obj is None:
         return {}
     players = obj.get("players", []) if isinstance(obj, dict) else []
     out: dict[tuple[str, str, str], dict[str, Any]] = {}
@@ -337,16 +344,20 @@ def load_enriched_players_for_script_season(
     if not base_dir.exists():
         return []
     year = int(ys)
-    g = enriched_gender_token(ENRICHED_GENDER)
-    preferred = base_dir / f"players_all_{g}_scriptSeason_{year}_fromJsonYear_{year-1}.json"
-    candidates: list[Path] = [preferred] if preferred.exists() else sorted(
-        base_dir.glob(f"players_all_{g}_scriptSeason_{year}_fromJsonYear_*.json")
-    )
-    if not candidates:
-        return []
-    try:
-        obj = json.loads(candidates[0].read_text(encoding="utf-8"))
-    except Exception:
+    obj = None
+    for g in enriched_gender_candidates(ENRICHED_GENDER):
+        preferred = base_dir / f"players_all_{g}_scriptSeason_{year}_fromJsonYear_{year-1}.json"
+        candidates: list[Path] = [preferred] if preferred.exists() else sorted(
+            base_dir.glob(f"players_all_{g}_scriptSeason_{year}_fromJsonYear_*.json")
+        )
+        if not candidates:
+            continue
+        try:
+            obj = json.loads(candidates[0].read_text(encoding="utf-8"))
+            break
+        except Exception:
+            continue
+    if obj is None:
         return []
     players = obj.get("players", []) if isinstance(obj, dict) else []
     return [r for r in players if isinstance(r, dict)]
@@ -3434,7 +3445,6 @@ def bt_per_game_overrides(target: PlayerGameStats, bt_rows: list[dict[str, str]]
 def render_card(
     stats: PlayerGameStats,
     bio: dict[str, str],
-    rsci_display: str,
     shots: list[dict[str, Any]],
     season_shots: list[dict[str, Any]],
     per_game_pcts: dict[str, float | None],
@@ -3462,7 +3472,7 @@ def render_card(
         age = bio.get("age", "") or "N/A"
     height = format_height(bio.get("height", ""))
     position = bio.get("position", "") or "N/A"
-    subtitle = f"{team} | {season} | Position: {position} | Age: {age} | Height: {height} | RSCI: {rsci_display}"
+    subtitle = f"{team} | {season} | Position: {position} | Age: {age} | Height: {height}"
 
     # Use full event-derived FG totals for header stats, not only plotted (x/y) shots.
     shot_makes = shot_header_makes if shot_header_makes is not None else stats.fgm
@@ -4255,16 +4265,9 @@ def main() -> None:
         _, pbp_rows = read_csv_rows(Path(args.pbp_metrics_csv))
     stage("Loaded optional CSV inputs")
 
-    rsci_csv_path = Path(args.rsci_csv) if args.rsci_csv else (
-        Path(__file__).resolve().parent.parent
-        / "player_cards_pipeline"
-        / "data"
-        / "manual"
-        / "rsci"
-        / "rsci_rankings.csv"
-    )
-    rsci_map = load_rsci_rankings(rsci_csv_path) if rsci_csv_path.exists() else {}
-    stage("Loaded RSCI rankings")
+    # NCAAW cards currently do not use RSCI.
+    rsci_map: dict[str, int] = {}
+    stage("Skipped RSCI for NCAAW")
 
     if bt_rows:
         inject_enriched_fields_into_bt_rows(bt_rows)
@@ -4300,6 +4303,10 @@ def main() -> None:
             bio["height"] = bt_get(target_bt_row, ["ht"])
         if not (bio.get("dob", "") or "").strip():
             bio["dob"] = bt_get(target_bt_row, ["dob"])
+        if not (bio.get("age", "") or "").strip():
+            bt_age = bt_num(target_bt_row, ["DD Age", " DD Age", "Age", " age", "age"])
+            if bt_age is not None and math.isfinite(bt_age):
+                bio["age"] = f"{float(bt_age):.1f}"
     if not (bio.get("height", "") or "").strip() and target_bt_row:
         inches = bt_num(target_bt_row, ["inches", " inches"])
         if inches is not None and math.isfinite(inches):
@@ -4419,13 +4426,10 @@ def main() -> None:
             season_shots = enr_shots
             bt_fgm, bt_fga = enr_makes, enr_att
 
-    rsci_rank = find_rsci_rank(target.player, rsci_map)
-    rsci_display = ordinal(int(rsci_rank)) if rsci_rank is not None else "Unranked"
-    stage("Computed percentiles and RSCI")
+    stage("Computed percentiles")
     render_card(
         target,
         bio,
-        rsci_display,
         shots,
         season_shots,
         per_game_pcts,
