@@ -189,7 +189,9 @@ jobs:
 
           out = Path("${OUT_HTML}")
           if not out.exists():
-              raise SystemExit("Output HTML not found for summary link")
+              summary = Path("${GITHUB_STEP_SUMMARY}")
+              summary.open("a", encoding="utf-8").write("\n### HTML Preview Link\nOutput HTML not found; run likely failed before render.\n")
+              raise SystemExit(0)
 
           b = out.read_bytes()
           max_bytes = 800_000
