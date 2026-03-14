@@ -3395,7 +3395,20 @@ def build_player_comparisons_html(
             continue
         ranked.append((s, r))
     ranked.sort(key=lambda x: x[0], reverse=True)
-    top = ranked[:top_n]
+    # Deduplicate by player+season so the same season does not appear multiple times
+    # for a single player in comps (different seasons are still allowed).
+    deduped: list[tuple[float, dict[str, str]]] = []
+    seen_ps: set[tuple[str, str]] = set()
+    for score, row in ranked:
+        key = (
+            norm_player_name(bt_get(row, ["player_name"])),
+            norm_season(bt_get(row, ["year"])),
+        )
+        if key in seen_ps:
+            continue
+        seen_ps.add(key)
+        deduped.append((score, row))
+    top = deduped[:top_n]
     if not top:
         return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">No comparable players found.</div></div>'
 
