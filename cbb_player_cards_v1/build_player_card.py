@@ -2943,6 +2943,36 @@ def build_draft_projection_html(
             w = max(0.0, 0.35 * c_d + 0.65 * c_p)
             if math.isfinite(w) and w > 0.0:
                 learned_weights[fk] = w
+        # Fallback for cohorts where directional correlations wash out (common in smaller/noisier samples):
+        # use absolute-signal weighting so we still learn a usable feature set.
+        if not learned_weights:
+            for fk in all_feature_keys:
+                xs_d = []
+                ys_d = []
+                xs_p = []
+                ys_p = []
+                for c in candidates_raw:
+                    v = c["comps"].get(fk)
+                    if v is None or not math.isfinite(v):
+                        continue
+                    picked = c["pick"] is not None
+                    xs_d.append(float(v))
+                    ys_d.append(1.0 if picked else 0.0)
+                    if picked:
+                        pnum = int(c["pick"])
+                        xs_p.append(float(v))
+                        ys_p.append((61.0 - float(pnum)) / 60.0)
+                c_d = abs(corr(xs_d, ys_d))
+                c_p = abs(corr(xs_p, ys_p))
+                w = 0.35 * c_d + 0.65 * c_p
+                if math.isfinite(w) and w > 0.0:
+                    learned_weights[fk] = w
+        # Last-resort deterministic prior so projection still runs.
+        if not learned_weights:
+            for fk in metric_keys:
+                learned_weights[fk] = 1.0
+            learned_weights["height"] = 0.8
+            learned_weights["rsci"] = 0.9
         if learned_weights:
             try:
                 model_path.parent.mkdir(parents=True, exist_ok=True)
