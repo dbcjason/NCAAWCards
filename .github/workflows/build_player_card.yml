@@ -89,7 +89,9 @@ jobs:
           env_lines.append(f"YEAR={year}")
           plays = plays_map.get(year, '').strip()
           if plays:
-              env_lines.append(f"PLAYS_CSV={resolve_from_repo(plays)}")
+              plays_path = Path(resolve_from_repo(plays))
+              if plays_path.exists():
+                  env_lines.append(f"PLAYS_CSV={str(plays_path)}")
 
           bio = cfg.get('bio_csv', '').strip()
           if bio:
@@ -141,7 +143,7 @@ jobs:
 
       - name: Expand gz plays (if needed)
         run: |
-          if [[ -n "${PLAYS_CSV:-}" && "$PLAYS_CSV" == *.gz ]]; then
+          if [[ -n "${PLAYS_CSV:-}" && -f "$PLAYS_CSV" && "$PLAYS_CSV" == *.gz ]]; then
             OUT="${RUNNER_TEMP}/plays_unzipped.csv"
             gunzip -c "$PLAYS_CSV" > "$OUT"
             echo "PLAYS_CSV=$OUT" >> "$GITHUB_ENV"
