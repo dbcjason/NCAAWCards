@@ -159,6 +159,11 @@ def norm_player_name(v: Any) -> str:
     return " ".join(parts)
 
 
+def norm_player_key(v: Any) -> str:
+    # Punctuation-insensitive matching key (e.g., Ta'Niya == TaNiya).
+    return re.sub(r"[^a-z0-9]+", "", norm_player_name(v))
+
+
 def card_cache_key(player: str, team: str, season: str) -> str:
     return f"{norm_player_name(player)}|{norm_team(team)}|{norm_season(season)}"
 
@@ -702,7 +707,7 @@ def load_bio_lookup(path: Path) -> dict[tuple[str, str, str], dict[str, str]]:
 
 
 def key_player_team_season(player: str, team: str, season: str) -> tuple[str, str, str]:
-    return norm_player_name(player), norm_team(team), norm_season(season)
+    return norm_player_key(player), norm_team(team), norm_season(season)
 
 
 def lookup_bio_fallback(
@@ -714,7 +719,7 @@ def lookup_bio_fallback(
     exact = bio_lookup.get(key_player_team_season(player, team, season))
     if exact:
         return exact
-    np = norm_player_name(player)
+    np = norm_player_key(player)
     ns = norm_season(season)
     nt = norm_team(team)
     candidates: list[tuple[float, dict[str, str]]] = []
@@ -1451,7 +1456,7 @@ def load_rsci_rankings(path: Path) -> dict[str, int]:
 
 
 def _name_key_compact(v: str) -> str:
-    return re.sub(r"[^a-z0-9]+", "", norm_player_name(v))
+    return norm_player_key(v)
 
 
 def _name_tokens(v: str) -> list[str]:
@@ -1697,13 +1702,13 @@ def bt_num_priority(row: dict[str, str], aliases: list[str]) -> float | None:
 
 
 def bt_find_target_row(rows: list[dict[str, str]], target: PlayerGameStats) -> dict[str, str] | None:
-    np = norm_text(target.player)
+    np = norm_player_key(target.player)
     nt = norm_team(target.team)
     ny = norm_text(target.season)
 
     by_name_year = []
     for r in rows:
-        rp = norm_text(bt_get(r, ["player_name"]))
+        rp = norm_player_key(bt_get(r, ["player_name"]))
         rt = norm_team(bt_get(r, ["team"]))
         ry = norm_text(bt_get(r, ["year"]))
         if rp == np and ry == ny:
@@ -1768,11 +1773,11 @@ def bt_position_filtered_cohort(
 
 
 def pbp_find_target_row(rows: list[dict[str, str]], target: PlayerGameStats) -> dict[str, str] | None:
-    np = norm_text(target.player)
+    np = norm_player_key(target.player)
     nt = norm_team(target.team)
     ny = norm_text(target.season)
     for r in rows:
-        rp = norm_text(r.get("player", ""))
+        rp = norm_player_key(r.get("player", ""))
         rt = norm_team(r.get("team", ""))
         ry = norm_text(r.get("season", ""))
         if rp == np and rt == nt and ry == ny:
@@ -1881,12 +1886,12 @@ def find_bt_playerstat_row(
     player: str,
     team: str,
 ) -> dict[str, Any] | None:
-    np = norm_player_name(player)
+    np = norm_player_key(player)
     nt = norm_team(team)
-    exact = [r for r in rows if norm_player_name(r.get("player", "")) == np and norm_team(r.get("team", "")) == nt]
+    exact = [r for r in rows if norm_player_key(r.get("player", "")) == np and norm_team(r.get("team", "")) == nt]
     if exact:
         return exact[0]
-    by_name = [r for r in rows if norm_player_name(r.get("player", "")) == np]
+    by_name = [r for r in rows if norm_player_key(r.get("player", "")) == np]
     if not by_name:
         return None
     if len(by_name) == 1:
@@ -4103,11 +4108,11 @@ def choose_player(
     team: str | None,
     season: str | None,
 ) -> PlayerGameStats:
-    np = norm_player_name(player)
+    np = norm_player_key(player)
     nt = norm_team(team or "")
     ns = norm_season(season or "")
 
-    candidates = [p for p in players if norm_player_name(p.player) == np]
+    candidates = [p for p in players if norm_player_key(p.player) == np]
     if nt:
         candidates = [
             p
