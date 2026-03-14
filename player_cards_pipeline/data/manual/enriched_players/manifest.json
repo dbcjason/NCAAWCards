@@ -1,19 +1,93 @@
 [
   {
-    "json_year": "2025",
-    "script_season": 2026,
+    "json_year": "2018",
+    "script_season": 2019,
     "tiers_included": [
-      "Low",
-      "Medium",
       "High"
     ],
     "source_files": [
-      "players_all_Women_2025_Low.json",
-      "players_all_Women_2025_Medium.json",
-      "players_all_Women_2025_High.json"
+      "players_all_Women_2018_High.json"
     ],
-    "players_count": 2918,
-    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2025_combined.json",
-    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2026_fromJsonYear_2025.json"
+    "players_count": 618,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2018_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2019_fromJsonYear_2018.json"
+  },
+  {
+    "json_year": "2019",
+    "script_season": 2020,
+    "tiers_included": [
+      "High"
+    ],
+    "source_files": [
+      "players_all_Women_2019_High.json"
+    ],
+    "players_count": 606,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2019_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2020_fromJsonYear_2019.json"
+  },
+  {
+    "json_year": "2020",
+    "script_season": 2021,
+    "tiers_included": [
+      "High"
+    ],
+    "source_files": [
+      "players_all_Women_2020_High.json"
+    ],
+    "players_count": 525,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2020_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2021_fromJsonYear_2020.json"
+  },
+  {
+    "json_year": "2021",
+    "script_season": 2022,
+    "tiers_included": [
+      "High"
+    ],
+    "source_files": [
+      "players_all_Women_2021_High.json"
+    ],
+    "players_count": 750,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2021_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2022_fromJsonYear_2021.json"
+  },
+  {
+    "json_year": "2022",
+    "script_season": 2023,
+    "tiers_included": [
+      "High"
+    ],
+    "source_files": [
+      "players_all_Women_2022_High.json"
+    ],
+    "players_count": 752,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2022_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2023_fromJsonYear_2022.json"
+  },
+  {
+    "json_year": "2023",
+    "script_season": 2024,
+    "tiers_included": [
+      "High"
+    ],
+    "source_files": [
+      "players_all_Women_2023_High.json"
+    ],
+    "players_count": 710,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2023_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2024_fromJsonYear_2023.json"
+  },
+  {
+    "json_year": "2024",
+    "script_season": 2025,
+    "tiers_included": [
+      "High"
+    ],
+    "source_files": [
+      "players_all_Women_2024_High.json"
+    ],
+    "players_count": 855,
+    "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2024_combined.json",
+    "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2025_fromJsonYear_2024.json"
   }
 ]
