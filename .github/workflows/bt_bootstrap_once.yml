@@ -1,0 +1,57 @@
+name: Bootstrap NCAAW Bart History (Run Once)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  bootstrap-bt:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Fetch Bart advstats + playerstat (2010-2025)
+        run: |
+          python3 player_cards_pipeline/scripts/fetch_bt_history_2010_2025.py \
+            --year-start 2010 \
+            --year-end 2025 \
+            --out-dir player_cards_pipeline \
+            --bart-prefix ncaaw
+
+      - name: Fetch Bart all_advgames (2010-2026)
+        run: |
+          python3 player_cards_pipeline/scripts/fetch_bt_advgames_by_year.py \
+            --year-start 2010 \
+            --year-end 2026 \
+            --out-dir player_cards_pipeline/data/bt \
+            --bart-prefix ncaaw
+
+      - name: Build 2010-2026 advstats file
+        run: |
+          python3 player_cards_pipeline/scripts/refresh_bart_2026_daily.py --project-root . --bart-prefix ncaaw
+
+      - name: Build self-creation cache (2010-2025)
+        run: |
+          python3 player_cards_pipeline/scripts/build_self_creation_cache.py \
+            --project-root "." \
+            --years 2010-2025
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add player_cards_pipeline/data/bt/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Bootstrap NCAAW Bart history datasets"
+          git push

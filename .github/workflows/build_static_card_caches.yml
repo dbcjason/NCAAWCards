@@ -1,0 +1,57 @@
+name: Build NCAAW Static Card Caches
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Years to cache (e.g. 2019-2025 or 2025,2026)"
+        required: true
+        default: "2019-2025"
+      min_games:
+        description: "Min games threshold used for per-game percentiles"
+        required: true
+        default: "5"
+
+jobs:
+  build-caches:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas
+
+      - name: Build cache sqlite files
+        run: |
+          python3 player_cards_pipeline/scripts/build_year_cache.py \
+            --project-root "." \
+            --years "${{ github.event.inputs.years }}" \
+            --min-games "${{ github.event.inputs.min_games }}" \
+            --gender "Women"
+
+      - name: Commit and push caches
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add player_cards_pipeline/data/cache/card_sections/ || true
+          if git diff --cached --quiet; then
+            echo "No cache changes to commit"
+            exit 0
+          fi
+          git commit -m "Build NCAAW card caches for years: ${{ github.event.inputs.years }}"
+          git push origin main

@@ -1,0 +1,186 @@
+name: Build NCAAW Player Card
+
+on:
+  workflow_dispatch:
+    inputs:
+      year:
+        description: "Season year (e.g. 2025)"
+        required: true
+        type: string
+      player:
+        description: "Player name (exact preferred)"
+        required: true
+        type: string
+      team:
+        description: "Team name (optional, helps disambiguate)"
+        required: false
+        type: string
+      output_filename:
+        description: "Output HTML file name (optional)"
+        required: false
+        default: ""
+        type: string
+      commit_to_repo:
+        description: "Commit generated card back to repo"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  build-card:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout (sparse)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github/workflows
+            cbb_player_cards_v1
+            player_cards_pipeline/config
+            player_cards_pipeline/data/bt
+            player_cards_pipeline/data/manual/bio
+            player_cards_pipeline/data/manual/rsci
+            player_cards_pipeline/data/manual/enriched_players/by_script_season
+            player_cards_pipeline/data/manual/pbp_metrics
+            player_cards_pipeline/data/manual/plays_by_year
+            cbbd_seasons/2024-2025/tables
+            cbbd_seasons/2025-2026/tables
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve config paths
+        id: cfg
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          root = Path('.').resolve()
+          cfg_path = root / 'player_cards_pipeline' / 'config' / 'settings.json'
+          cfg = json.loads(cfg_path.read_text(encoding='utf-8'))
+
+          year = '${{ github.event.inputs.year }}'.strip()
+          if not year:
+              raise SystemExit('Missing input: year')
+
+          def resolve_from_repo(value: str) -> str:
+              p = (root / 'player_cards_pipeline' / value).resolve()
+              return str(p)
+          
+          def resolve_path(value: str) -> str:
+              p = Path(value)
+              if p.is_absolute():
+                  return str(p)
+              return resolve_from_repo(value)
+
+          plays_map = cfg.get('plays_csv_by_year', {})
+          adv_map = cfg.get('advgames_csv_by_year', {})
+          pbp_map = cfg.get('pbp_metrics_csv_by_year', {})
+
+          env_lines = []
+          env_lines.append(f"YEAR={year}")
+          plays = plays_map.get(year, '').strip()
+          if plays:
+              env_lines.append(f"PLAYS_CSV={resolve_from_repo(plays)}")
+
+          bio = cfg.get('bio_csv', '').strip()
+          if bio:
+              env_lines.append(f"BIO_CSV={resolve_path(bio)}")
+
+          bt = cfg.get('bt_advstats_csv', '').strip()
+          if bt:
+              env_lines.append(f"BT_CSV={resolve_from_repo(bt)}")
+
+          adv = adv_map.get(year, '').strip()
+          if adv:
+              env_lines.append(f"ADVGAMES_CSV={resolve_from_repo(adv)}")
+
+          pbp = pbp_map.get(year, '').strip()
+          if pbp:
+              env_lines.append(f"PBP_METRICS_CSV={resolve_from_repo(pbp)}")
+
+          bt_ps_tpl = cfg.get('bt_playerstat_url_template', 'https://barttorvik.com/{year}_pbp_playerstat_array.json')
+          env_lines.append(f"BT_PLAYERSTAT_URL_TEMPLATE={bt_ps_tpl}")
+
+          out_name = '${{ github.event.inputs.output_filename }}'.strip()
+          if not out_name:
+              safe_player = ''.join(ch.lower() if ch.isalnum() else '_' for ch in '${{ github.event.inputs.player }}').strip('_')
+              out_name = f"{safe_player}_{year}.html"
+          out_path = root / 'player_cards_pipeline' / 'output' / out_name
+          out_path.parent.mkdir(parents=True, exist_ok=True)
+          env_lines.append(f"OUT_HTML={str(out_path)}")
+
+          env_file = Path('${{ github.env }}')
+          with env_file.open('a', encoding='utf-8') as f:
+              for line in env_lines:
+                  f.write(line + '\n')
+          PY
+
+      - name: Validate required files
+        run: |
+          test -f "$BT_CSV" || (echo "Missing BT CSV: $BT_CSV" && exit 1)
+
+      - name: Expand gz plays (if needed)
+        run: |
+          if [[ -n "${PLAYS_CSV:-}" && "$PLAYS_CSV" == *.gz ]]; then
+            OUT="${RUNNER_TEMP}/plays_unzipped.csv"
+            gunzip -c "$PLAYS_CSV" > "$OUT"
+            echo "PLAYS_CSV=$OUT" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build card
+        run: |
+          CMD=(python3 cbb_player_cards_v1/build_player_card.py \
+            --player "${{ github.event.inputs.player }}" \
+            --season "$YEAR" \
+            --gender "Women" \
+            --bt-csv "$BT_CSV" \
+            --bt-playerstat-url-template "$BT_PLAYERSTAT_URL_TEMPLATE" \
+            --out-html "$OUT_HTML")
+
+          if [ -n "${PLAYS_CSV:-}" ] && [ -f "$PLAYS_CSV" ]; then
+            CMD+=(--plays-csv "$PLAYS_CSV")
+          fi
+
+          if [ -n "${{ github.event.inputs.team }}" ]; then
+            CMD+=(--team "${{ github.event.inputs.team }}")
+          fi
+          if [ -n "${BIO_CSV:-}" ] && [ -f "$BIO_CSV" ]; then
+            CMD+=(--bio-csv "$BIO_CSV")
+          fi
+          if [ -n "${ADVGAMES_CSV:-}" ] && [ -f "$ADVGAMES_CSV" ]; then
+            CMD+=(--advgames-csv "$ADVGAMES_CSV")
+          fi
+          if [ -n "${PBP_METRICS_CSV:-}" ] && [ -f "$PBP_METRICS_CSV" ]; then
+            CMD+=(--pbp-metrics-csv "$PBP_METRICS_CSV")
+          fi
+
+          echo "Running: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Upload card artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: player-card-${{ github.event.inputs.player }}-${{ github.event.inputs.year }}
+          path: ${{ env.OUT_HTML }}
+
+      - name: Commit output to repo
+        if: ${{ github.event.inputs.commit_to_repo == 'true' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$OUT_HTML"
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Build player card: ${{ github.event.inputs.player }} (${{ github.event.inputs.year }})"
+          git push

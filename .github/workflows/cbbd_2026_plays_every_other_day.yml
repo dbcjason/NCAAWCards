@@ -1,0 +1,73 @@
+name: Refresh 2026 NCAAW Bart + Enriched (Daily 4AM ET)
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Two UTC windows to hit 4AM ET in both EST and EDT.
+    - cron: '5 8 * * *'
+    - cron: '5 9 * * *'
+
+concurrency:
+  group: refresh-2026-data-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  refresh-data:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas
+
+      - name: Refresh Bart 2026 datasets
+        run: |
+          python3 player_cards_pipeline/scripts/refresh_bart_2026_daily.py \
+            --project-root "." \
+            --bart-prefix "ncaaw"
+
+      - name: Refresh enriched players for script season 2026
+        run: |
+          CMD=(python3 player_cards_pipeline/scripts/refresh_enriched_2026_daily.py \
+            --project-root "." \
+            --gender "Women" \
+            --json-year "2025" \
+            --script-season "2026")
+          if [ -n "${{ secrets.ENRICHED_WOMEN_ZIP_URL }}" ]; then
+            CMD+=(--dropbox-url "${{ secrets.ENRICHED_WOMEN_ZIP_URL }}")
+          fi
+          "${CMD[@]}"
+
+      - name: Rebuild self-creation cache (2026)
+        run: |
+          python3 player_cards_pipeline/scripts/build_self_creation_cache.py \
+            --project-root "." \
+            --years 2026
+
+      - name: Commit and push updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add player_cards_pipeline/data/bt/ || true
+          git add player_cards_pipeline/data/manual/enriched_players/ || true
+          git add player_cards_pipeline/data/bt/self_creation_by_year/ || true
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Refresh 2026 NCAAW Bart + enriched datasets"
+          git pull --rebase origin main
+          git push origin main || (git pull --rebase origin main && git push origin main)

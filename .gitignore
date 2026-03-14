@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Mac
+.DS_Store
+
+# Generated outputs
+player_cards_pipeline/output/*.html
+
+# Large manual/raw datasets (keep local but don't push by default)
+cbbd_seasons/
+!cbbd_seasons/2025-2026/
+cbbd_seasons/2025-2026/raw/
+!cbbd_seasons/2025-2026/tables/
+!cbbd_seasons/2025-2026/tables/**
+!cbbd_seasons/2025-2026/manifest/
+!cbbd_seasons/2025-2026/manifest/**
+
+cbb_player_cards_v1/output/
+
+player_cards_pipeline/output/
+
+player_cards_pipeline/data/bt/
+player_cards_pipeline/data/manual/plays_by_year/
+player_cards_pipeline/data/manual/pbp_metrics/
+player_cards_pipeline/data/manual/enriched_players/by_json_year/
+player_cards_pipeline/data/manual/enriched_players/by_script_season/
+player_cards_pipeline/data/manual/enriched_players/dropbox_2025_source/
+player_cards_pipeline/data/cache/
