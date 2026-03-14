@@ -40,13 +40,6 @@ jobs:
             --out-dir player_cards_pipeline/data/bt \
             --bart-prefix ncaaw
 
-      - name: Build self-creation cache (2019-2025)
-        run: |
-          python3 player_cards_pipeline/scripts/build_self_creation_cache.py \
-            --project-root "." \
-            --bt-csv "player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv" \
-            --years 2019-2025
-
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"

@@ -51,19 +51,12 @@ jobs:
           fi
           "${CMD[@]}"
 
-      - name: Rebuild self-creation cache (2026)
-        run: |
-          python3 player_cards_pipeline/scripts/build_self_creation_cache.py \
-            --project-root "." \
-            --years 2026
-
       - name: Commit and push updates
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add player_cards_pipeline/data/bt/ || true
           git add player_cards_pipeline/data/manual/enriched_players/ || true
-          git add player_cards_pipeline/data/bt/self_creation_by_year/ || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
