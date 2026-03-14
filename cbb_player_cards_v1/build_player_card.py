@@ -2297,9 +2297,13 @@ def bt_category_percentile(
 
 
 def build_grade_boxes_html(target: PlayerGameStats, bt_rows: list[dict[str, str]]) -> str:
+    scoring_keys = ["usg", "ts_per", "twop_per", "dunksmade", "rim_pct", "mid_pct", "tp_per", "threepa100", "ft_per", "ftr"]
+    if ENRICHED_GENDER == "Women":
+        scoring_keys = [k for k in scoring_keys if k != "dunksmade"]
+
     categories: list[tuple[str, list[str]]] = [
         ("Impact", ["bpm", "rapm", "net_pts", "onoff_net_rating"]),
-        ("Scoring", ["usg", "ts_per", "twop_per", "dunksmade", "rim_pct", "mid_pct", "tp_per", "threepa100", "ft_per", "ftr"]),
+        ("Scoring", scoring_keys),
         ("Playmaking", ["ast_per", "to_per", "ast_tov", "rim_assists_100_btposs"]),
         ("Defense", ["stl_per", "blk_per", "dbpm"]),
         ("Rebounding", ["orb_per", "drb_per"]),
@@ -2386,6 +2390,8 @@ def build_bt_percentile_html(
             ("DREB%", "drb_per", True, 1),
         ],
     }
+    if ENRICHED_GENDER == "Women":
+        sections["Scoring"] = [row for row in sections["Scoring"] if row[1] != "dunks_100_bt"]
 
     def section_rows(rows: list[tuple[str, str, bool, int]]) -> str:
         rows_html = ""
@@ -2494,6 +2500,8 @@ def build_self_creation_html(
         ("UAsst'd 3PM/100", "unassisted_3pm_100"),
         ("Unassisted Pts/100", "unassisted_points_100"),
     ]
+    if ENRICHED_GENDER == "Women":
+        specs = [row for row in specs if row[1] != "unassisted_dunks_100"]
     for label, key in specs:
         value = target_metrics.get(key)
         cohort = metric_vals.get(key, [])
