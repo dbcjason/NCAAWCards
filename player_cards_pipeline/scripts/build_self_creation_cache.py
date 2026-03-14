@@ -130,8 +130,8 @@ def parse_years(spec: str) -> list[int]:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Build cached self-creation per-100 metrics by year.")
     ap.add_argument("--project-root", default=".")
-    ap.add_argument("--years", default="2010-2025")
-    ap.add_argument("--bt-csv", default="player_cards_pipeline/data/bt/bt_advstats_2010_2026.csv")
+    ap.add_argument("--years", default="2019-2025")
+    ap.add_argument("--bt-csv", default="player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv")
     ap.add_argument("--out-dir", default="player_cards_pipeline/data/bt/self_creation_by_year")
     args = ap.parse_args()
 
@@ -192,4 +192,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

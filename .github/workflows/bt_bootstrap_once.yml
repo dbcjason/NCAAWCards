@@ -44,6 +44,7 @@ jobs:
         run: |
           python3 player_cards_pipeline/scripts/build_self_creation_cache.py \
             --project-root "." \
+            --bt-csv "player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv" \
             --years 2019-2025
 
       - name: Commit and push
