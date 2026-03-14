@@ -180,6 +180,32 @@ jobs:
           echo "Running: ${CMD[*]}"
           "${CMD[@]}"
 
+
+      - name: Add browser-open HTML link to run summary
+        run: |
+          python3 - <<'PY'
+          import base64
+          from pathlib import Path
+
+          out = Path("${OUT_HTML}")
+          if not out.exists():
+              raise SystemExit("Output HTML not found for summary link")
+
+          b = out.read_bytes()
+          max_bytes = 800_000
+          summary = Path("${GITHUB_STEP_SUMMARY}")
+          if len(b) > max_bytes:
+              summary.open("a", encoding="utf-8").write(
+                  f"\n### HTML Preview Link\nGenerated file is too large ({len(b)} bytes) for inline data URL in summary. Use artifact section.\n"
+              )
+          else:
+              data_url = "data:text/html;base64," + base64.b64encode(b).decode("ascii")
+              summary.open("a", encoding="utf-8").write(
+                  "\n### HTML Preview Link\n"
+                  f"[Open Generated HTML]({data_url})\n"
+              )
+          PY
+
       - name: Upload card artifact
         uses: actions/upload-artifact@v4
         with:

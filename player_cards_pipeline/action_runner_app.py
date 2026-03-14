@@ -5,6 +5,9 @@ import json
 import urllib.error
 import urllib.parse
 import urllib.request
+import io
+import zipfile
+import base64
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -122,6 +125,22 @@ def github_api(
         return e.code, body
 
 
+def github_viewer_login(owner: str, repo: str, token: str) -> str:
+    code, body = github_api(
+        method="GET",
+        owner=owner,
+        repo=repo,
+        token=token,
+        path="",
+    )
+    # Repo endpoint returns owner info; use that as a stable actor fallback.
+    if code == 200 and isinstance(body, dict):
+        o = body.get("owner")
+        if isinstance(o, dict):
+            return str(o.get("login") or "").strip()
+    return ""
+
+
 def dispatch_build(
     owner: str,
     repo: str,
@@ -182,6 +201,43 @@ def list_dispatch_runs(
     return [r for r in runs if isinstance(r, dict)]
 
 
+def find_run_id_for_dispatch(
+    owner: str,
+    repo: str,
+    token: str,
+    workflow_file: str,
+    *,
+    after_ts: str,
+    actor_login: str = "",
+    tries: int = 8,
+    sleep_sec: float = 1.25,
+) -> int | None:
+    for _ in range(max(1, tries)):
+        runs = list_dispatch_runs(owner, repo, token, workflow_file, per_page=30)
+        for r in runs:
+            created_at = str(r.get("created_at") or "")
+            if created_at:
+                try:
+                    if _parse_iso(created_at) < _parse_iso(after_ts):
+                        continue
+                except Exception:
+                    pass
+            if actor_login:
+                ta = r.get("triggering_actor")
+                tal = str(ta.get("login") if isinstance(ta, dict) else "").strip().lower()
+                if tal and tal != actor_login.strip().lower():
+                    continue
+            rid = r.get("id")
+            if isinstance(rid, int):
+                return rid
+            try:
+                return int(str(rid))
+            except Exception:
+                continue
+        time.sleep(sleep_sec)
+    return None
+
+
 def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[str, Any]]:
     code, body = github_api(
         method="GET",
@@ -196,6 +252,51 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
     if not isinstance(arts, list):
         return []
     return [a for a in arts if isinstance(a, dict)]
+
+
+def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int) -> bytes | None:
+    code, body = github_api(
+        method="GET",
+        owner=owner,
+        repo=repo,
+        token=token,
+        path=f"/actions/artifacts/{artifact_id}/zip",
+    )
+    # github_api decodes JSON/text; for zip bytes use direct request.
+    if code == 200 and isinstance(body, (bytes, bytearray)):
+        return bytes(body)
+    url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
+    req = urllib.request.Request(
+        url,
+        method="GET",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "NCAAWCards-ActionRunner",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            if resp.status != 200:
+                return None
+            return resp.read()
+    except Exception:
+        return None
+
+
+def extract_html_from_artifact_zip(zip_bytes: bytes) -> tuple[str, str] | None:
+    try:
+        with zipfile.ZipFile(io.BytesIO(zip_bytes), "r") as zf:
+            names = zf.namelist()
+            html_names = [n for n in names if n.lower().endswith(".html")]
+            if not html_names:
+                return None
+            target = html_names[0]
+            data = zf.read(target).decode("utf-8", errors="replace")
+            return target, data
+    except Exception:
+        return None
 
 
 def run_progress(status: str, conclusion: str) -> tuple[int, str]:
@@ -265,7 +366,6 @@ GITHUB_REF = "main"
     players = index.get(year, {}).get(team, []) if team else []
     player = st.selectbox("Player", players) if players else st.selectbox("Player", [""])
     output_filename = st.text_input("Output filename (optional)", value="")
-    commit_to_repo = st.checkbox("Commit output HTML back to repo", value=False)
 
     col1, col2 = st.columns(2)
     with col1:
@@ -277,12 +377,15 @@ GITHUB_REF = "main"
         st.session_state.last_trigger_ts = None
         st.session_state.last_year = ""
         st.session_state.last_player = ""
+        st.session_state.last_run_id = None
+        st.session_state.last_actor = ""
 
     if run_btn:
         if not year.strip() or not player.strip():
             st.error("Please enter at least Season and Player before running.")
             st.stop()
         ts = _iso_now()
+        actor = github_viewer_login(owner, repo, token)
         ok, msg = dispatch_build(
             owner,
             repo,
@@ -293,34 +396,66 @@ GITHUB_REF = "main"
             player=player.strip(),
             team=team.strip(),
             output_filename=output_filename.strip(),
-            commit_to_repo=commit_to_repo,
+            commit_to_repo=False,
         )
         if ok:
             st.success(msg)
             st.session_state.last_trigger_ts = ts
             st.session_state.last_year = year.strip()
             st.session_state.last_player = player.strip()
+            st.session_state.last_actor = actor
+            st.session_state.last_run_id = find_run_id_for_dispatch(
+                owner,
+                repo,
+                token,
+                workflow_file,
+                after_ts=ts,
+                actor_login=actor,
+            )
         else:
             st.error(msg)
 
     if refresh_btn or st.session_state.last_trigger_ts:
-        runs = list_dispatch_runs(owner, repo, token, workflow_file, per_page=25)
-        if not runs:
-            st.warning("No workflow_dispatch runs found yet.")
-            st.stop()
-
         target_run = None
-        for r in runs:
-            if run_matches_request(
-                r,
-                st.session_state.last_year or year.strip(),
-                st.session_state.last_player or player.strip(),
-                st.session_state.last_trigger_ts,
-            ):
-                target_run = r
-                break
+        run_id = st.session_state.get("last_run_id")
+        if not run_id and st.session_state.get("last_trigger_ts"):
+            # Try to resolve the just-dispatched run id; don't show stale older runs.
+            rid = find_run_id_for_dispatch(
+                owner,
+                repo,
+                token,
+                workflow_file,
+                after_ts=str(st.session_state.get("last_trigger_ts")),
+                actor_login=str(st.session_state.get("last_actor") or ""),
+                tries=1,
+                sleep_sec=0.25,
+            )
+            if rid:
+                st.session_state.last_run_id = rid
+                run_id = rid
+            else:
+                st.info("Waiting for your new run to appear...")
+                st.stop()
+        if run_id:
+            code, body = github_api(
+                method="GET",
+                owner=owner,
+                repo=repo,
+                token=token,
+                path=f"/actions/runs/{int(run_id)}",
+            )
+            if code == 200 and isinstance(body, dict):
+                target_run = body
         if target_run is None:
+            runs = list_dispatch_runs(owner, repo, token, workflow_file, per_page=25)
+            if not runs:
+                st.warning("No workflow_dispatch runs found yet.")
+                st.stop()
             target_run = runs[0]
+            try:
+                st.session_state.last_run_id = int(target_run.get("id"))
+            except Exception:
+                pass
 
         run_id = int(target_run.get("id"))
         status = str(target_run.get("status") or "")
@@ -341,8 +476,25 @@ GITHUB_REF = "main"
                 for a in arts:
                     name = str(a.get("name") or "artifact")
                     aid = a.get("id")
-                    aurl = f"https://github.com/{owner}/{repo}/actions/runs/{run_id}/artifacts/{aid}"
-                    st.markdown(f"- [{name}]({aurl})")
+                    if aid is None:
+                        st.markdown(f"- {name}")
+                        continue
+                    try:
+                        aid_int = int(aid)
+                    except Exception:
+                        st.markdown(f"- {name}")
+                        continue
+
+                    zip_bytes = download_artifact_zip(owner, repo, token, aid_int)
+                    html_payload = extract_html_from_artifact_zip(zip_bytes) if zip_bytes else None
+                    if html_payload:
+                        html_name, html_text = html_payload
+                        b64 = base64.b64encode(html_text.encode("utf-8")).decode("ascii")
+                        data_url = f"data:text/html;base64,{b64}"
+                        st.markdown(f"- {name}: [Open HTML]({data_url})")
+                    else:
+                        aurl = f"https://github.com/{owner}/{repo}/actions/runs/{run_id}/artifacts/{aid_int}"
+                        st.markdown(f"- [{name}]({aurl})")
             else:
                 st.info("No artifacts found on this run yet.")
 
