@@ -55,8 +55,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add player_cards_pipeline/data/bt/ || true
-          git add player_cards_pipeline/data/manual/enriched_players/ || true
+          git add -f player_cards_pipeline/data/bt/ || true
+          git add -f player_cards_pipeline/data/manual/enriched_players/ || true
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0

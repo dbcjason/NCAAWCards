@@ -40,14 +40,25 @@ jobs:
             --out-dir player_cards_pipeline/data/bt \
             --bart-prefix ncaaw
 
+      - name: Bootstrap historical enriched players (Women)
+        run: |
+          CMD=(python3 player_cards_pipeline/scripts/bootstrap_enriched_history.py \
+            --project-root "." \
+            --gender "Women")
+          if [ -n "${{ secrets.ENRICHED_WOMEN_HISTORY_ZIP_URL }}" ]; then
+            CMD+=(--dropbox-url "${{ secrets.ENRICHED_WOMEN_HISTORY_ZIP_URL }}")
+          fi
+          "${CMD[@]}"
+
       - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f player_cards_pipeline/data/bt/
+          git add -f player_cards_pipeline/data/manual/enriched_players/
           if git diff --cached --quiet; then
             echo "No changes to commit"
             exit 0
           fi
-          git commit -m "Bootstrap NCAAW Bart history datasets"
+          git commit -m "Bootstrap NCAAW Bart + historical enriched datasets"
           git push

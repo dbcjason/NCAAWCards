@@ -20,8 +20,8 @@ from pathlib import Path
 
 
 DEFAULT_DROPBOX_URL = (
-    "https://www.dropbox.com/scl/fi/REPLACE_WITH_WOMEN_ZIP/"
-    "hoop_explorer_players_all_women_2025_26.zip?dl=0"
+    "https://www.dropbox.com/scl/fi/zezrb2fnpuu62efmd40jt/"
+    "hoop_explorer_players_all_2025_26.zip?rlkey=xv5e4n1rx7n109mschdsfpqlo&e=1&dl=0"
 )
 
 
