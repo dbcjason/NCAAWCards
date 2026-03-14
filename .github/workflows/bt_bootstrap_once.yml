@@ -3,6 +3,10 @@ name: Bootstrap NCAAW Bart History (Run Once)
 on:
   workflow_dispatch:
 
+concurrency:
+  group: bootstrap-ncaaw-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   bootstrap-bt:
     runs-on: ubuntu-latest
@@ -54,6 +58,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
           git add -f player_cards_pipeline/data/bt/
           git add -f player_cards_pipeline/data/manual/enriched_players/
           if git diff --cached --quiet; then
@@ -61,4 +66,4 @@ jobs:
             exit 0
           fi
           git commit -m "Bootstrap NCAAW Bart + historical enriched datasets"
-          git push
+          git push origin main || (git pull --rebase origin main && git push origin main)
