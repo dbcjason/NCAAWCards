@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import time
+import io
+import zipfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -253,6 +255,47 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
     return [a for a in arts if isinstance(a, dict)]
 
 
+def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int) -> tuple[bytes | None, str]:
+    url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
+    req = urllib.request.Request(
+        url,
+        method="GET",
+        headers={
+            "Authorization": f"Bearer {token}",
+            "Accept": "application/octet-stream",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "NCAAWCards-ActionRunner",
+        },
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            raw = resp.read()
+            if raw[:2] != b"PK":
+                return None, f"unexpected payload ({len(raw)} bytes)"
+            return raw, ""
+    except urllib.error.HTTPError as e:
+        body = b""
+        try:
+            body = e.read()
+        except Exception:
+            pass
+        return None, f"http {e.code} ({len(body)} bytes)"
+    except Exception as e:
+        return None, str(e)
+
+
+def extract_first_html(zip_bytes: bytes) -> tuple[str, bytes] | None:
+    try:
+        with zipfile.ZipFile(io.BytesIO(zip_bytes), "r") as zf:
+            html_names = [n for n in zf.namelist() if n.lower().endswith((".html", ".htm"))]
+            if not html_names:
+                return None
+            target = html_names[0]
+            return target, zf.read(target)
+    except Exception:
+        return None
+
+
 def run_progress(status: str, conclusion: str) -> tuple[int, str]:
     s = (status or "").strip().lower()
     c = (conclusion or "").strip().lower()
@@ -433,7 +476,7 @@ GITHUB_REF = "main"
             arts = get_artifacts(owner, repo, token, run_id)
             if arts:
                 st.subheader("Artifacts")
-                for a in arts:
+                for i, a in enumerate(arts):
                     name = str(a.get("name") or "artifact")
                     aid = a.get("id")
                     if aid is None:
@@ -445,8 +488,22 @@ GITHUB_REF = "main"
                         st.markdown(f"- {name}")
                         continue
 
-                    aurl = f"https://github.com/{owner}/{repo}/actions/runs/{run_id}/artifacts/{aid_int}"
-                    st.markdown(f"- [{name}]({aurl})")
+                    zip_bytes, err = download_artifact_zip(owner, repo, token, aid_int)
+                    if zip_bytes:
+                        html_payload = extract_first_html(zip_bytes)
+                        if html_payload:
+                            html_name, html_bytes = html_payload
+                            st.download_button(
+                                label=f"Download {html_name}",
+                                data=html_bytes,
+                                file_name=Path(html_name).name,
+                                mime="text/html",
+                                key=f"dl_{run_id}_{aid_int}_{i}",
+                            )
+                        else:
+                            st.caption(f"{name}: No HTML file found inside artifact.")
+                    else:
+                        st.caption(f"{name}: Download unavailable ({err}).")
             else:
                 st.info("No artifacts found on this run yet.")
 
