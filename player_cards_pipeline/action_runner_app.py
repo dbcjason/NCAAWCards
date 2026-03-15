@@ -256,13 +256,15 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
     return [a for a in arts if isinstance(a, dict)]
 
 
-def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> bytes | None:
+def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> tuple[bytes | None, str]:
     def _fetch(url: str, with_auth: bool) -> tuple[int, bytes, str]:
         headers = {
-            "Accept": "application/vnd.github+json",
+            "Accept": "*/*",
             "X-GitHub-Api-Version": "2022-11-28",
             "User-Agent": "NCAAWCards-ActionRunner",
         }
+        if url.endswith("/zip"):
+            headers["Accept"] = "application/octet-stream"
         if with_auth:
             headers["Authorization"] = f"Bearer {token}"
         req = urllib.request.Request(url, method="GET", headers=headers)
@@ -286,12 +288,12 @@ def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, a
     if archive_url:
         code, data, loc = _fetch(archive_url, with_auth=True)
         if data and data[:2] == b"PK":
-            return data
+            return data, "ok:archive_url"
         # Follow redirect target manually without auth header if needed.
         if loc and loc != archive_url:
             _c2, d2, _ = _fetch(loc, with_auth=False)
             if d2 and d2[:2] == b"PK":
-                return d2
+                return d2, "ok:archive_redirect"
 
     code, body = github_api(
         method="GET",
@@ -302,23 +304,23 @@ def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, a
     )
     # github_api decodes JSON/text; for zip bytes use direct request.
     if code == 200 and isinstance(body, (bytes, bytearray)):
-        return bytes(body)
+        return bytes(body), "ok:github_api_bytes"
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
     code, data, loc = _fetch(url, with_auth=True)
     if data and data[:2] == b"PK":
-        return data
+        return data, "ok:artifact_api"
     if loc and loc != url:
         _c2, d2, _ = _fetch(loc, with_auth=False)
         if d2 and d2[:2] == b"PK":
-            return d2
-    return None
+            return d2, "ok:artifact_redirect"
+    return None, f"no-zip-bytes code={code} len={len(data) if data else 0}"
 
 
 def extract_html_from_artifact_zip(zip_bytes: bytes) -> tuple[str, str] | None:
     try:
         with zipfile.ZipFile(io.BytesIO(zip_bytes), "r") as zf:
             names = zf.namelist()
-            html_names = [n for n in names if n.lower().endswith(".html")]
+            html_names = [n for n in names if n.lower().endswith((".html", ".htm"))]
             if not html_names:
                 return None
             target = html_names[0]
@@ -521,7 +523,7 @@ GITHUB_REF = "main"
                         continue
 
                     archive_url = str(a.get("archive_download_url") or "")
-                    zip_bytes = download_artifact_zip(owner, repo, token, aid_int, archive_url=archive_url)
+                    zip_bytes, debug_msg = download_artifact_zip(owner, repo, token, aid_int, archive_url=archive_url)
                     html_payload = extract_html_from_artifact_zip(zip_bytes) if zip_bytes else None
                     if html_payload:
                         html_name, html_text = html_payload
@@ -529,7 +531,7 @@ GITHUB_REF = "main"
                         data_url = f"data:text/html;base64,{b64}"
                         st.markdown(f"- {name}: [Open HTML]({data_url})")
                     else:
-                        st.markdown(f"- {name}: HTML preview unavailable (artifact could not be parsed).")
+                        st.markdown(f"- {name}: HTML preview unavailable ({debug_msg}).")
             else:
                 st.info("No artifacts found on this run yet.")
 
