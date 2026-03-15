@@ -7,6 +7,7 @@ import io
 import zipfile
 import base64
 import re
+import http.client
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -156,7 +157,11 @@ def github_api(
         try:
             with urllib.request.urlopen(req, timeout=45) as resp:
                 status = resp.status
-                raw = resp.read().decode("utf-8", errors="replace")
+                try:
+                    raw_bytes = resp.read()
+                except http.client.IncompleteRead as e:
+                    raw_bytes = e.partial or b""
+                raw = raw_bytes.decode("utf-8", errors="replace")
                 if not raw:
                     return status, None
                 try:
@@ -164,7 +169,12 @@ def github_api(
                 except Exception:
                     return status, raw
         except urllib.error.HTTPError as e:
-            raw = e.read().decode("utf-8", errors="replace") if e.fp else ""
+            raw = ""
+            if e.fp:
+                try:
+                    raw = e.read().decode("utf-8", errors="replace")
+                except http.client.IncompleteRead as ie:
+                    raw = (ie.partial or b"").decode("utf-8", errors="replace")
             try:
                 body = json.loads(raw) if raw else {}
             except Exception:
@@ -353,7 +363,10 @@ def _http_fetch_bytes(url: str, token: str, *, accept: str, with_auth: bool) -> 
         req = urllib.request.Request(url, method="GET", headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
-                data = resp.read()
+                try:
+                    data = resp.read()
+                except http.client.IncompleteRead as e:
+                    data = e.partial or b""
                 status = int(getattr(resp, "status", 200) or 200)
                 location = str(getattr(resp, "url", "") or "")
                 return status, data, location
@@ -361,6 +374,8 @@ def _http_fetch_bytes(url: str, token: str, *, accept: str, with_auth: bool) -> 
             body = b""
             try:
                 body = e.read()
+            except http.client.IncompleteRead as ie:
+                body = ie.partial or b""
             except Exception:
                 pass
             location = str(e.headers.get("Location", "") if e.headers else "")
