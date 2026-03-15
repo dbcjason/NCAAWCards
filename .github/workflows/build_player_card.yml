@@ -49,6 +49,7 @@ jobs:
             player_cards_pipeline/data/manual/enriched_players/by_script_season
             player_cards_pipeline/data/manual/pbp_metrics
             player_cards_pipeline/data/manual/plays_by_year
+            player_cards_pipeline/output
             cbbd_seasons/2024-2025/tables
             cbbd_seasons/2025-2026/tables
 
@@ -215,7 +216,7 @@ jobs:
           path: ${{ env.OUT_HTML }}
 
       - name: Commit output to repo
-        if: ${{ github.event.inputs.commit_to_repo == 'true' }}
+        if: ${{ github.event.inputs.commit_to_repo }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"

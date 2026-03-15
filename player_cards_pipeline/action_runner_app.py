@@ -5,6 +5,8 @@ import json
 import time
 import io
 import zipfile
+import base64
+import re
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -181,6 +183,37 @@ def dispatch_build(
     if code == 204:
         return True, "Workflow dispatched"
     return False, f"Dispatch failed ({code}): {body}"
+
+
+def slugify(s: str) -> str:
+    s2 = re.sub(r"[^A-Za-z0-9]+", "_", (s or "").strip()).strip("_").lower()
+    return s2 or "player"
+
+
+def get_repo_file_bytes(owner: str, repo: str, token: str, path: str, ref: str) -> tuple[bytes | None, str]:
+    enc_path = urllib.parse.quote(path, safe="/")
+    code, body = github_api(
+        method="GET",
+        owner=owner,
+        repo=repo,
+        token=token,
+        path=f"/contents/{enc_path}",
+        query={"ref": ref},
+    )
+    if code != 200 or not isinstance(body, dict):
+        return None, f"http {code}"
+    if str(body.get("type") or "") != "file":
+        return None, "not a file"
+    content = str(body.get("content") or "")
+    encoding = str(body.get("encoding") or "")
+    if not content:
+        return None, "empty content"
+    try:
+        if encoding == "base64":
+            return base64.b64decode(content.encode("ascii"), validate=False), ""
+        return content.encode("utf-8"), ""
+    except Exception:
+        return None, "decode failed"
 
 
 def list_dispatch_runs(
@@ -414,11 +447,16 @@ GITHUB_REF = "main"
         st.session_state.last_player = ""
         st.session_state.last_run_id = None
         st.session_state.last_actor = ""
+        st.session_state.last_output_repo_path = ""
 
     if run_btn:
         if not year.strip() or not player.strip():
             st.error("Please enter at least Season and Player before running.")
             st.stop()
+        out_name = output_filename.strip()
+        if not out_name:
+            out_name = f"streamlit_cards/{year.strip()}/{slugify(player)}_{int(time.time())}.html"
+        out_repo_path = f"player_cards_pipeline/output/{out_name}"
         ts = _iso_now()
         actor = github_viewer_login(owner, repo, token)
         ok, msg = dispatch_build(
@@ -430,8 +468,8 @@ GITHUB_REF = "main"
             year=year.strip(),
             player=player.strip(),
             team=team.strip(),
-            output_filename=output_filename.strip(),
-            commit_to_repo=False,
+            output_filename=out_name,
+            commit_to_repo=True,
         )
         if ok:
             st.success(msg)
@@ -439,6 +477,7 @@ GITHUB_REF = "main"
             st.session_state.last_year = year.strip()
             st.session_state.last_player = player.strip()
             st.session_state.last_actor = actor
+            st.session_state.last_output_repo_path = out_repo_path
             st.session_state.last_run_id = find_run_id_for_dispatch(
                 owner,
                 repo,
@@ -509,40 +548,30 @@ GITHUB_REF = "main"
             st.rerun()
 
         if status == "completed":
-            arts = get_artifacts(owner, repo, token, run_id)
-            if arts:
-                st.subheader("Artifacts")
-                for i, a in enumerate(arts):
-                    name = str(a.get("name") or "artifact")
-                    aid = a.get("id")
-                    if aid is None:
-                        st.markdown(f"- {name}")
-                        continue
-                    try:
-                        aid_int = int(aid)
-                    except Exception:
-                        st.markdown(f"- {name}")
-                        continue
-
-                    archive_url = str(a.get("archive_download_url") or "")
-                    zip_bytes, err = download_artifact_zip(owner, repo, token, aid_int, archive_url=archive_url)
-                    if zip_bytes:
-                        html_payload = extract_first_html(zip_bytes)
-                        if html_payload:
-                            html_name, html_bytes = html_payload
-                            st.download_button(
-                                label=f"Download {html_name}",
-                                data=html_bytes,
-                                file_name=Path(html_name).name,
-                                mime="text/html",
-                                key=f"dl_{run_id}_{aid_int}_{i}",
-                            )
-                        else:
-                            st.caption(f"{name}: No HTML file found inside artifact.")
+            if conclusion == "success":
+                out_repo_path = str(st.session_state.get("last_output_repo_path") or "").strip()
+                if out_repo_path:
+                    html_bytes = None
+                    err = "not found"
+                    for _ in range(8):
+                        html_bytes, err = get_repo_file_bytes(owner, repo, token, out_repo_path, ref)
+                        if html_bytes:
+                            break
+                        time.sleep(1.5)
+                    if html_bytes:
+                        st.download_button(
+                            label="Download HTML",
+                            data=html_bytes,
+                            file_name=Path(out_repo_path).name,
+                            mime="text/html",
+                            key=f"html_{run_id}",
+                        )
                     else:
-                        st.caption(f"{name}: Download unavailable ({err}).")
+                        st.caption(f"Built, but committed HTML is not readable yet ({err}).")
+                else:
+                    st.caption("Built, but output path was not captured for this run.")
             else:
-                st.info("No artifacts found on this run yet.")
+                st.caption("Run failed; no HTML output available.")
 
 
 if __name__ == "__main__":
