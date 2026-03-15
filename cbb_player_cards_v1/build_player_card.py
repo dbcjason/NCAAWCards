@@ -2615,6 +2615,7 @@ def build_playstyles_html(target: PlayerGameStats, bt_rows: list[dict[str, str]]
         <div class="play-grid">
           {rows_html}
         </div>
+        <div class="play-credit">CREATED BY @DBCJASON</div>
       </div>
 """
 
@@ -2965,7 +2966,8 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
         <div class="draft-odds-grid transfer-two-col">
           {per_game_rows}
         </div>
-        <div class="draft-proj-credit">CREATED BY @DBCJASON</div>
+        <div class="draft-proj-sub" style="margin-top:8px;">The model examines historical low/mid-to-high conference transfers, weighting similar pre-transfer profiles more heavily. Using those weighted historical stat translations, it projects statistical outcomes for the new player in the selected conference.</div>
+        <div class="draft-proj-sub">Transfer Grade compares the player’s projected impact to historical transfer-up outcomes into the selected conference.</div>
       </div>
 """
 
