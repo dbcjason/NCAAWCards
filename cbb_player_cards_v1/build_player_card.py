@@ -2963,7 +2963,7 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
         <div class="draft-proj-main">{html.escape(dest_conf_raw)} Transfer Grade: {transfer_grade}</div>
         <div class="draft-proj-sub">Projected next-season statline vs transfer-up historical comps ({len(weighted_examples)} comps weighted)</div>
         <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Per Game</div>
-        <div class="draft-odds-grid">
+        <div class="draft-odds-grid transfer-two-col">
           {per_game_rows}
         </div>
       </div>
@@ -4334,6 +4334,10 @@ body {{
   flex: 1 1 auto;
   align-content: start;
 }}
+.transfer-two-col {{
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}}
 .draft-odd-row {{
   display: grid;
   grid-template-columns: 1fr auto;
@@ -4344,6 +4348,10 @@ body {{
   border-radius: 6px;
   padding: 4px 6px;
   background: var(--panel-alt);
+}}
+.transfer-two-col .draft-odd-row {{
+  font-size: 10px;
+  padding: 3px 5px;
 }}
 .draft-odd-k {{
   color: var(--muted);
