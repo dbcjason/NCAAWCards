@@ -2615,6 +2615,19 @@ def build_playstyles_html(target: PlayerGameStats, bt_rows: list[dict[str, str]]
         <div class="play-grid">
           {rows_html}
         </div>
+        <div class="play-credit">CREATED BY @DBCJASON</div>
+      </div>
+"""
+
+
+def build_transfer_projection_html(target: PlayerGameStats, destination_conference: str) -> str:
+    dest = (destination_conference or "").strip()
+    dest_html = html.escape(dest) if dest else "Destination conference not provided"
+    return f"""
+      <div class="panel draft-proj-panel">
+        <h3>Transfer Up Projection</h3>
+        <div class="draft-proj-main">{dest_html}</div>
+        <div class="draft-proj-sub">Projection mode enabled for transfer-up scenario.</div>
       </div>
 """
 
@@ -3225,7 +3238,6 @@ def build_draft_projection_html(
           {rows_html}
         </div>
         <div class="draft-proj-sub">Projections based solely on statistical profile in an average draft</div>
-        <div class="draft-proj-credit">CREATED BY @DBCJASON</div>
       </div>
 """
 
@@ -3971,6 +3983,12 @@ body {{
   font-size: 15px;
   font-weight: 700;
 }}
+.play-credit {{
+  margin-top: 8px;
+  color: #60a5fa;
+  font-size: 15px;
+  font-weight: 700;
+}}
 .draft-odds-grid {{
   margin-top: 8px;
   display: grid;
@@ -4280,6 +4298,8 @@ def main() -> None:
     ap.add_argument("--rsci-csv", default="", help="Optional RSCI rankings CSV path.")
     ap.add_argument("--wnba-draft-csv", default="", help="Optional WNBA draft CSV path (pick in col 1, player in col 3).")
     ap.add_argument("--gender", default="Women", help="Enriched dataset gender token: Women or Men.")
+    ap.add_argument("--transfer-up", action="store_true", help="Render Transfer Up Projection instead of draft projection.")
+    ap.add_argument("--destination-conference", default="", help="Destination conference for Transfer Up projection.")
     ap.add_argument("--bt-playerstat-json", default="", help="Optional Bart playerstat JSON file path or URL.")
     ap.add_argument(
         "--bt-playerstat-url-template",
@@ -4474,6 +4494,16 @@ def main() -> None:
             else:
                 pps_line = f"Points per Shot Over Expectation: {pps_oe:+.1f}% (Percentile N/A)"
         per_game_pcts = build_per_game_percentiles(players, target, args.min_games, bt_rows=bt_rows)
+    if args.transfer_up:
+        draft_projection_html = build_transfer_projection_html(target, args.destination_conference)
+    else:
+        draft_projection_html = draft_projection_html.replace('<div class="draft-proj-credit">CREATED BY @DBCJASON</div>', "")
+    if playstyles_html and "CREATED BY @DBCJASON" not in playstyles_html:
+        tail = "</div>"
+        marker = '<div class="play-credit">CREATED BY @DBCJASON</div>'
+        if tail in playstyles_html:
+            head, sep, end = playstyles_html.rpartition(tail)
+            playstyles_html = f"{head}        {marker}\n{sep}{end}"
     advanced_html = build_advanced_html(target, lebron_rows, rim_rows, style_rows)
     stage("Built card section HTML blocks")
     per_game_override = bt_per_game_overrides(target, bt_rows)

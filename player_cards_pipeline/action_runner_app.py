@@ -78,6 +78,50 @@ def load_team_player_index() -> dict[str, dict[str, list[str]]]:
     return out
 
 
+def load_player_conference_index() -> tuple[dict[str, list[dict[str, str]]], list[str]]:
+    files = [
+        ROOT / "data" / "bt" / "bt_advstats_2010_2025.csv",
+        ROOT / "data" / "bt" / "bt_advstats_2019_2025.csv",
+        ROOT / "data" / "bt" / "bt_advstats_2026.csv",
+        ROOT / "data" / "bt" / "bt_advstats_2010_2026.csv",
+    ]
+    by_year: dict[str, dict[tuple[str, str], dict[str, str]]] = {}
+    confs: set[str] = set()
+    allowed_years = {"2021", "2022", "2023", "2024", "2025", "2026"}
+
+    for p in files:
+        if not p.exists():
+            continue
+        with p.open("r", encoding="utf-8-sig", newline="") as f:
+            for row in csv.DictReader(f):
+                y = _norm_year(row.get("year", ""))
+                if y not in allowed_years:
+                    continue
+                player = (row.get("player_name") or "").strip()
+                team = (row.get("team") or "").strip()
+                conf = (row.get("conf") or "").strip()
+                if not player or not team:
+                    continue
+                if conf:
+                    confs.add(conf)
+                ymap = by_year.setdefault(y, {})
+                key = (player, team)
+                if key not in ymap:
+                    ymap[key] = {
+                        "player": player,
+                        "team": team,
+                        "conf": conf,
+                    }
+
+    out_year: dict[str, list[dict[str, str]]] = {}
+    for y, items in by_year.items():
+        out_year[y] = sorted(
+            items.values(),
+            key=lambda r: ((r.get("team") or "").lower(), (r.get("player") or "").lower()),
+        )
+    return out_year, sorted(confs)
+
+
 def github_api(
     *,
     method: str,
@@ -161,6 +205,8 @@ def dispatch_build(
     team: str,
     output_filename: str,
     commit_to_repo: bool,
+    transfer_up: bool = False,
+    destination_conference: str = "",
 ) -> tuple[bool, str]:
     payload = {
         "ref": ref,
@@ -170,6 +216,8 @@ def dispatch_build(
             "team": team,
             "output_filename": output_filename,
             "commit_to_repo": bool(commit_to_repo),
+            "transfer_up": bool(transfer_up),
+            "destination_conference": destination_conference,
         },
     }
     code, body = github_api(
@@ -423,16 +471,22 @@ GITHUB_REF = "main"
         st.stop()
 
     index = load_team_player_index()
+    _player_conf_index, all_confs = load_player_conference_index()
     years = [y for y in ["2021", "2022", "2023", "2024", "2025", "2026"] if y in index]
     if not years:
         years = ["2021", "2022", "2023", "2024", "2025", "2026"]
 
-    year = st.selectbox("Season", years, index=len(years) - 1)
+    year = st.selectbox("Season", years, index=len(years) - 1, key="card_year")
     teams = sorted(index.get(year, {}).keys())
-    team = st.selectbox("Team", teams) if teams else st.selectbox("Team", [""])
+    team = st.selectbox("Team", teams, key="card_team") if teams else st.selectbox("Team", [""], key="card_team_empty")
     players = index.get(year, {}).get(team, []) if team else []
-    player = st.selectbox("Player", players) if players else st.selectbox("Player", [""])
+    player = st.selectbox("Player", players, key="card_player") if players else st.selectbox("Player", [""], key="card_player_empty")
     output_filename = st.text_input("Output filename (optional)", value="")
+    transfer_up = st.checkbox("Transfer Up", value=False, key="transfer_up")
+    destination_conf = ""
+    if transfer_up:
+        conf_choices = [""] + (all_confs if all_confs else [])
+        destination_conf = st.selectbox("Destination Conference", conf_choices, key="transfer_dest_conf")
 
     col1, col2 = st.columns(2)
     with col1:
@@ -453,6 +507,9 @@ GITHUB_REF = "main"
         if not year.strip() or not player.strip():
             st.error("Please enter at least Season and Player before running.")
             st.stop()
+        if transfer_up and not destination_conf.strip():
+            st.error("Please choose a destination conference for Transfer Up projection.")
+            st.stop()
         out_name = output_filename.strip()
         if not out_name:
             out_name = f"streamlit_cards/{year.strip()}/{slugify(player)}_{int(time.time())}.html"
@@ -470,6 +527,8 @@ GITHUB_REF = "main"
             team=team.strip(),
             output_filename=out_name,
             commit_to_repo=True,
+            transfer_up=transfer_up,
+            destination_conference=destination_conf.strip(),
         )
         if ok:
             st.success(msg)

@@ -25,6 +25,16 @@ on:
         required: false
         default: false
         type: boolean
+      transfer_up:
+        description: "Render Transfer Up Projection instead of draft projection"
+        required: false
+        default: false
+        type: boolean
+      destination_conference:
+        description: "Destination conference for Transfer Up projection"
+        required: false
+        default: ""
+        type: string
 
 jobs:
   build-card:
@@ -176,6 +186,12 @@ jobs:
           fi
           if [ -n "${PBP_METRICS_CSV:-}" ] && [ -f "$PBP_METRICS_CSV" ]; then
             CMD+=(--pbp-metrics-csv "$PBP_METRICS_CSV")
+          fi
+          if [ "${{ github.event.inputs.transfer_up }}" = "true" ]; then
+            CMD+=(--transfer-up)
+          fi
+          if [ -n "${{ github.event.inputs.destination_conference }}" ]; then
+            CMD+=(--destination-conference "${{ github.event.inputs.destination_conference }}")
           fi
 
           echo "Running: ${CMD[*]}"
