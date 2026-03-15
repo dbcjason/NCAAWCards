@@ -3223,6 +3223,7 @@ def build_draft_projection_html(
           {rows_html}
         </div>
         <div class="draft-proj-sub">Projections based solely on statistical profile in an average draft</div>
+        <div class="draft-proj-credit">Created by @DBCJason</div>
       </div>
 """
 
@@ -3961,6 +3962,12 @@ body {{
   margin-top: 4px;
   color: var(--muted);
   font-size: 11px;
+}}
+.draft-proj-credit {{
+  margin-top: 8px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
 }}
 .draft-odds-grid {{
   margin-top: 8px;
