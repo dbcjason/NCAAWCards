@@ -6,6 +6,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import urllib.response
 import io
 import zipfile
 import base64
@@ -256,26 +257,41 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
 
 
 def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> bytes | None:
-    if archive_url:
-        req = urllib.request.Request(
-            archive_url,
-            method="GET",
-            headers={
-                "Authorization": f"Bearer {token}",
-                "Accept": "application/vnd.github+json",
-                "X-GitHub-Api-Version": "2022-11-28",
-                "User-Agent": "NCAAWCards-ActionRunner",
-            },
-        )
+    def _fetch(url: str, with_auth: bool) -> tuple[int, bytes, str]:
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "NCAAWCards-ActionRunner",
+        }
+        if with_auth:
+            headers["Authorization"] = f"Bearer {token}"
+        req = urllib.request.Request(url, method="GET", headers=headers)
         try:
             with urllib.request.urlopen(req, timeout=60) as resp:
-                if resp.status != 200:
-                    return None
+                status = int(getattr(resp, "status", 200) or 200)
                 data = resp.read()
-                if data and data[:2] == b"PK":
-                    return data
+                loc = str(getattr(resp, "url", "") or "")
+                return status, data, loc
+        except urllib.error.HTTPError as e:
+            data = b""
+            try:
+                data = e.read()
+            except Exception:
+                pass
+            loc = str(e.headers.get("Location", "") if e.headers else "")
+            return int(e.code or 0), data, loc
         except Exception:
-            pass
+            return 0, b"", ""
+
+    if archive_url:
+        code, data, loc = _fetch(archive_url, with_auth=True)
+        if data and data[:2] == b"PK":
+            return data
+        # Follow redirect target manually without auth header if needed.
+        if loc and loc != archive_url:
+            _c2, d2, _ = _fetch(loc, with_auth=False)
+            if d2 and d2[:2] == b"PK":
+                return d2
 
     code, body = github_api(
         method="GET",
@@ -288,23 +304,14 @@ def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, a
     if code == 200 and isinstance(body, (bytes, bytearray)):
         return bytes(body)
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
-    req = urllib.request.Request(
-        url,
-        method="GET",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "NCAAWCards-ActionRunner",
-        },
-    )
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            if resp.status != 200:
-                return None
-            return resp.read()
-    except Exception:
-        return None
+    code, data, loc = _fetch(url, with_auth=True)
+    if data and data[:2] == b"PK":
+        return data
+    if loc and loc != url:
+        _c2, d2, _ = _fetch(loc, with_auth=False)
+        if d2 and d2[:2] == b"PK":
+            return d2
+    return None
 
 
 def extract_html_from_artifact_zip(zip_bytes: bytes) -> tuple[str, str] | None:
