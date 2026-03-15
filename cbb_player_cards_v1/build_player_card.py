@@ -2946,7 +2946,6 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
 
     per_game_rows = "".join(
         [
-            row_html("MPG", "mpg", 1),
             row_html("PPG", "ppg", 1),
             row_html("RPG", "rpg", 1),
             row_html("APG", "apg", 1),
@@ -2957,6 +2956,30 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
             row_html("FT%", "ft_pct", 1),
         ]
     )
+    cur_year = norm_season(target.season)
+    impact_specs = [
+        ("BPM", "bpm", 1),
+        ("RAPM", "rapm", 1),
+        ("Net Pts", "net_pts", 1),
+        ("On/Off NetR", "onoff_net_rating", 1),
+    ]
+    impact_rows_plain = '<div class="transfer-impact-row transfer-impact-head"><span>Stat</span><span>Proj</span><span>%ile</span></div>'
+    for label, key, digits in impact_specs:
+        if key in predicted and math.isfinite(predicted[key]):
+            v = float(predicted[key])
+            cohort_vals = []
+            for r in bt_rows:
+                if norm_season(bt_get(r, ["year"])) != cur_year:
+                    continue
+                cv = bt_metric_value(r, key)
+                if cv is None or not math.isfinite(cv):
+                    continue
+                cohort_vals.append(float(cv))
+            pct = percentile(v, cohort_vals) if cohort_vals else None
+            pct_txt = f"{ordinal(int(round(pct)))}" if pct is not None and math.isfinite(pct) else "-"
+            impact_rows_plain += f'<div class="transfer-impact-row"><span>{html.escape(label)}</span><span>{v:.{digits}f}</span><span>{pct_txt}</span></div>'
+        else:
+            impact_rows_plain += f'<div class="transfer-impact-row"><span>{html.escape(label)}</span><span>-</span><span>-</span></div>'
     return f"""
       <div class="panel draft-proj-panel">
         <h3>Transfer Projection</h3>
@@ -2965,6 +2988,10 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
         <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Per Game</div>
         <div class="draft-odds-grid transfer-two-col">
           {per_game_rows}
+        </div>
+        <div class="draft-proj-sub" style="font-weight:700;margin-top:8px;">Impact Projections</div>
+        <div class="transfer-impact-list">
+          {impact_rows_plain}
         </div>
       </div>
 """
@@ -4352,6 +4379,31 @@ body {{
 .transfer-two-col .draft-odd-row {{
   font-size: 10px;
   padding: 3px 5px;
+}}
+.transfer-impact-list {{
+  margin-top: 2px;
+  display: grid;
+  gap: 2px;
+  max-height: 64px;
+  overflow: hidden;
+}}
+.transfer-impact-row {{
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.05;
+}}
+.transfer-impact-row span:nth-child(2),
+.transfer-impact-row span:nth-child(3) {{
+  color: var(--text);
+  font-weight: 700;
+  text-align: right;
+}}
+.transfer-impact-head span {{
+  color: var(--muted) !important;
+  font-weight: 600 !important;
 }}
 .draft-odd-k {{
   color: var(--muted);
