@@ -255,7 +255,28 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
     return [a for a in arts if isinstance(a, dict)]
 
 
-def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int) -> bytes | None:
+def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> bytes | None:
+    if archive_url:
+        req = urllib.request.Request(
+            archive_url,
+            method="GET",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "NCAAWCards-ActionRunner",
+            },
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                if resp.status != 200:
+                    return None
+                data = resp.read()
+                if data and data[:2] == b"PK":
+                    return data
+        except Exception:
+            pass
+
     code, body = github_api(
         method="GET",
         owner=owner,
@@ -492,7 +513,8 @@ GITHUB_REF = "main"
                         st.markdown(f"- {name}")
                         continue
 
-                    zip_bytes = download_artifact_zip(owner, repo, token, aid_int)
+                    archive_url = str(a.get("archive_download_url") or "")
+                    zip_bytes = download_artifact_zip(owner, repo, token, aid_int, archive_url=archive_url)
                     html_payload = extract_html_from_artifact_zip(zip_bytes) if zip_bytes else None
                     if html_payload:
                         html_name, html_text = html_payload
