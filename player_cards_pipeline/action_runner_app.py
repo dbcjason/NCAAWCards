@@ -257,14 +257,12 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
 
 
 def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> tuple[bytes | None, str]:
-    def _fetch(url: str, with_auth: bool) -> tuple[int, bytes, str]:
+    def _fetch(url: str, with_auth: bool, accept: str = "application/vnd.github+json") -> tuple[int, bytes, str]:
         headers = {
-            "Accept": "*/*",
+            "Accept": accept,
             "X-GitHub-Api-Version": "2022-11-28",
             "User-Agent": "NCAAWCards-ActionRunner",
         }
-        if url.endswith("/zip"):
-            headers["Accept"] = "application/octet-stream"
         if with_auth:
             headers["Authorization"] = f"Bearer {token}"
         req = urllib.request.Request(url, method="GET", headers=headers)
@@ -291,7 +289,7 @@ def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, a
             return data, "ok:archive_url"
         # Follow redirect target manually without auth header if needed.
         if loc and loc != archive_url:
-            _c2, d2, _ = _fetch(loc, with_auth=False)
+            _c2, d2, _ = _fetch(loc, with_auth=False, accept="*/*")
             if d2 and d2[:2] == b"PK":
                 return d2, "ok:archive_redirect"
 
@@ -307,10 +305,13 @@ def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, a
         return bytes(body), "ok:github_api_bytes"
     url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
     code, data, loc = _fetch(url, with_auth=True)
+    # Some environments return 415 unless accept is broad.
+    if code == 415:
+        code, data, loc = _fetch(url, with_auth=True, accept="*/*")
     if data and data[:2] == b"PK":
         return data, "ok:artifact_api"
     if loc and loc != url:
-        _c2, d2, _ = _fetch(loc, with_auth=False)
+        _c2, d2, _ = _fetch(loc, with_auth=False, accept="*/*")
         if d2 and d2[:2] == b"PK":
             return d2, "ok:artifact_redirect"
     return None, f"no-zip-bytes code={code} len={len(data) if data else 0}"
