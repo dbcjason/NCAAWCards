@@ -2620,14 +2620,319 @@ def build_playstyles_html(target: PlayerGameStats, bt_rows: list[dict[str, str]]
 """
 
 
-def build_transfer_projection_html(target: PlayerGameStats, destination_conference: str) -> str:
-    dest = (destination_conference or "").strip()
-    dest_html = html.escape(dest) if dest else "Destination conference not provided"
+def _conference_key(raw: str) -> str:
+    s = norm_text(raw)
+    s = s.replace("&", "and")
+    s = re.sub(r"conference|conf\\b", "", s)
+    s = re.sub(r"[^a-z0-9]+", "", s)
+    aliases = {
+        "acc": "acc",
+        "atlanticcoast": "acc",
+        "bigeast": "bigeast",
+        "bigten": "bigten",
+        "big12": "big12",
+        "bigtwelve": "big12",
+        "sec": "sec",
+        "southeastern": "sec",
+        "pac12": "pac12",
+        "pacten": "pac12",
+        "mwc": "mountainwest",
+        "mountainwest": "mountainwest",
+        "wcc": "wcc",
+        "a10": "a10",
+        "atlant10": "a10",
+        "american": "aac",
+        "aac": "aac",
+        "missourivalley": "mvc",
+        "mvc": "mvc",
+        "mac": "mac",
+        "conferenceusa": "cusa",
+        "cusa": "cusa",
+        "sunbelt": "sunbelt",
+        "bigwest": "bigwest",
+        "wac": "wac",
+        "horizon": "horizon",
+        "socon": "socon",
+        "ivyleague": "ivy",
+        "ivy": "ivy",
+    }
+    return aliases.get(s, s)
+
+
+def _conference_tier(conf_key: str) -> str:
+    high = {"acc", "bigeast", "bigten", "big12", "sec", "pac12"}
+    mid = {"aac", "a10", "mountainwest", "wcc", "mvc", "mac", "cusa", "sunbelt", "bigwest", "wac", "horizon", "socon", "ivy"}
+    if conf_key in high:
+        return "high"
+    if conf_key in mid:
+        return "mid"
+    return "low"
+
+
+def _row_transfer_metrics(row: dict[str, str]) -> dict[str, float]:
+    out: dict[str, float] = {}
+    ppg = bt_num(row, ["pts", "PTS"])
+    oreb = bt_num(row, ["oreb", "OREB"])
+    dreb = bt_num(row, ["dreb", "DREB"])
+    apg = bt_num(row, ["ast", "AST"])
+    spg = bt_num(row, ["stl", "STL"])
+    bpg = bt_num(row, ["blk", "BLK"])
+    if ppg is not None:
+        out["ppg"] = float(ppg)
+    if oreb is not None and dreb is not None:
+        out["rpg"] = float(oreb + dreb)
+    if apg is not None:
+        out["apg"] = float(apg)
+    if spg is not None:
+        out["spg"] = float(spg)
+    if bpg is not None:
+        out["bpg"] = float(bpg)
+
+    two_m = bt_num(row, ["twoPM", "2PM", "2PM_per_g"]) or 0.0
+    two_a = bt_num(row, ["twoPA", "2PA", "2PA_per_g"]) or 0.0
+    three_m = bt_num(row, ["TPM", "3PM"]) or 0.0
+    three_a = bt_num(row, ["TPA", "3PA"]) or 0.0
+    ft_m = bt_num(row, ["FTM"]) or 0.0
+    ft_a = bt_num(row, ["FTA"]) or 0.0
+    fga = two_a + three_a
+    if fga > 0:
+        out["fg_pct"] = 100.0 * (two_m + three_m) / fga
+    if three_a > 0:
+        out["tp_pct"] = 100.0 * three_m / three_a
+    if ft_a > 0:
+        out["ft_pct"] = 100.0 * ft_m / ft_a
+
+    for k in [
+        "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
+        "stl_per", "blk_per", "orb_per", "drb_per",
+    ]:
+        v = bt_metric_value(row, k)
+        if v is not None and math.isfinite(v):
+            out[k] = float(v)
+    return out
+
+
+def _clip_transfer_metric(key: str, v: float) -> float:
+    if key in {"ppg"}:
+        return max(0.0, min(40.0, v))
+    if key in {"rpg", "apg"}:
+        return max(0.0, min(18.0, v))
+    if key in {"spg", "bpg"}:
+        return max(0.0, min(6.0, v))
+    if key in {"fg_pct", "tp_pct", "ft_pct", "ts_per", "rim_pct", "usg", "ast_per", "stl_per", "blk_per", "orb_per", "drb_per"}:
+        return max(0.0, min(100.0, v))
+    if key in {"ast_tov"}:
+        return max(0.0, min(8.0, v))
+    if key in {"bpm"}:
+        return max(-15.0, min(20.0, v))
+    return v
+
+
+def build_transfer_projection_html(target: PlayerGameStats, destination_conference: str, bt_rows: list[dict[str, str]]) -> str:
+    if not bt_rows:
+        return '<div class="panel"><h3>Transfer Up Projection</h3><div class="shot-meta">No Bart Torvik CSV loaded.</div></div>'
+    target_row = bt_find_target_row(bt_rows, target)
+    if not target_row:
+        return '<div class="panel"><h3>Transfer Up Projection</h3><div class="shot-meta">No matching Bart row found for this player/team/season.</div></div>'
+
+    dest_conf_raw = (destination_conference or "").strip()
+    if not dest_conf_raw:
+        return '<div class="panel"><h3>Transfer Up Projection</h3><div class="shot-meta">Destination conference is required.</div></div>'
+    dest_conf = _conference_key(dest_conf_raw)
+
+    by_player_year: dict[str, dict[int, dict[str, str]]] = defaultdict(dict)
+    for r in bt_rows:
+        p = norm_player_name(bt_get(r, ["player_name"]))
+        ys = norm_season(bt_get(r, ["year"]))
+        if not p or not ys.isdigit():
+            continue
+        y = int(ys)
+        prev = by_player_year[p].get(y)
+        if prev is None:
+            by_player_year[p][y] = r
+            continue
+        prev_gp = bt_num(prev, ["GP", "gp"]) or 0.0
+        cur_gp = bt_num(r, ["GP", "gp"]) or 0.0
+        if cur_gp > prev_gp:
+            by_player_year[p][y] = r
+
+    examples: list[dict[str, Any]] = []
+    for _p, season_map in by_player_year.items():
+        years = sorted(season_map.keys())
+        for y in years:
+            if (y + 1) not in season_map:
+                continue
+            src = season_map[y]
+            dst = season_map[y + 1]
+            src_conf = _conference_key(bt_get(src, ["conf", "conference"]))
+            dst_conf = _conference_key(bt_get(dst, ["conf", "conference"]))
+            if _conference_tier(dst_conf) != "high":
+                continue
+            if _conference_tier(src_conf) == "high":
+                continue
+            src_m = _row_transfer_metrics(src)
+            dst_m = _row_transfer_metrics(dst)
+            if len(src_m) < 8 or len(dst_m) < 8:
+                continue
+            examples.append(
+                {
+                    "src_conf": src_conf,
+                    "dst_conf": dst_conf,
+                    "src": src_m,
+                    "dst": dst_m,
+                }
+            )
+
+    if len(examples) < 200:
+        return f"""
+      <div class="panel draft-proj-panel">
+        <h3>Transfer Up Projection</h3>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
+        <div class="shot-meta">Not enough historical transfer-up samples to project.</div>
+      </div>
+"""
+
+    source = _row_transfer_metrics(target_row)
+    if len(source) < 8:
+        return f"""
+      <div class="panel draft-proj-panel">
+        <h3>Transfer Up Projection</h3>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
+        <div class="shot-meta">Not enough source stats for this player to project.</div>
+      </div>
+"""
+
+    source_conf = _conference_key(bt_get(target_row, ["conf", "conference"]))
+    same_dest = [e for e in examples if e["dst_conf"] == dest_conf]
+    pool = same_dest if len(same_dest) >= 35 else examples
+
+    feat_keys = [
+        "ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct",
+        "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
+        "stl_per", "blk_per", "orb_per", "drb_per",
+    ]
+    scales: dict[str, float] = {}
+    for k in feat_keys:
+        vals = sorted([float(e["src"][k]) for e in pool if k in e["src"] and math.isfinite(float(e["src"][k]))])
+        if len(vals) >= 12:
+            lo = vals[max(0, int(0.1 * (len(vals) - 1)))]
+            hi = vals[min(len(vals) - 1, int(0.9 * (len(vals) - 1)))]
+            spread = hi - lo
+            scales[k] = spread if spread > 1e-6 else 1.0
+        else:
+            scales[k] = 1.0
+
+    weighted_examples: list[tuple[float, dict[str, Any]]] = []
+    for e in pool:
+        diffs: list[float] = []
+        for k in feat_keys:
+            tv = source.get(k)
+            ev = e["src"].get(k)
+            if tv is None or ev is None or not math.isfinite(tv) or not math.isfinite(ev):
+                continue
+            s = scales.get(k, 1.0)
+            diffs.append(abs(float(tv) - float(ev)) / max(1e-6, s))
+        if len(diffs) < 8:
+            continue
+        d = sum(diffs) / len(diffs)
+        if dest_conf and e["dst_conf"] == dest_conf:
+            d *= 0.86
+        elif dest_conf:
+            d *= 1.10
+        if source_conf and e["src_conf"] == source_conf:
+            d *= 0.92
+        w = math.exp(-1.35 * d)
+        if w > 1e-9:
+            weighted_examples.append((w, e))
+
+    weighted_examples.sort(key=lambda x: x[0], reverse=True)
+    weighted_examples = weighted_examples[:450]
+    if not weighted_examples:
+        return f"""
+      <div class="panel draft-proj-panel">
+        <h3>Transfer Up Projection</h3>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
+        <div class="shot-meta">No similar transfer-up comps found for projection.</div>
+      </div>
+"""
+
+    out_keys = [
+        "ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct",
+        "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
+        "stl_per", "blk_per", "orb_per", "drb_per",
+    ]
+    predicted: dict[str, float] = {}
+    for k in out_keys:
+        num = 0.0
+        den = 0.0
+        for w, e in weighted_examples:
+            sv = e["src"].get(k)
+            dv = e["dst"].get(k)
+            if sv is None or dv is None or not math.isfinite(float(sv)) or not math.isfinite(float(dv)):
+                continue
+            if k in source and math.isfinite(float(source[k])):
+                val = float(source[k]) + (float(dv) - float(sv))
+            else:
+                val = float(dv)
+            num += w * val
+            den += w
+        if den > 0:
+            predicted[k] = _clip_transfer_metric(k, num / den)
+
+    if not predicted:
+        return f"""
+      <div class="panel draft-proj-panel">
+        <h3>Transfer Up Projection</h3>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
+        <div class="shot-meta">Projection failed due to missing comparable stat fields.</div>
+      </div>
+"""
+
+    def row_html(label: str, key: str, digits: int = 1) -> str:
+        if key not in predicted:
+            return f'<div class="draft-odd-row"><div class="draft-odd-k">{html.escape(label)}</div><div class="draft-odd-v">-</div></div>'
+        return f'<div class="draft-odd-row"><div class="draft-odd-k">{html.escape(label)}</div><div class="draft-odd-v">{predicted[key]:.{digits}f}</div></div>'
+
+    per_game_rows = "".join(
+        [
+            row_html("PPG", "ppg", 1),
+            row_html("RPG", "rpg", 1),
+            row_html("APG", "apg", 1),
+            row_html("SPG", "spg", 1),
+            row_html("BPG", "bpg", 1),
+            row_html("FG%", "fg_pct", 1),
+            row_html("3P%", "tp_pct", 1),
+            row_html("FT%", "ft_pct", 1),
+        ]
+    )
+    adv_rows = "".join(
+        [
+            row_html("BPM", "bpm", 1),
+            row_html("USG%", "usg", 1),
+            row_html("TS%", "ts_per", 1),
+            row_html("Rim%", "rim_pct", 1),
+            row_html("AST%", "ast_per", 1),
+            row_html("A/TO", "ast_tov", 2),
+            row_html("STL%", "stl_per", 1),
+            row_html("BLK%", "blk_per", 1),
+            row_html("OREB%", "orb_per", 1),
+            row_html("DREB%", "drb_per", 1),
+        ]
+    )
+
     return f"""
       <div class="panel draft-proj-panel">
         <h3>Transfer Up Projection</h3>
-        <div class="draft-proj-main">{dest_html}</div>
-        <div class="draft-proj-sub">Projection mode enabled for transfer-up scenario.</div>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
+        <div class="draft-proj-sub">Projected next-season statline vs transfer-up historical comps ({len(weighted_examples)} comps weighted)</div>
+        <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Per Game</div>
+        <div class="draft-odds-grid">
+          {per_game_rows}
+        </div>
+        <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Advanced</div>
+        <div class="draft-odds-grid">
+          {adv_rows}
+        </div>
       </div>
 """
 
@@ -4495,7 +4800,7 @@ def main() -> None:
                 pps_line = f"Points per Shot Over Expectation: {pps_oe:+.1f}% (Percentile N/A)"
         per_game_pcts = build_per_game_percentiles(players, target, args.min_games, bt_rows=bt_rows)
     if args.transfer_up:
-        draft_projection_html = build_transfer_projection_html(target, args.destination_conference)
+        draft_projection_html = build_transfer_projection_html(target, args.destination_conference, bt_rows)
     else:
         draft_projection_html = draft_projection_html.replace('<div class="draft-proj-credit">CREATED BY @DBCJASON</div>', "")
     if playstyles_html and "CREATED BY @DBCJASON" not in playstyles_html:
