@@ -94,36 +94,41 @@ def github_api(
     if payload is not None:
         data = json.dumps(payload).encode("utf-8")
 
-    req = urllib.request.Request(
-        base,
-        data=data,
-        method=method,
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/vnd.github+json",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "NCAAWCards-ActionRunner",
-            "Content-Type": "application/json",
-        },
-    )
-
-    try:
-        with urllib.request.urlopen(req, timeout=45) as resp:
-            status = resp.status
-            raw = resp.read().decode("utf-8", errors="replace")
-            if not raw:
-                return status, None
-            try:
-                return status, json.loads(raw)
-            except Exception:
-                return status, raw
-    except urllib.error.HTTPError as e:
-        raw = e.read().decode("utf-8", errors="replace") if e.fp else ""
+    def _do_req(auth_value: str) -> tuple[int, Any]:
+        req = urllib.request.Request(
+            base,
+            data=data,
+            method=method,
+            headers={
+                "Authorization": auth_value,
+                "Accept": "application/vnd.github+json",
+                "X-GitHub-Api-Version": "2022-11-28",
+                "User-Agent": "NCAAWCards-ActionRunner",
+                "Content-Type": "application/json",
+            },
+        )
         try:
-            body = json.loads(raw) if raw else {}
-        except Exception:
-            body = {"raw": raw}
-        return e.code, body
+            with urllib.request.urlopen(req, timeout=45) as resp:
+                status = resp.status
+                raw = resp.read().decode("utf-8", errors="replace")
+                if not raw:
+                    return status, None
+                try:
+                    return status, json.loads(raw)
+                except Exception:
+                    return status, raw
+        except urllib.error.HTTPError as e:
+            raw = e.read().decode("utf-8", errors="replace") if e.fp else ""
+            try:
+                body = json.loads(raw) if raw else {}
+            except Exception:
+                body = {"raw": raw}
+            return int(e.code or 0), body
+
+    code, body = _do_req(f"Bearer {token}")
+    if code == 401:
+        code, body = _do_req(f"token {token}")
+    return code, body
 
 
 def github_viewer_login(owner: str, repo: str, token: str) -> str:
@@ -256,30 +261,39 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
 
 
 def _http_fetch_bytes(url: str, token: str, *, accept: str, with_auth: bool) -> tuple[int, bytes, str]:
-    headers = {
-        "Accept": accept,
-        "X-GitHub-Api-Version": "2022-11-28",
-        "User-Agent": "NCAAWCards-ActionRunner",
-    }
-    if with_auth:
-        headers["Authorization"] = f"Bearer {token}"
-    req = urllib.request.Request(url, method="GET", headers=headers)
-    try:
-        with urllib.request.urlopen(req, timeout=60) as resp:
-            data = resp.read()
-            status = int(getattr(resp, "status", 200) or 200)
-            location = str(getattr(resp, "url", "") or "")
-            return status, data, location
-    except urllib.error.HTTPError as e:
-        body = b""
+    def _single_fetch(auth_value: str | None) -> tuple[int, bytes, str]:
+        headers = {
+            "Accept": accept,
+            "X-GitHub-Api-Version": "2022-11-28",
+            "User-Agent": "NCAAWCards-ActionRunner",
+        }
+        if auth_value:
+            headers["Authorization"] = auth_value
+        req = urllib.request.Request(url, method="GET", headers=headers)
         try:
-            body = e.read()
+            with urllib.request.urlopen(req, timeout=60) as resp:
+                data = resp.read()
+                status = int(getattr(resp, "status", 200) or 200)
+                location = str(getattr(resp, "url", "") or "")
+                return status, data, location
+        except urllib.error.HTTPError as e:
+            body = b""
+            try:
+                body = e.read()
+            except Exception:
+                pass
+            location = str(e.headers.get("Location", "") if e.headers else "")
+            return int(e.code or 0), body, location
         except Exception:
-            pass
-        location = str(e.headers.get("Location", "") if e.headers else "")
-        return int(e.code or 0), body, location
-    except Exception:
-        return 0, b"", ""
+            return 0, b"", ""
+
+    if with_auth:
+        code, data, location = _single_fetch(f"Bearer {token}")
+        if code == 401:
+            code, data, location = _single_fetch(f"token {token}")
+        return code, data, location
+
+    return _single_fetch(None)
 
 
 def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> tuple[bytes | None, str]:
