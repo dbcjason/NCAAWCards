@@ -2615,7 +2615,6 @@ def build_playstyles_html(target: PlayerGameStats, bt_rows: list[dict[str, str]]
         <div class="play-grid">
           {rows_html}
         </div>
-        <div class="play-credit">CREATED BY @DBCJASON</div>
       </div>
 """
 
@@ -2924,7 +2923,8 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
       </div>
 """
 
-    impact_keys = ["bpm", "rapm", "net_pts", "onoff_net_rating"]
+    # Transfer grade is based on core impact signals (exclude On/Off NetR per request).
+    impact_keys = ["bpm", "rapm", "net_pts"]
     pred_impact = [predicted[k] for k in impact_keys if k in predicted and math.isfinite(predicted[k])]
     impact_pct: float | None = None
     if pred_impact:
@@ -2956,30 +2956,6 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
             row_html("FT%", "ft_pct", 1),
         ]
     )
-    cur_year = norm_season(target.season)
-    impact_specs = [
-        ("BPM", "bpm", 1),
-        ("RAPM", "rapm", 1),
-        ("Net Pts", "net_pts", 1),
-        ("On/Off NetR", "onoff_net_rating", 1),
-    ]
-    impact_rows_plain = '<div class="transfer-impact-row transfer-impact-head"><span>Stat</span><span>Proj</span><span>%ile</span></div>'
-    for label, key, digits in impact_specs:
-        if key in predicted and math.isfinite(predicted[key]):
-            v = float(predicted[key])
-            cohort_vals = []
-            for r in bt_rows:
-                if norm_season(bt_get(r, ["year"])) != cur_year:
-                    continue
-                cv = bt_metric_value(r, key)
-                if cv is None or not math.isfinite(cv):
-                    continue
-                cohort_vals.append(float(cv))
-            pct = percentile(v, cohort_vals) if cohort_vals else None
-            pct_txt = f"{ordinal(int(round(pct)))}" if pct is not None and math.isfinite(pct) else "-"
-            impact_rows_plain += f'<div class="transfer-impact-row"><span>{html.escape(label)}</span><span>{v:.{digits}f}</span><span>{pct_txt}</span></div>'
-        else:
-            impact_rows_plain += f'<div class="transfer-impact-row"><span>{html.escape(label)}</span><span>-</span><span>-</span></div>'
     return f"""
       <div class="panel draft-proj-panel">
         <h3>Transfer Projection</h3>
@@ -2989,10 +2965,7 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
         <div class="draft-odds-grid transfer-two-col">
           {per_game_rows}
         </div>
-        <div class="draft-proj-sub" style="font-weight:700;margin-top:8px;">Impact Projections</div>
-        <div class="transfer-impact-list">
-          {impact_rows_plain}
-        </div>
+        <div class="draft-proj-credit">CREATED BY @DBCJASON</div>
       </div>
 """
 
@@ -4343,7 +4316,8 @@ body {{
   font-size: 11px;
 }}
 .draft-proj-credit {{
-  margin-top: 8px;
+  margin-top: auto;
+  padding-top: 8px;
   color: #60a5fa;
   font-size: 15px;
   font-weight: 700;
@@ -4896,12 +4870,6 @@ def main() -> None:
         draft_projection_html = build_transfer_projection_html(target, args.destination_conference, bt_rows)
     else:
         draft_projection_html = draft_projection_html.replace('<div class="draft-proj-credit">CREATED BY @DBCJASON</div>', "")
-    if playstyles_html and "CREATED BY @DBCJASON" not in playstyles_html:
-        tail = "</div>"
-        marker = '<div class="play-credit">CREATED BY @DBCJASON</div>'
-        if tail in playstyles_html:
-            head, sep, end = playstyles_html.rpartition(tail)
-            playstyles_html = f"{head}        {marker}\n{sep}{end}"
     advanced_html = build_advanced_html(target, lebron_rows, rim_rows, style_rows)
     stage("Built card section HTML blocks")
     per_game_override = bt_per_game_overrides(target, bt_rows)
