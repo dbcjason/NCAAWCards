@@ -1,0 +1,1109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sarah Strong - Player Card</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #141414;
+  --line: #3b3b3b;
+  --text: #f5f5f5;
+  --muted: #d4d4d4;
+  --accent: #ffffff;
+  --bar: #22c55e;
+  --panel-alt: #1f1f1f;
+  --bar-track: #2a2a2a;
+  --shot-mid: #ef4444;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+.wrap {
+  max-width: 1100px;
+  margin: 18px auto;
+  padding: 16px;
+}
+.card {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: #000000;
+  padding: 16px;
+}
+.title {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 0 0 8px 0;
+}
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.grade-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(96px, 1fr));
+  gap: 8px;
+  min-width: 560px;
+}
+.grade-chip {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+  background: var(--panel-alt);
+}
+.grade-k {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.1;
+}
+.grade-v {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--accent);
+}
+.sub {
+  color: var(--muted);
+  margin-bottom: 0;
+  font-size: 15px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--panel);
+}
+.per-game-panel {
+  margin-top: 10px;
+}
+.panel h3 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(210px, 1fr));
+  gap: 10px;
+}
+.section-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--panel-alt);
+}
+.section-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: var(--text);
+  letter-spacing: 0.1px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 8px;
+  font-size: 14px;
+}
+.stat-strip {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+.shot-wrap {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  align-items: stretch;
+}
+.left-wrap {
+  flex: 0 0 33%;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.shot-panel {
+  min-width: 0;
+}
+.shot-panel svg {
+  display: block;
+  margin: 0 auto;
+  transform: translateX(-8px);
+}
+.shot-chart-col { min-width: 0; }
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  background: var(--panel-alt);
+}
+.chip .k {
+  color: var(--muted);
+  font-size: 12px;
+}
+.chip .v {
+  font-size: 20px;
+  font-weight: 700;
+}
+.chip .p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1;
+}
+.metric-row {
+  display: grid;
+  grid-template-columns: 72px 58px 1fr 34px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.metric-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+.metric-val {
+  font-weight: 700;
+  font-size: 12px;
+}
+.bar-wrap {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--bar-track);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 12px;
+  background: var(--bar);
+}
+.metric-pct {
+  text-align: right;
+  font-weight: 700;
+  font-size: 12px;
+}
+.shot-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.trend-wrap {
+  margin-top: 8px;
+}
+.shotdiet-bar {
+  width: 100%;
+  height: 16px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bar-track);
+  border: 1px solid var(--line);
+  display: flex;
+}
+.shotdiet-seg {
+  height: 100%;
+  display: block;
+  flex: 0 0 auto;
+}
+.shotdiet-rim {
+  background: var(--bar);
+}
+.shotdiet-mid {
+  background: var(--shot-mid);
+}
+.shotdiet-three {
+  background: #60a5fa !important;
+  box-shadow: none;
+}
+.shotdiet-legend {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.shotdiet-key {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.shotdiet-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.right-wrap {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 14px;
+}
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+}
+.comp-table {
+  display: grid;
+  gap: 6px;
+}
+.comp-row {
+  display: grid;
+  grid-template-columns: 1fr 42px 42px;
+  gap: 8px;
+  font-size: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 8px;
+  background: var(--panel-alt);
+}
+.comp-name {
+  font-weight: 600;
+  color: var(--text);
+}
+.comp-year {
+  color: var(--muted);
+  text-align: right;
+}
+.comp-score {
+  color: var(--accent);
+  text-align: right;
+  font-weight: 700;
+}
+.play-grid {
+  display: grid;
+  gap: 11px;
+}
+.play-row {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 6px;
+  align-items: center;
+}
+.play-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+.play-stack {
+  display: grid;
+  gap: 6px;
+}
+.play-line {
+  display: grid;
+  grid-template-columns: 1fr 82px;
+  gap: 6px;
+  align-items: center;
+}
+.play-track {
+  position: relative;
+  height: 10px;
+  background: var(--bar-track);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: visible;
+}
+.play-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+.play-vol {
+  background: #60a5fa;
+}
+.play-ppp {
+  background: var(--bar);
+}
+.play-badge {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #0e0e0e;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+.play-tag {
+  color: var(--muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.play-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.play-head h3 {
+  margin: 0;
+}
+.play-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.play-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.play-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.playstyles-wrap {
+  flex: 1 1 auto;
+  display: flex;
+}
+.playstyles-wrap .panel {
+  width: 100%;
+}
+.team-impact-wrap {
+  margin-top: 2px;
+}
+.comp-bottom {
+  margin-top: 0;
+}
+.draft-proj-main {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-top: 2px;
+}
+.draft-proj-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.draft-proj-sub {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.draft-proj-credit {
+  margin-top: 8px;
+  color: #60a5fa;
+  font-size: 15px;
+  font-weight: 700;
+}
+.draft-odds-grid {
+  margin-top: 8px;
+  display: grid;
+  gap: 4px;
+  flex: 1 1 auto;
+  align-content: start;
+}
+.draft-odd-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: var(--panel-alt);
+}
+.draft-odd-k {
+  color: var(--muted);
+}
+.draft-odd-v {
+  font-weight: 700;
+  color: var(--text);
+}
+.ti-comp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ti-section {
+  margin-top: 8px;
+}
+.ti-subhead {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 700;
+  margin: 0;
+  text-align: left !important;
+}
+.ti-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  margin: 0 0 6px 0;
+  font-size: 11px;
+}
+.ti-table th, .ti-table td {
+  border: none;
+  padding: 2px 4px;
+}
+.ti-table th {
+  color: var(--muted);
+  font-weight: 700;
+  text-align: right;
+}
+.ti-table th:first-child {
+  text-align: left;
+}
+.ti-metric {
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+}
+.ti-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 920px) {
+  .title-row { flex-direction: column; }
+  .grade-strip { min-width: 0; width: 100%; grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+  .row { grid-template-columns: 1fr; }
+  .stat-strip { grid-template-columns: repeat(3, 1fr); }
+  .section-grid { grid-template-columns: 1fr; }
+  .left-wrap { width: 100%; flex: 1 1 auto; min-width: 0; }
+  .shot-panel { width: 100%; min-width: 0; }
+  .shot-chart-col { min-width: 0; }
+  .right-wrap { width: 100%; margin-top: 14px; }
+  .right-wrap { grid-template-columns: 1fr; }
+  .right-col { width: 100%; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title-row">
+        <h1 class="title">Sarah Strong</h1>
+        <div class="grade-strip"><div class="grade-chip"><div class="grade-k">Impact</div><div class="grade-v">A+</div></div><div class="grade-chip"><div class="grade-k">Scoring</div><div class="grade-v">A+</div></div><div class="grade-chip"><div class="grade-k">Playmaking</div><div class="grade-v">A+</div></div><div class="grade-chip"><div class="grade-k">Defense</div><div class="grade-v">A+</div></div><div class="grade-chip"><div class="grade-k">Rebounding</div><div class="grade-v">D+</div></div></div>
+      </div>
+      <div class="sub">Connecticut | 2026 | Position: F | Height: 6&#x27;2&quot;</div>
+
+      <div class="panel per-game-panel">
+        <h3>Per Game</h3>
+        <div class="stat-strip">
+          <div class="chip"><div class="k">PPG</div><div class="v">18.5</div><div class="p">99%</div></div>
+          <div class="chip"><div class="k">RPG</div><div class="v">7.6</div><div class="p">92%</div></div>
+          <div class="chip"><div class="k">APG</div><div class="v">4.1</div><div class="p">100%</div></div>
+          <div class="chip"><div class="k">SPG</div><div class="v">3.4</div><div class="p">100%</div></div>
+          <div class="chip"><div class="k">BPG</div><div class="v">1.6</div><div class="p">97%</div></div>
+          <div class="chip"><div class="k">FG%</div><div class="v">60.1</div><div class="p">96%</div></div>
+          <div class="chip"><div class="k">3P%</div><div class="v">42.7</div><div class="p">96%</div></div>
+          <div class="chip"><div class="k">FT%</div><div class="v">87.3</div><div class="p">96%</div></div>
+        </div>
+      </div>
+
+      
+      <div class="panel" style="margin-top:14px;">
+        <h3>Advanced Percentiles</h3>
+        <div class="shot-meta">Season: 2026</div>
+        <div class="section-grid">
+          <div class="section-card"><h4>Impact</h4>
+<div class="metric-row">
+  <div class="metric-label">BPM</div>
+  <div class="metric-val">27.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:100.0%;background:rgb(34, 197, 94);"></div></div>
+  <div class="metric-pct">100</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">RAPM</div>
+  <div class="metric-val">24.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:99.9%;background:rgb(34, 197, 94);"></div></div>
+  <div class="metric-pct">100</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Net Pts</div>
+  <div class="metric-val">21.9</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:99.9%;background:rgb(34, 197, 94);"></div></div>
+  <div class="metric-pct">100</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">On/Off NetR</div>
+  <div class="metric-val">35.8</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:99.9%;background:rgb(34, 197, 94);"></div></div>
+  <div class="metric-pct">100</div>
+</div>
+
+<div class="trend-wrap">
+<svg viewBox="0 0 330 130" width="330" height="130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="38" y="10" width="282" height="96" fill="var(--panel-alt)" stroke="var(--line)" stroke-width="1"/>
+  <line x1="38" y1="106.0" x2="320" y2="106.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="82.0" x2="320" y2="82.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="58.0" x2="320" y2="58.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="34.0" x2="320" y2="34.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="10.0" x2="320" y2="10.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/>
+  <line x1="38" y1="99.4" x2="320" y2="99.4" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="38.0" y1="63.6" x2="46.8" y2="50.6" stroke="#22c55e" stroke-width="2" /><line x1="46.8" y1="50.6" x2="55.6" y2="49.9" stroke="#22c55e" stroke-width="2" /><line x1="55.6" y1="49.9" x2="64.4" y2="35.7" stroke="#22c55e" stroke-width="2" /><line x1="64.4" y1="35.7" x2="73.2" y2="64.2" stroke="#22c55e" stroke-width="2" /><line x1="73.2" y1="64.2" x2="82.1" y2="49.7" stroke="#22c55e" stroke-width="2" /><line x1="82.1" y1="49.7" x2="90.9" y2="50.5" stroke="#22c55e" stroke-width="2" /><line x1="90.9" y1="50.5" x2="99.7" y2="52.7" stroke="#22c55e" stroke-width="2" /><line x1="99.7" y1="52.7" x2="108.5" y2="23.3" stroke="#22c55e" stroke-width="2" /><line x1="108.5" y1="23.3" x2="117.3" y2="72.9" stroke="#22c55e" stroke-width="2" /><line x1="117.3" y1="72.9" x2="126.1" y2="61.9" stroke="#22c55e" stroke-width="2" /><line x1="126.1" y1="61.9" x2="134.9" y2="58.3" stroke="#22c55e" stroke-width="2" /><line x1="134.9" y1="58.3" x2="143.8" y2="62.5" stroke="#22c55e" stroke-width="2" /><line x1="143.8" y1="62.5" x2="152.6" y2="71.8" stroke="#22c55e" stroke-width="2" /><line x1="152.6" y1="71.8" x2="161.4" y2="46.8" stroke="#22c55e" stroke-width="2" /><line x1="161.4" y1="46.8" x2="170.2" y2="49.4" stroke="#22c55e" stroke-width="2" /><line x1="170.2" y1="49.4" x2="179.0" y2="52.6" stroke="#22c55e" stroke-width="2" /><line x1="179.0" y1="52.6" x2="187.8" y2="49.5" stroke="#22c55e" stroke-width="2" /><line x1="187.8" y1="49.5" x2="196.6" y2="61.5" stroke="#22c55e" stroke-width="2" /><line x1="196.6" y1="61.5" x2="205.4" y2="62.2" stroke="#22c55e" stroke-width="2" /><line x1="205.4" y1="62.2" x2="214.2" y2="76.3" stroke="#22c55e" stroke-width="2" /><line x1="214.2" y1="76.3" x2="223.1" y2="66.2" stroke="#22c55e" stroke-width="2" /><line x1="223.1" y1="66.2" x2="231.9" y2="80.5" stroke="#22c55e" stroke-width="2" /><line x1="231.9" y1="80.5" x2="240.7" y2="55.0" stroke="#22c55e" stroke-width="2" /><line x1="240.7" y1="55.0" x2="249.5" y2="63.6" stroke="#22c55e" stroke-width="2" /><line x1="249.5" y1="63.6" x2="258.3" y2="66.5" stroke="#22c55e" stroke-width="2" /><line x1="258.3" y1="66.5" x2="267.1" y2="52.8" stroke="#22c55e" stroke-width="2" /><line x1="267.1" y1="52.8" x2="275.9" y2="46.9" stroke="#22c55e" stroke-width="2" /><line x1="275.9" y1="46.9" x2="284.8" y2="49.1" stroke="#22c55e" stroke-width="2" /><line x1="284.8" y1="49.1" x2="293.6" y2="69.5" stroke="#22c55e" stroke-width="2" /><line x1="293.6" y1="69.5" x2="302.4" y2="64.0" stroke="#22c55e" stroke-width="2" /><line x1="302.4" y1="64.0" x2="311.2" y2="16.6" stroke="#22c55e" stroke-width="2" /><line x1="311.2" y1="16.6" x2="320.0" y2="62.5" stroke="#22c55e" stroke-width="2" />
+  <circle cx="38.0" cy="63.6" r="2.4" fill="#22c55e" /><circle cx="46.8" cy="50.6" r="2.4" fill="#22c55e" /><circle cx="55.6" cy="49.9" r="2.4" fill="#22c55e" /><circle cx="64.4" cy="35.7" r="2.4" fill="#22c55e" /><circle cx="73.2" cy="64.2" r="2.4" fill="#22c55e" /><circle cx="82.1" cy="49.7" r="2.4" fill="#22c55e" /><circle cx="90.9" cy="50.5" r="2.4" fill="#22c55e" /><circle cx="99.7" cy="52.7" r="2.4" fill="#22c55e" /><circle cx="108.5" cy="23.3" r="2.4" fill="#22c55e" /><circle cx="117.3" cy="72.9" r="2.4" fill="#22c55e" /><circle cx="126.1" cy="61.9" r="2.4" fill="#22c55e" /><circle cx="134.9" cy="58.3" r="2.4" fill="#22c55e" /><circle cx="143.8" cy="62.5" r="2.4" fill="#22c55e" /><circle cx="152.6" cy="71.8" r="2.4" fill="#22c55e" /><circle cx="161.4" cy="46.8" r="2.4" fill="#22c55e" /><circle cx="170.2" cy="49.4" r="2.4" fill="#22c55e" /><circle cx="179.0" cy="52.6" r="2.4" fill="#22c55e" /><circle cx="187.8" cy="49.5" r="2.4" fill="#22c55e" /><circle cx="196.6" cy="61.5" r="2.4" fill="#22c55e" /><circle cx="205.4" cy="62.2" r="2.4" fill="#22c55e" /><circle cx="214.2" cy="76.3" r="2.4" fill="#22c55e" /><circle cx="223.1" cy="66.2" r="2.4" fill="#22c55e" /><circle cx="231.9" cy="80.5" r="2.4" fill="#22c55e" /><circle cx="240.7" cy="55.0" r="2.4" fill="#22c55e" /><circle cx="249.5" cy="63.6" r="2.4" fill="#22c55e" /><circle cx="258.3" cy="66.5" r="2.4" fill="#22c55e" /><circle cx="267.1" cy="52.8" r="2.4" fill="#22c55e" /><circle cx="275.9" cy="46.9" r="2.4" fill="#22c55e" /><circle cx="284.8" cy="49.1" r="2.4" fill="#22c55e" /><circle cx="293.6" cy="69.5" r="2.4" fill="#22c55e" /><circle cx="302.4" cy="64.0" r="2.4" fill="#22c55e" /><circle cx="311.2" cy="16.6" r="2.4" fill="#22c55e" /><circle cx="320.0" cy="62.5" r="2.4" fill="#22c55e" />
+  <text x="38.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-4</text><text x="82.1" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-23</text><text x="134.9" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">12-20</text><text x="179.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">1-11</text><text x="223.1" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">1-28</text><text x="275.9" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">2-22</text><text x="320.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">3-9</text>
+  <text x="12" y="109.0" text-anchor="start" font-size="9" fill="var(--muted)">-4.3</text><text x="12" y="85.0" text-anchor="start" font-size="9" fill="var(--muted)">11.2</text><text x="12" y="61.0" text-anchor="start" font-size="9" fill="var(--muted)">26.7</text><text x="12" y="37.0" text-anchor="start" font-size="9" fill="var(--muted)">42.2</text><text x="12" y="13.0" text-anchor="start" font-size="9" fill="var(--muted)">57.6</text>
+  <text x="165.0" y="129" text-anchor="middle" font-size="9" fill="var(--muted)">Date</text>
+  <text x="6" y="65.0" text-anchor="start" font-size="9" fill="var(--muted)" transform="rotate(-90 6 65.0)">BPM</text>
+</svg>
+</div>
+</div>
+          <div class="section-card"><h4>Scoring</h4>
+<div class="metric-row">
+  <div class="metric-label">Usage</div>
+  <div class="metric-val">26.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:90.7%;background:rgb(75, 208, 124);"></div></div>
+  <div class="metric-pct">91</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">TS%</div>
+  <div class="metric-val">68.8</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:98.0%;background:rgb(43, 199, 100);"></div></div>
+  <div class="metric-pct">98</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">2P%</div>
+  <div class="metric-val">67.6</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:98.2%;background:rgb(42, 199, 100);"></div></div>
+  <div class="metric-pct">98</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Rim Att/100</div>
+  <div class="metric-val">12.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:82.7%;background:rgb(110, 217, 150);"></div></div>
+  <div class="metric-pct">83</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Rim%</div>
+  <div class="metric-val">74.6</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:96.1%;background:rgb(51, 202, 107);"></div></div>
+  <div class="metric-pct">96</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Mid%</div>
+  <div class="metric-val">51.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:95.6%;background:rgb(54, 202, 108);"></div></div>
+  <div class="metric-pct">96</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">3P%</div>
+  <div class="metric-val">42.7</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:96.5%;background:rgb(50, 201, 105);"></div></div>
+  <div class="metric-pct">96</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">3PA/100</div>
+  <div class="metric-val">7.8</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:91.1%;background:rgb(73, 207, 123);"></div></div>
+  <div class="metric-pct">91</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">FTA/100</div>
+  <div class="metric-val">4.3</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:40.8%;background:rgb(252, 221, 221);"></div></div>
+  <div class="metric-pct">41</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">FT%</div>
+  <div class="metric-val">87.3</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:95.6%;background:rgb(54, 202, 108);"></div></div>
+  <div class="metric-pct">96</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">FTr</div>
+  <div class="metric-val">17.3</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:23.1%;background:rgb(246, 154, 154);"></div></div>
+  <div class="metric-pct">23</div>
+</div>
+</div>
+          <div class="section-card">
+            <h4>Playmaking</h4>
+            
+<div class="metric-row">
+  <div class="metric-label">AST%</div>
+  <div class="metric-val">26.4</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:99.3%;background:rgb(37, 198, 96);"></div></div>
+  <div class="metric-pct">99</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">TO%</div>
+  <div class="metric-val">14.6</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:87.1%;background:rgb(91, 212, 136);"></div></div>
+  <div class="metric-pct">87</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">A/TO</div>
+  <div class="metric-val">2.21</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:98.7%;background:rgb(40, 198, 98);"></div></div>
+  <div class="metric-pct">99</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Rim Ast/100</div>
+  <div class="metric-val">3.77</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:98.7%;background:rgb(40, 199, 98);"></div></div>
+  <div class="metric-pct">99</div>
+</div>
+
+            <h4 style="margin-top:4px;">Defense</h4>
+            
+<div class="metric-row">
+  <div class="metric-label">STL%</div>
+  <div class="metric-val">7.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:99.9%;background:rgb(35, 197, 94);"></div></div>
+  <div class="metric-pct">100</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">BLK%</div>
+  <div class="metric-val">8.1</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:93.4%;background:rgb(63, 205, 115);"></div></div>
+  <div class="metric-pct">93</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">DBPM</div>
+  <div class="metric-val">11.5</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:99.9%;background:rgb(35, 197, 94);"></div></div>
+  <div class="metric-pct">100</div>
+</div>
+
+            <h4 style="margin-top:4px;">Rebounding</h4>
+            
+<div class="metric-row">
+  <div class="metric-label">OREB%</div>
+  <div class="metric-val">6.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:32.3%;background:rgb(249, 189, 189);"></div></div>
+  <div class="metric-pct">32</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">DREB%</div>
+  <div class="metric-val">26.1</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:93.5%;background:rgb(63, 205, 115);"></div></div>
+  <div class="metric-pct">93</div>
+</div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="shot-wrap">
+        <div class="left-wrap">
+          <div class="panel shot-panel shot-chart-col" style="margin-top:14px;">
+            <h3>Shot Chart</h3>
+            <div class="shot-meta">Attempts: 411 | Made: 247 | FG%: 60.1%</div>
+            <div class="shot-meta">Points per Shot Over Expectation: +37.7% (99th Percentile)</div>
+            
+<svg viewBox="0 0 355 250" width="355" height="250" xmlns="http://www.w3.org/2000/svg">
+  
+<rect x="20.0" y="20.0" width="315.0" height="210.0" fill="#000000" stroke="#ffffff" stroke-width="2"/>
+<rect x="139.7" y="20.0" width="75.6" height="84.9" fill="none" stroke="#ffffff" stroke-width="2"/>
+<line x1="158.6" y1="34.5" x2="196.4" y2="34.5" stroke="#ffffff" stroke-width="2"/>
+<ellipse cx="177.5" cy="37.9" rx="6.0" ry="6.0" fill="none" stroke="#ffffff" stroke-width="2"/>
+<path d="M 152.3 37.9 A 25.2 17.9 0 0 1 202.7 37.9" fill="none" stroke="#ffffff" stroke-width="2"/>
+<ellipse cx="177.5" cy="104.9" rx="37.8" ry="26.8" fill="none" stroke="#ffffff" stroke-width="2"/>
+<line x1="38.9" y1="20.0" x2="38.9" y2="49.2" stroke="#ffffff" stroke-width="2"/>
+<line x1="316.1" y1="20.0" x2="316.1" y2="49.2" stroke="#ffffff" stroke-width="2"/>
+<polyline points="38.9,49.2 42.4,62.5 45.8,70.6 49.3,76.9 52.8,82.2 56.2,86.8 59.7,90.9 63.2,94.6 66.6,97.9 70.1,101.0 73.5,103.9 77.0,106.5 80.5,109.0 83.9,111.3 87.4,113.4 90.9,115.4 94.3,117.3 97.8,119.1 101.3,120.7 104.7,122.3 108.2,123.8 111.7,125.1 115.1,126.4 118.6,127.6 122.1,128.7 125.5,129.7 129.0,130.6 132.5,131.5 135.9,132.3 139.4,133.1 142.8,133.7 146.3,134.3 149.8,134.8 153.2,135.3 156.7,135.7 160.2,136.1 163.6,136.3 167.1,136.5 170.6,136.7 174.0,136.8 177.5,136.8 181.0,136.8 184.4,136.7 187.9,136.5 191.4,136.3 194.8,136.1 198.3,135.7 201.8,135.3 205.2,134.8 208.7,134.3 212.2,133.7 215.6,133.1 219.1,132.3 222.5,131.5 226.0,130.6 229.5,129.7 232.9,128.7 236.4,127.6 239.9,126.4 243.3,125.1 246.8,123.8 250.3,122.3 253.7,120.7 257.2,119.1 260.7,117.3 264.1,115.4 267.6,113.4 271.1,111.3 274.5,109.0 278.0,106.5 281.4,103.9 284.9,101.0 288.4,97.9 291.8,94.6 295.3,90.9 298.8,86.8 302.2,82.2 305.7,76.9 309.2,70.6 312.6,62.5 316.1,49.2" fill="none" stroke="#ffffff" stroke-width="2"/>
+<line x1="20.0" y1="230.0" x2="335.0" y2="230.0" stroke="#ffffff" stroke-width="2"/>
+
+  <circle cx="189.5" cy="46.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="187.9" cy="47.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.6" cy="47.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.7" cy="47.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.9" cy="47.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.7" cy="47.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="187.9" cy="46.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.4" cy="47.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.9" cy="47.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.5" cy="47.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.1" cy="46.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.2" cy="47.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.3" cy="47.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.3" cy="47.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="171.7" cy="48.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="172.0" cy="47.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="173.5" cy="47.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="172.0" cy="48.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="172.9" cy="47.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="172.4" cy="46.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.0" cy="41.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.1" cy="40.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="178.2" cy="40.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="175.9" cy="40.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.7" cy="40.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="184.3" cy="57.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="183.4" cy="58.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="185.3" cy="57.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="183.4" cy="58.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="183.8" cy="57.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.5" cy="46.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.3" cy="47.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.9" cy="47.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.4" cy="40.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.4" cy="39.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="192.6" cy="39.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.7" cy="43.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.5" cy="42.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.1" cy="56.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="197.8" cy="55.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="197.5" cy="56.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="198.9" cy="55.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="167.6" cy="63.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="169.2" cy="62.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="167.8" cy="62.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="168.9" cy="62.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="168.4" cy="63.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.7" cy="65.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.3" cy="65.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.6" cy="66.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.4" cy="66.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="237.9" cy="139.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="237.4" cy="138.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="237.5" cy="139.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="237.4" cy="138.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="106.2" cy="138.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="104.6" cy="137.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="105.9" cy="137.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="104.2" cy="137.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="128.4" cy="153.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="129.6" cy="153.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="129.2" cy="154.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="128.6" cy="153.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="128.8" cy="154.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="92.1" cy="130.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="91.8" cy="129.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="219.9" cy="149.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="218.2" cy="149.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="266.6" cy="130.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="268.7" cy="129.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="117.8" cy="145.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="119.7" cy="145.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="81.8" cy="122.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="83.7" cy="122.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="75.5" cy="128.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="74.8" cy="129.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="75.4" cy="128.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="207.6" cy="63.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="207.2" cy="64.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="207.8" cy="63.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="325.9" cy="46.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="325.7" cy="47.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="324.5" cy="47.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.4" cy="148.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.8" cy="148.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="192.7" cy="149.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.6" cy="148.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.1" cy="149.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="192.4" cy="148.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="46.7" cy="101.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="46.7" cy="102.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="125.0" cy="59.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="32.7" cy="60.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="132.9" cy="143.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="174.8" cy="81.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="175.6" cy="81.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="175.7" cy="81.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="192.7" cy="79.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="191.2" cy="77.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="323.7" cy="34.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="323.8" cy="35.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="221.9" cy="145.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="231.8" cy="117.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.7" cy="146.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="195.8" cy="113.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="165.8" cy="149.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="165.9" cy="150.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="205.5" cy="151.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.9" cy="151.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="204.2" cy="151.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="278.2" cy="119.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="296.6" cy="104.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="297.4" cy="104.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="296.1" cy="105.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="292.8" cy="117.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="162.1" cy="30.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="166.2" cy="69.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="166.6" cy="69.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.1" cy="109.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="131.7" cy="100.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="129.0" cy="47.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="131.3" cy="47.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="100.7" cy="150.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="100.2" cy="150.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="225.8" cy="110.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.5" cy="72.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="241.6" cy="64.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="229.2" cy="58.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="229.6" cy="59.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="238.4" cy="149.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="238.4" cy="149.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="168.6" cy="127.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="159.5" cy="116.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="173.9" cy="116.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="174.0" cy="115.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="310.8" cy="104.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="309.1" cy="83.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="307.7" cy="82.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="42.9" cy="81.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="57.8" cy="108.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="152.4" cy="61.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="137.7" cy="112.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="159.8" cy="90.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="92.1" cy="57.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="98.9" cy="45.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="102.2" cy="90.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="120.3" cy="87.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="35.3" cy="40.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="116.8" cy="158.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="73.5" cy="137.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="92.7" cy="142.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="69.6" cy="120.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="265.0" cy="44.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="241.4" cy="95.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="233.6" cy="107.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="254.2" cy="74.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="234.0" cy="44.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="198.4" cy="78.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="325.5" cy="52.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="243.2" cy="170.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="149.2" cy="124.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.9" cy="129.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="171.2" cy="158.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="281.0" cy="129.1" r="4.2" fill="#ef4444" fill-opacity="0.8" />
+  <circle cx="188.5" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.0" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.2" cy="47.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.1" cy="48.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.1" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.3" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.5" cy="47.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.2" cy="47.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="187.8" cy="46.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="47.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.2" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.5" cy="47.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.3" cy="47.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="187.9" cy="48.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.1" cy="47.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.4" cy="47.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.5" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.2" cy="47.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.3" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.6" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.3" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.4" cy="48.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.4" cy="48.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.5" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.6" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.2" cy="47.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="187.9" cy="48.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.1" cy="47.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.9" cy="48.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.2" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.3" cy="48.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.4" cy="48.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.5" cy="47.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.5" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.1" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="187.9" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.2" cy="48.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.2" cy="47.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.0" cy="47.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.4" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.1" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.3" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.8" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.0" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.9" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.8" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.9" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.7" cy="48.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.9" cy="47.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="48.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.6" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="172.2" cy="48.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="172.2" cy="47.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.4" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.4" cy="47.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="171.7" cy="48.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.1" cy="46.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.3" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="171.7" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.9" cy="48.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.4" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="172.7" cy="47.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.5" cy="47.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="171.5" cy="48.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.2" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.8" cy="40.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.8" cy="39.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.5" cy="40.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.9" cy="41.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.3" cy="39.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.2" cy="40.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.8" cy="39.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.2" cy="39.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.7" cy="39.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.4" cy="39.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.9" cy="40.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.3" cy="39.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.0" cy="40.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.7" cy="39.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="183.4" cy="57.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="183.8" cy="57.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="184.3" cy="58.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="184.4" cy="57.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="185.1" cy="58.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="183.6" cy="58.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="183.1" cy="57.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="183.5" cy="58.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="185.2" cy="57.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="185.2" cy="58.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="184.9" cy="58.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="184.7" cy="58.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="183.5" cy="57.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.1" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.6" cy="47.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.0" cy="47.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.6" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.2" cy="46.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.2" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.0" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="47.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.0" cy="46.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.2" cy="46.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.7" cy="46.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="204.0" cy="47.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="204.2" cy="47.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="47.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.9" cy="39.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.9" cy="39.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.2" cy="40.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.0" cy="39.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.1" cy="39.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.3" cy="40.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.9" cy="39.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.1" cy="40.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.8" cy="39.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.2" cy="40.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.6" cy="39.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.7" cy="40.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="163.3" cy="42.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="162.9" cy="43.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="163.6" cy="43.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="162.0" cy="44.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="162.8" cy="43.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="163.5" cy="43.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="162.5" cy="42.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="163.3" cy="43.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="162.5" cy="43.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="163.1" cy="42.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="163.2" cy="43.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="196.9" cy="55.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="198.0" cy="55.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="197.8" cy="56.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="197.0" cy="55.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="197.6" cy="55.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="198.2" cy="55.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="197.5" cy="56.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="197.9" cy="55.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="198.0" cy="55.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="168.2" cy="62.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="169.5" cy="62.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="169.0" cy="63.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="168.3" cy="62.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="155.4" cy="51.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="157.2" cy="51.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="155.2" cy="51.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="155.4" cy="51.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="156.9" cy="51.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="155.3" cy="51.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="156.2" cy="51.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.8" cy="65.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.9" cy="65.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.6" cy="66.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="237.4" cy="139.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="237.2" cy="138.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="238.5" cy="140.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="105.3" cy="137.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="105.6" cy="137.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="90.8" cy="129.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="91.4" cy="130.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="92.9" cy="129.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="217.9" cy="148.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="219.5" cy="148.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="220.0" cy="149.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="267.4" cy="130.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="268.8" cy="129.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="267.5" cy="129.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="118.4" cy="143.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="118.3" cy="144.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="82.5" cy="122.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="84.3" cy="123.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="75.8" cy="128.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="207.1" cy="64.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="324.7" cy="46.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="175.7" cy="149.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="175.9" cy="148.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="47.0" cy="103.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="123.8" cy="59.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="124.5" cy="59.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="32.6" cy="59.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="31.0" cy="60.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="131.3" cy="144.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="131.6" cy="145.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.7" cy="78.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="324.9" cy="34.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="221.9" cy="144.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="220.7" cy="144.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="232.8" cy="117.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="233.2" cy="117.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="146.7" cy="146.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="147.1" cy="146.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="195.6" cy="114.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="195.6" cy="113.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="165.7" cy="149.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="280.1" cy="118.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="279.9" cy="118.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="292.7" cy="116.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="292.9" cy="116.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.9" cy="30.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="150.4" cy="44.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="150.9" cy="44.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="134.2" cy="65.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="135.0" cy="65.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="146.1" cy="109.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="132.8" cy="99.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="31.1" cy="40.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="31.4" cy="39.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="223.8" cy="110.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="185.3" cy="89.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="186.1" cy="89.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.6" cy="72.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="243.1" cy="63.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="214.9" cy="55.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="216.1" cy="56.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="313.3" cy="74.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="314.7" cy="74.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="168.5" cy="125.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="159.8" cy="116.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.2" cy="155.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.1" cy="154.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="311.4" cy="104.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="258.5" cy="131.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="258.7" cy="130.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="180.3" cy="31.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="120.7" cy="29.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="39.2" cy="90.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="46.2" cy="95.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="44.6" cy="116.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="96.1" cy="103.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="115.2" cy="53.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="86.1" cy="99.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="67.7" cy="112.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="124.2" cy="74.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="35.5" cy="44.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="270.8" cy="40.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="210.2" cy="98.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="265.4" cy="61.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="240.7" cy="75.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="224.8" cy="52.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="219.5" cy="117.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="205.0" cy="116.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="199.7" cy="103.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="150.2" cy="149.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="212.7" cy="145.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="256.6" cy="116.9" r="4.2" fill="#22c55e" fill-opacity="0.8" />
+</svg>
+
+          </div>
+          
+      <div class="panel draft-proj-panel">
+        <h3>Statistical WNBA Draft Projection</h3>
+        <div class="draft-proj-main">Number One Pick</div>
+        <div class="draft-proj-sub">Drafted: 99.0% | Top 20: 95.4%</div>
+        <div class="draft-odds-grid">
+          <div class="draft-odd-row"><div class="draft-odd-k">Number One Pick</div><div class="draft-odd-v">52.3%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 5</div><div class="draft-odd-v">75.7%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 10</div><div class="draft-odd-v">88.5%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 20</div><div class="draft-odd-v">95.4%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Outside Top 20</div><div class="draft-odd-v">4.6%</div></div>
+        </div>
+        <div class="draft-proj-sub">Projections based solely on statistical profile in an average draft</div>
+        <div class="draft-proj-credit">CREATED BY @DBCJASON</div>
+      </div>
+
+        </div>
+        <div class="right-wrap">
+          <div class="right-col">
+            
+      <div class="panel">
+        <h3>Self Creation</h3>
+        
+<div class="metric-row">
+  <div class="metric-label">UAsst&#x27;d Rim FGM/100</div>
+  <div class="metric-val">3.47</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:90.9%;background:rgb(74, 208, 123);"></div></div>
+  <div class="metric-pct">91</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">UAsst&#x27;d Mid FGM/100</div>
+  <div class="metric-val">0.97</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:68.1%;background:rgb(175, 234, 197);"></div></div>
+  <div class="metric-pct">68</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">UAsst&#x27;d 3PM/100</div>
+  <div class="metric-val">0.18</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:67.3%;background:rgb(179, 235, 199);"></div></div>
+  <div class="metric-pct">67</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Unassisted Pts/100</div>
+  <div class="metric-val">9.42</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:86.0%;background:rgb(96, 213, 139);"></div></div>
+  <div class="metric-pct">86</div>
+</div>
+
+      </div>
+
+            <div class="playstyles-wrap">
+      <div class="panel">
+        <div class="play-head">
+          <h3>Playstyles</h3>
+          <div class="play-legend">
+            <div class="play-legend-item"><span class="play-legend-dot play-vol"></span>Volume</div>
+            <div class="play-legend-item"><span class="play-legend-dot play-ppp"></span>PPP</div>
+          </div>
+        </div>
+        <div class="play-grid">
+          
+        <div class="play-row">
+          <div class="play-name">Drives</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:38.7%"></div>
+                <span class="play-badge" style="left:38.7%">39</span>
+              </div>
+              <div class="play-tag">3.83 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.6%"></div>
+                <span class="play-badge" style="left:99.6%">100</span>
+              </div>
+              <div class="play-tag">1.23 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">Spotup 3</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:50.9%"></div>
+                <span class="play-badge" style="left:50.9%">51</span>
+              </div>
+              <div class="play-tag">3.52 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.7%"></div>
+                <span class="play-badge" style="left:99.7%">100</span>
+              </div>
+              <div class="play-tag">1.52 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">OTD 3</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:14.0%"></div>
+                <span class="play-badge" style="left:14.0%">14</span>
+              </div>
+              <div class="play-tag">0.24 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.7%"></div>
+                <span class="play-badge" style="left:99.7%">100</span>
+              </div>
+              <div class="play-tag">1.42 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">Mid Range</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:80.4%"></div>
+                <span class="play-badge" style="left:80.4%">80</span>
+              </div>
+              <div class="play-tag">3.15 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.6%"></div>
+                <span class="play-badge" style="left:99.6%">100</span>
+              </div>
+              <div class="play-tag">1.17 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">PnR Passer</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:65.2%"></div>
+                <span class="play-badge" style="left:65.2%">65</span>
+              </div>
+              <div class="play-tag">1.26 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.5%"></div>
+                <span class="play-badge" style="left:99.5%">99</span>
+              </div>
+              <div class="play-tag">1.29 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">PnR Roller</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:38.0%"></div>
+                <span class="play-badge" style="left:38.0%">38</span>
+              </div>
+              <div class="play-tag">1.00 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.8%"></div>
+                <span class="play-badge" style="left:99.8%">100</span>
+              </div>
+              <div class="play-tag">1.53 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">Pick &amp; Pop</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:51.5%"></div>
+                <span class="play-badge" style="left:51.5%">51</span>
+              </div>
+              <div class="play-tag">0.72 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.3%"></div>
+                <span class="play-badge" style="left:99.3%">99</span>
+              </div>
+              <div class="play-tag">1.54 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">Post Up</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:66.6%"></div>
+                <span class="play-badge" style="left:66.6%">67</span>
+              </div>
+              <div class="play-tag">1.55 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:99.8%"></div>
+                <span class="play-badge" style="left:99.8%">100</span>
+              </div>
+              <div class="play-tag">1.21 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">Cutter</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:96.3%"></div>
+                <span class="play-badge" style="left:96.3%">96</span>
+              </div>
+              <div class="play-tag">4.21 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:97.7%"></div>
+                <span class="play-badge" style="left:97.7%">98</span>
+              </div>
+              <div class="play-tag">1.51 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="play-row">
+          <div class="play-name">Transition</div>
+          <div class="play-stack">
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-vol" style="width:95.1%"></div>
+                <span class="play-badge" style="left:95.1%">95</span>
+              </div>
+              <div class="play-tag">6.22 poss/100</div>
+            </div>
+            <div class="play-line">
+              <div class="play-track">
+                <div class="play-fill play-ppp" style="width:96.6%"></div>
+                <span class="play-badge" style="left:96.6%">97</span>
+              </div>
+              <div class="play-tag">1.53 PPP</div>
+            </div>
+          </div>
+        </div>
+        
+        </div>
+      </div>
+</div>
+          </div>
+          <div class="right-col">
+            
+      <div class="panel">
+        <h3>Shot Diet</h3>
+        <div class="shotdiet-bar">
+          <div class="shotdiet-seg shotdiet-rim" style="width:48.91%"></div>
+          <div class="shotdiet-seg shotdiet-mid" style="width:20.92%"></div>
+          <div class="shotdiet-seg shotdiet-three" style="width:30.17%;background:#60a5fa !important;"></div>
+        </div>
+        <div class="shotdiet-legend">
+          <div class="shotdiet-key"><span class="shotdiet-dot shotdiet-rim"></span> Rim (48.9%)</div>
+          <div class="shotdiet-key"><span class="shotdiet-dot shotdiet-mid"></span> Non-Rim 2 (20.9%)</div>
+          <div class="shotdiet-key"><span class="shotdiet-dot shotdiet-three"></span> 3PA (30.2%)</div>
+        </div>
+      </div>
+
+            <div class="ti-comp-stack">
+              <div class="team-impact-wrap">
+      <div class="panel">
+        <h3>Team Impact</h3>
+        
+        <div class="ti-section">
+          <table class="ti-table">
+            <colgroup>
+              <col style="width:46%">
+              <col style="width:18%">
+              <col style="width:18%">
+              <col style="width:18%">
+            </colgroup>
+            <thead>
+              <tr><th class="ti-subhead">Offense</th><th>On</th><th>Off</th><th>Diff</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ti-metric">eFG%</td><td class="ti-num">62.7</td><td class="ti-num">53.4</td><td class="ti-num" style="color:#22c55e;font-weight:700;">+9.3</td></tr><tr><td class="ti-metric">TO%</td><td class="ti-num">16.3</td><td class="ti-num">20.2</td><td class="ti-num" style="color:#22c55e;font-weight:700;">-3.9</td></tr><tr><td class="ti-metric">Rim%</td><td class="ti-num">71.7</td><td class="ti-num">63.1</td><td class="ti-num" style="color:#22c55e;font-weight:700;">+8.6</td></tr><tr><td class="ti-metric">Rim Rate</td><td class="ti-num">42.4</td><td class="ti-num">40.5</td><td class="ti-num" style="color:#22c55e;font-weight:700;">+1.9</td></tr><tr><td class="ti-metric">FTr</td><td class="ti-num">16.9</td><td class="ti-num">24.6</td><td class="ti-num" style="color:#ef4444;font-weight:700;">-7.7</td></tr><tr><td class="ti-metric">3Pr</td><td class="ti-num">37.3</td><td class="ti-num">33.6</td><td class="ti-num" style="color:#22c55e;font-weight:700;">+3.7</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        
+        <div class="ti-section">
+          <table class="ti-table">
+            <colgroup>
+              <col style="width:46%">
+              <col style="width:18%">
+              <col style="width:18%">
+              <col style="width:18%">
+            </colgroup>
+            <thead>
+              <tr><th class="ti-subhead">Defense</th><th>On</th><th>Off</th><th>Diff</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ti-metric">Opp eFG%</td><td class="ti-num">38.6</td><td class="ti-num">40.6</td><td class="ti-num" style="color:#22c55e;font-weight:700;">-2.0</td></tr><tr><td class="ti-metric">Opp TO%</td><td class="ti-num">37.4</td><td class="ti-num">26.8</td><td class="ti-num" style="color:#22c55e;font-weight:700;">+10.6</td></tr><tr><td class="ti-metric">Opp Rim%</td><td class="ti-num">39.9</td><td class="ti-num">50.6</td><td class="ti-num" style="color:#22c55e;font-weight:700;">-10.7</td></tr><tr><td class="ti-metric">Opp Rim Rate</td><td class="ti-num">30.3</td><td class="ti-num">24.0</td><td class="ti-num" style="color:#ef4444;font-weight:700;">+6.3</td></tr><tr><td class="ti-metric">Opp FTr</td><td class="ti-num">18.3</td><td class="ti-num">22.8</td><td class="ti-num" style="color:#22c55e;font-weight:700;">-4.5</td></tr><tr><td class="ti-metric">Opp 3Pr</td><td class="ti-num">42.2</td><td class="ti-num">47.7</td><td class="ti-num" style="color:#22c55e;font-weight:700;">-5.5</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        
+        <div class="ti-section">
+          <table class="ti-table">
+            <colgroup>
+              <col style="width:46%">
+              <col style="width:18%">
+              <col style="width:18%">
+              <col style="width:18%">
+            </colgroup>
+            <thead>
+              <tr><th class="ti-subhead">Rebounding</th><th>On</th><th>Off</th><th>Diff</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ti-metric">OREB%</td><td class="ti-num">32.1</td><td class="ti-num">38.0</td><td class="ti-num" style="color:#ef4444;font-weight:700;">-5.9</td></tr><tr><td class="ti-metric">Opp OREB%</td><td class="ti-num">27.2</td><td class="ti-num">28.8</td><td class="ti-num" style="color:#22c55e;font-weight:700;">-1.7</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+</div>
+              <div class="comp-bottom">
+      <div class="panel">
+        <h3>Player Comparisons</h3>
+        <div class="comp-table">
+          <div class="comp-row"><span class="comp-name">Sarah Strong</span><span class="comp-year">2025</span><span class="comp-score">96.6</span></div><div class="comp-row"><span class="comp-name">Maggie Bair</span><span class="comp-year">2023</span><span class="comp-score">92.6</span></div><div class="comp-row"><span class="comp-name">Maggie Doogan</span><span class="comp-year">2025</span><span class="comp-score">89.4</span></div><div class="comp-row"><span class="comp-name">Kayla Jones</span><span class="comp-year">2022</span><span class="comp-score">89.1</span></div><div class="comp-row"><span class="comp-name">Madison Booker</span><span class="comp-year">2026</span><span class="comp-score">88.8</span></div>
+        </div>
+      </div>
+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</body>
+</html>
