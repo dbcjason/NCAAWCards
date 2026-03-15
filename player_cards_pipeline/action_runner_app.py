@@ -255,33 +255,55 @@ def get_artifacts(owner: str, repo: str, token: str, run_id: int) -> list[dict[s
     return [a for a in arts if isinstance(a, dict)]
 
 
-def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int) -> tuple[bytes | None, str]:
-    url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
-    req = urllib.request.Request(
-        url,
-        method="GET",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Accept": "application/octet-stream",
-            "X-GitHub-Api-Version": "2022-11-28",
-            "User-Agent": "NCAAWCards-ActionRunner",
-        },
-    )
+def _http_fetch_bytes(url: str, token: str, *, accept: str, with_auth: bool) -> tuple[int, bytes, str]:
+    headers = {
+        "Accept": accept,
+        "X-GitHub-Api-Version": "2022-11-28",
+        "User-Agent": "NCAAWCards-ActionRunner",
+    }
+    if with_auth:
+        headers["Authorization"] = f"Bearer {token}"
+    req = urllib.request.Request(url, method="GET", headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=60) as resp:
-            raw = resp.read()
-            if raw[:2] != b"PK":
-                return None, f"unexpected payload ({len(raw)} bytes)"
-            return raw, ""
+            data = resp.read()
+            status = int(getattr(resp, "status", 200) or 200)
+            location = str(getattr(resp, "url", "") or "")
+            return status, data, location
     except urllib.error.HTTPError as e:
         body = b""
         try:
             body = e.read()
         except Exception:
             pass
-        return None, f"http {e.code} ({len(body)} bytes)"
-    except Exception as e:
-        return None, str(e)
+        location = str(e.headers.get("Location", "") if e.headers else "")
+        return int(e.code or 0), body, location
+    except Exception:
+        return 0, b"", ""
+
+
+def download_artifact_zip(owner: str, repo: str, token: str, artifact_id: int, archive_url: str = "") -> tuple[bytes | None, str]:
+    api_url = f"https://api.github.com/repos/{owner}/{repo}/actions/artifacts/{artifact_id}/zip"
+    urls = [u for u in [archive_url, api_url] if u]
+    accepts = ["application/octet-stream", "application/zip", "*/*", "application/vnd.github+json"]
+    last_err = "unknown download error"
+
+    for u in urls:
+        for accept in accepts:
+            code, data, loc = _http_fetch_bytes(u, token, accept=accept, with_auth=True)
+            if data[:2] == b"PK":
+                return data, ""
+
+            # Sometimes GitHub returns a redirect URL that must be fetched without auth header.
+            if loc and loc != u:
+                _c2, d2, _loc2 = _http_fetch_bytes(loc, token, accept="*/*", with_auth=False)
+                if d2[:2] == b"PK":
+                    return d2, ""
+                last_err = f"http {code} -> redirected non-zip"
+            else:
+                last_err = f"http {code} ({len(data)} bytes)"
+
+    return None, last_err
 
 
 def extract_first_html(zip_bytes: bytes) -> tuple[str, bytes] | None:
@@ -488,7 +510,8 @@ GITHUB_REF = "main"
                         st.markdown(f"- {name}")
                         continue
 
-                    zip_bytes, err = download_artifact_zip(owner, repo, token, aid_int)
+                    archive_url = str(a.get("archive_download_url") or "")
+                    zip_bytes, err = download_artifact_zip(owner, repo, token, aid_int, archive_url=archive_url)
                     if zip_bytes:
                         html_payload = extract_first_html(zip_bytes)
                         if html_payload:
