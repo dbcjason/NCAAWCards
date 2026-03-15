@@ -128,6 +128,8 @@ def norm_team(v: Any) -> str:
     aliases = {
         "connecticut": "uconn",
         "universityofconnecticut": "uconn",
+        "southerncalifornia": "usc",
+        "southerncal": "usc",
     }
     s = aliases.get(s, s)
     return s
