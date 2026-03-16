@@ -339,6 +339,38 @@ def load_enriched_lookup_for_script_season(
     return out
 
 
+def find_enriched_row(
+    lookup: dict[tuple[str, str, str], dict[str, Any]],
+    player: str,
+    team: str,
+    season: str,
+) -> dict[str, Any] | None:
+    ys = norm_season(season)
+    np = norm_player_name(player)
+    nt = norm_team(team)
+    exact = lookup.get((np, nt, ys))
+    if exact:
+        return exact
+    # Fallback: if a player-season is unique in enriched, use it despite team label differences.
+    player_season = [row for (p, _t, y), row in lookup.items() if p == np and y == ys]
+    if len(player_season) == 1:
+        return player_season[0]
+    if len(player_season) > 1 and nt:
+        scored = sorted(
+            (
+                difflib.SequenceMatcher(None, nt, t).ratio(),
+                row,
+            )
+            for (p, t, y), row in lookup.items()
+            if p == np and y == ys
+        )
+        if scored:
+            best_score, best_row = scored[-1]
+            if best_score >= 0.65:
+                return best_row
+    return None
+
+
 def load_enriched_players_for_script_season(
     season: str,
     base_dir: Path | None = None,
@@ -391,12 +423,12 @@ def inject_enriched_fields_into_bt_rows(
         lookup = cache[ys]
         if not lookup:
             continue
-        k = (
-            norm_player_name(bt_get(r, ["player_name"])),
-            norm_team(bt_get(r, ["team"])),
+        er = find_enriched_row(
+            lookup,
+            bt_get(r, ["player_name"]),
+            bt_get(r, ["team"]),
             ys,
         )
-        er = lookup.get(k)
         if not er:
             continue
 
@@ -2473,8 +2505,7 @@ def build_self_creation_html(
     enriched_lookup = load_enriched_lookup_for_script_season(target.season)
 
     def enriched_off_poss(player_name: str, team_name: str, season: str) -> float | None:
-        k = (norm_player_name(player_name), norm_team(team_name), norm_season(season))
-        er = enriched_lookup.get(k)
+        er = find_enriched_row(enriched_lookup, player_name, team_name, season)
         if not er:
             return None
         v = to_float(_enriched_nested_value(er, "off_team_poss", "value"))
@@ -2527,8 +2558,7 @@ def build_self_creation_html(
 
 def build_playstyles_html(target: PlayerGameStats, bt_rows: list[dict[str, str]]) -> str:
     enriched_lookup = load_enriched_lookup_for_script_season(target.season)
-    ek = (norm_player_name(target.player), norm_team(target.team), norm_season(target.season))
-    erow = enriched_lookup.get(ek)
+    erow = find_enriched_row(enriched_lookup, target.player, target.team, target.season)
     if not erow:
         return '<div class="panel"><h3>Playstyles</h3><div class="shot-meta">No matching enriched playstyle row found for this player/team/season.</div></div>'
 
@@ -4899,8 +4929,7 @@ def main() -> None:
 
     # Prefer enriched shot bins for chart plotting when available.
     enriched_lookup = load_enriched_lookup_for_script_season(target.season)
-    ek = (norm_player_name(target.player), norm_team(target.team), norm_season(target.season))
-    erow = enriched_lookup.get(ek)
+    erow = find_enriched_row(enriched_lookup, target.player, target.team, target.season)
     if erow:
         enr_shots, enr_makes, enr_att = build_shots_from_enriched_player_row(erow)
         if enr_shots:
