@@ -504,7 +504,7 @@ def aggregate_team(
 
     out: dict[str, float] = {}
 
-    def wavg(key: str) -> float | None:
+    def wavg_minutes(key: str) -> float | None:
         num = den = 0.0
         for idx, p in enumerate(players):
             v = per_player[idx].get(key)
@@ -516,16 +516,61 @@ def aggregate_team(
             return None
         return num / den
 
-    for k in COUNTING_KEYS + ["bpm", "rapm", "net_pts", "onoff_net_rating", "ts_per", "fg_pct", "tp_pct", "ortg", "drtg", "poss_pg_proxy", "orb_per", "to_per"]:
-        v = wavg(k)
+    # Metrics that should stay as minute-weighted averages.
+    for k in [
+        "bpm",
+        "rapm",
+        "net_pts",
+        "onoff_net_rating",
+        "ts_per",
+        "fg_pct",
+        "tp_pct",
+        "ortg",
+        "drtg",
+        "orb_per",
+        "to_per",
+    ]:
+        v = wavg_minutes(k)
         if v is not None:
             out[k] = v
+
+    # Counting stats: convert each player to per-minute rates using their projected MPG,
+    # apply selected minutes, then scale to a full 200-minute team game.
+    stat_totals = {k: 0.0 for k in COUNTING_KEYS}
+    poss_total = 0.0
+    for idx, p in enumerate(players):
+        sel_min = max(0.0, float(p.inp.minutes))
+        m = per_player[idx]
+        proj_mpg = max(0.1, float(m.get("mpg", sel_min if sel_min > 0 else 1.0)))
+        minute_scale = sel_min / proj_mpg
+
+        for k in COUNTING_KEYS:
+            v = m.get(k)
+            if v is None or not math.isfinite(float(v)):
+                continue
+            stat_totals[k] += float(v) * minute_scale
+
+        poss_pg = m.get("poss_pg_proxy")
+        if poss_pg is not None and math.isfinite(float(poss_pg)):
+            poss_total += float(poss_pg) * minute_scale
+
+    game_scale = 200.0 / max(1.0, float(tot_min))
+    for k in COUNTING_KEYS:
+        out[k] = stat_totals[k] * game_scale
+
+    if poss_total > 1e-6:
+        out["poss_pg_proxy"] = poss_total * game_scale
 
     pace = out.get("poss_pg_proxy")
     if pace is not None and pace > 1e-6:
         pace_adj = max(55.0, min(80.0, float(pace) * float(pace_scale)))
         out["adj_pace_proxy"] = pace_adj
-        for src, dst in [("ppg", "points_per100"), ("apg", "assists_per100"), ("spg", "steals_per100"), ("rpg", "rebounds_per100")]:
+        for src, dst in [
+            ("ppg", "points_per100"),
+            ("apg", "assists_per100"),
+            ("spg", "steals_per100"),
+            ("rpg", "rebounds_per100"),
+        ]:
             v = out.get(src)
             if v is not None:
                 out[dst] = float(v) * 100.0 / float(pace_adj)

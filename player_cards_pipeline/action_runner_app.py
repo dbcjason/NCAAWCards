@@ -978,18 +978,18 @@ def render_roster_tab():
         st.success("Team fit simulation completed.")
         st.subheader("In")
         if in_data:
-            st.dataframe(pd.DataFrame(in_data), hide_index=True, use_container_width=True)
+            st.table(pd.DataFrame(in_data))
         else:
             st.info("No added players selected.")
 
         st.subheader("Out")
         if out_data:
-            st.dataframe(pd.DataFrame(out_data), hide_index=True, use_container_width=True)
+            st.table(pd.DataFrame(out_data))
         else:
             st.info("No removed players.")
 
         st.subheader("Team Projection: Current vs Edited")
-        st.dataframe(pd.DataFrame(proj_rows), hide_index=True, use_container_width=True)
+        st.table(pd.DataFrame(proj_rows))
 
         if export_html:
             out_dir = ROOT / "output" / "roster_simulator"
