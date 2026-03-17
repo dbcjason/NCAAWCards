@@ -18,6 +18,8 @@ from typing import Any
 import csv
 
 import streamlit as st
+import pandas as pd
+from scripts import roster_simulator as roster_sim
 
 
 DEFAULT_WORKFLOW_FILE = "build_player_card.yml"
@@ -460,31 +462,119 @@ def run_matches_request(run: dict[str, Any], year: str, player: str, after_ts: s
     return True
 
 
-def main() -> None:
-    st.set_page_config(page_title="NCAAW Player Card Creator", layout="centered")
-    st.title("NCAAW Player Card Creator")
-    st.caption("Created by @DBCJason")
+ROSTER_BT_CSV_CANDIDATES = [
+    ROOT / "data" / "bt" / "bt_advstats_2010_2026.csv",
+    ROOT / "data" / "bt" / "bt_advstats_2010_2025.csv",
+    ROOT / "data" / "bt" / "bt_advstats_2019_2025.csv",
+]
 
-    secrets = st.secrets if hasattr(st, "secrets") else {}
-    owner = str(secrets.get("GITHUB_OWNER", "")).strip()
-    repo = str(secrets.get("GITHUB_REPO", "")).strip()
-    token = str(secrets.get("GITHUB_TOKEN", "")).strip()
-    workflow_file = str(secrets.get("GITHUB_WORKFLOW_FILE", DEFAULT_WORKFLOW_FILE)).strip() or DEFAULT_WORKFLOW_FILE
-    ref = str(secrets.get("GITHUB_REF", DEFAULT_REF)).strip() or DEFAULT_REF
 
-    if not owner or not repo or not token:
-        st.error("Missing Streamlit secrets: GITHUB_OWNER, GITHUB_REPO, GITHUB_TOKEN")
-        st.code(
-            """
-GITHUB_OWNER = "dbcjason"
-GITHUB_REPO = "NCAAWCards"
-GITHUB_TOKEN = "ghp_..."
-GITHUB_WORKFLOW_FILE = "build_player_card.yml"
-GITHUB_REF = "main"
-            """.strip()
+@st.cache_resource(show_spinner=False)
+def load_roster_core():
+    mod = roster_sim.load_module(ROOT.parent)
+    loaded_files = []
+    bt_rows = []
+    seen = set()
+    for p in ROSTER_BT_CSV_CANDIDATES:
+        if not p.exists():
+            continue
+        rows = roster_sim.read_bt_rows(p)
+        if not rows:
+            continue
+        loaded_files.append(p)
+        for r in rows:
+            k = (
+                mod.norm_player_name(mod.bt_get(r, ["player_name"])),
+                mod.norm_team(mod.bt_get(r, ["team"])),
+                mod.norm_season(mod.bt_get(r, ["year"])),
+            )
+            if not k[0] or not k[1] or not k[2]:
+                continue
+            if int(k[2]) < 2021:
+                continue
+            if k in seen:
+                continue
+            seen.add(k)
+            bt_rows.append(r)
+    return mod, bt_rows, loaded_files
+
+
+def roster_seasons(mod, bt_rows):
+    years = sorted(
+        {
+            int(mod.norm_season(mod.bt_get(r, ["year"])))
+            for r in bt_rows
+            if mod.norm_season(mod.bt_get(r, ["year"])).isdigit()
+            and int(mod.norm_season(mod.bt_get(r, ["year"]))) >= 2021
+        },
+        reverse=True,
+    )
+    return years
+
+
+def roster_teams(mod, bt_rows, season):
+    teams = sorted(
+        {
+            (mod.bt_get(r, ["team"]) or "").strip()
+            for r in bt_rows
+            if mod.norm_season(mod.bt_get(r, ["year"])) == str(season)
+        }
+    )
+    return [t for t in teams if t]
+
+
+def roster_rows_for_team(mod, bt_rows, season, team):
+    out = []
+    for r in bt_rows:
+        if mod.norm_season(mod.bt_get(r, ["year"])) != str(season):
+            continue
+        t = (mod.bt_get(r, ["team"]) or "").strip()
+        if mod.norm_team(t) != mod.norm_team(team):
+            continue
+        name = (mod.bt_get(r, ["player_name"]) or "").strip()
+        if not name:
+            continue
+        m = mod._row_transfer_metrics(r)
+        out.append(
+            {
+                "player": name,
+                "team": t,
+                "season": season,
+                "conf": (mod.bt_get(r, ["conf", "conference"]) or "").strip(),
+                "mpg": float(m.get("mpg", 20.0) or 20.0),
+            }
         )
-        st.stop()
+    out.sort(key=lambda x: x["player"])
+    return out
 
+
+def roster_candidate_pool(mod, bt_rows, season, exclude_team):
+    rows = []
+    for r in bt_rows:
+        if mod.norm_season(mod.bt_get(r, ["year"])) != str(season):
+            continue
+        team = (mod.bt_get(r, ["team"]) or "").strip()
+        if mod.norm_team(team) == mod.norm_team(exclude_team):
+            continue
+        name = (mod.bt_get(r, ["player_name"]) or "").strip()
+        if not name:
+            continue
+        m = mod._row_transfer_metrics(r)
+        rows.append(
+            {
+                "player": name,
+                "team": team,
+                "season": season,
+                "conf": (mod.bt_get(r, ["conf", "conference"]) or "").strip(),
+                "mpg": float(m.get("mpg", 15.0) or 15.0),
+                "label": f"{name} ({team})",
+            }
+        )
+    rows.sort(key=lambda x: x["label"])
+    return rows
+
+
+def render_card_tab(owner: str, repo: str, token: str, workflow_file: str, ref: str):
     index = load_team_player_index()
     _player_conf_index, all_confs = load_player_conference_index()
     years = [y for y in ["2021", "2022", "2023", "2024", "2025", "2026"] if y in index]
@@ -567,7 +657,6 @@ GITHUB_REF = "main"
         target_run = None
         run_id = st.session_state.get("last_run_id")
         if not run_id and st.session_state.get("last_trigger_ts"):
-            # Try to resolve the just-dispatched run id; don't show stale older runs.
             rid = find_run_id_for_dispatch(
                 owner,
                 repo,
@@ -646,6 +735,326 @@ GITHUB_REF = "main"
                     st.caption("Built, but output path was not captured for this run.")
             else:
                 st.caption("Run failed; no HTML output available.")
+
+
+def render_roster_tab():
+    st.caption("Interactive roster simulator (Women). Remove current players, add incoming players, set minutes, and see in-app projection deltas.")
+    mod, bt_rows, bt_paths = load_roster_core()
+    if bt_paths:
+        shown = ", ".join(str(p.name) for p in bt_paths)
+        st.caption(f"BT sources: {shown} | merged rows: {len(bt_rows)}")
+    else:
+        st.error("No BT CSV found for roster simulator.")
+        return
+
+    years = roster_seasons(mod, bt_rows)
+    if not years:
+        st.error("No seasons found in BT CSV (2021+).")
+        return
+
+    c1, c2, c3 = st.columns([1, 1.2, 1.2])
+    with c1:
+        season = st.selectbox("Season", years, index=0, key="r_season")
+    teams = roster_teams(mod, bt_rows, season)
+    with c2:
+        team = st.selectbox("Base Team", teams, key="r_team") if teams else st.selectbox("Base Team", [""], key="r_team_empty")
+    base_rows = roster_rows_for_team(mod, bt_rows, season, team)
+    if not base_rows:
+        st.error("No roster rows for selected team/season.")
+        return
+    base_conf = base_rows[0]["conf"] if base_rows else ""
+    with c3:
+        dest_conf = st.text_input("Destination Conference (for added players)", value=base_conf, key="r_dest_conf")
+
+    st.subheader("1) Exclude Current Players")
+    base_names = [r["player"] for r in base_rows]
+    exclude_names = st.multiselect("Select players to exclude", options=base_names, default=[], key="r_exclude")
+    keep_rows = [r for r in base_rows if r["player"] not in set(exclude_names)]
+
+    st.subheader("2) Add Incoming Players")
+    pool = roster_candidate_pool(mod, bt_rows, season, team)
+    add_labels = st.multiselect(
+        "Select players to add",
+        options=[r["label"] for r in pool],
+        default=[],
+        key="r_add",
+        help="All available players for the selected season (excluding current base team).",
+    )
+    label_to_row = {r["label"]: r for r in pool}
+    add_rows = [label_to_row[l] for l in add_labels if l in label_to_row]
+
+    st.subheader("3) Minutes / Final Roster")
+    merged = []
+    for r in keep_rows:
+        merged.append(
+            {
+                "player": r["player"],
+                "team": r["team"],
+                "season": r["season"],
+                "added": False,
+                "minutes": round(max(0.0, r["mpg"]), 1),
+                "destination_conference": "",
+            }
+        )
+    for r in add_rows:
+        merged.append(
+            {
+                "player": r["player"],
+                "team": r["team"],
+                "season": r["season"],
+                "added": True,
+                "minutes": round(max(0.0, r["mpg"]), 1),
+                "destination_conference": dest_conf,
+            }
+        )
+    if not merged:
+        st.warning("No players selected after exclusions/additions.")
+        return
+
+    edited = st.data_editor(
+        pd.DataFrame(merged),
+        hide_index=True,
+        use_container_width=True,
+        disabled=["player", "team", "season", "added"],
+        key="r_editor",
+        column_config={
+            "minutes": st.column_config.NumberColumn(min_value=0.0, max_value=40.0, step=0.5),
+            "destination_conference": st.column_config.TextColumn(help="Only used when added=True"),
+        },
+    )
+
+    interaction_model = st.checkbox(
+        "Enable Interaction Model",
+        value=True,
+        key="r_interaction",
+        help="Rebalances projected usage/efficiency across selected players based on creation and spacing context.",
+    )
+    export_html = st.checkbox(
+        "Also generate HTML report",
+        value=False,
+        key="r_export_html",
+    )
+    out_name = st.text_input(
+        "Output HTML filename (used only if export is enabled)",
+        value=f"{team.replace(' ', '_').lower()}_{season}_roster_sim.html",
+        disabled=not export_html,
+        key="r_out_name",
+    )
+
+    if st.button("Generate Team Fit Report", type="primary", key="r_generate"):
+        progress = st.progress(0, text="Starting team-fit simulation...")
+        inputs: list[roster_sim.InputPlayer] = []
+        for _, row in edited.iterrows():
+            inputs.append(
+                roster_sim.InputPlayer(
+                    player=str(row["player"]),
+                    team=str(row["team"]),
+                    season=int(row["season"]),
+                    minutes=float(row["minutes"]),
+                    destination_conference=str(row["destination_conference"] or ""),
+                )
+            )
+        progress.progress(10, text="Prepared roster inputs")
+        history_examples = roster_sim.build_transfer_examples(mod, bt_rows)
+        progress.progress(25, text="Built transfer history examples")
+
+        resolved: list[roster_sim.ResolvedPlayer] = []
+        missing: list[roster_sim.InputPlayer] = []
+        total_inputs = max(1, len(inputs))
+        for idx, p in enumerate(inputs, start=1):
+            bt_row = roster_sim.find_bt_row(mod, bt_rows, p)
+            if bt_row is None:
+                missing.append(p)
+                continue
+            projected, transfer_applied = roster_sim.project_transfer_metrics(mod, bt_row, p.destination_conference, history_examples)
+            src_conf = mod._conference_key(mod.bt_get(bt_row, ["conf", "conference"]))
+            resolved.append(
+                roster_sim.ResolvedPlayer(
+                    inp=p,
+                    bt_row=bt_row,
+                    projected=projected,
+                    source_conf=src_conf,
+                    transfer_applied=transfer_applied,
+                )
+            )
+            if idx % 5 == 0 or idx == total_inputs:
+                pct = 25 + int(35 * (idx / total_inputs))
+                progress.progress(min(60, pct), text=f"Matching/projecting players ({idx}/{total_inputs})")
+
+        if not resolved:
+            progress.progress(100, text="No matched players")
+            st.error("No players matched in BT data. Check names/teams.")
+            return
+
+        progress.progress(70, text="Aggregating team summaries")
+        pace_scale = roster_sim.estimate_pace_scale(mod, bt_rows, season)
+        team_summary, total_minutes = roster_sim.aggregate_team(resolved, interaction_model=interaction_model, pace_scale=pace_scale)
+        current_players = roster_sim.build_current_team_players(mod, bt_rows, season, team)
+        current_summary, _ = roster_sim.aggregate_team(current_players, interaction_model=False, pace_scale=pace_scale)
+        league_team_summaries = roster_sim.build_season_team_summaries(mod, bt_rows, season)
+        edited_player_metrics = roster_sim.projected_player_metrics(resolved, interaction_model=interaction_model)
+        current_player_metrics = roster_sim.projected_player_metrics(current_players, interaction_model=False)
+        in_rows, out_rows = roster_sim.build_in_out_rows(
+            mod=mod,
+            base_team=team,
+            edited_players=resolved,
+            edited_metrics=edited_player_metrics,
+            current_players=current_players,
+            current_metrics=current_player_metrics,
+        )
+        progress.progress(88, text="Preparing in-app tables")
+
+        # Build In/Out.
+        base_norm = mod.norm_team(team)
+        selected_base_keys = {
+            (str(p.inp.player).strip().lower(), mod.norm_team(p.inp.team))
+            for p in resolved
+            if mod.norm_team(p.inp.team) == base_norm
+        }
+        in_data = []
+        for p, m in zip(resolved, edited_player_metrics):
+            is_in = p.transfer_applied or mod.norm_team(p.inp.team) != base_norm
+            if not is_in:
+                continue
+            in_data.append(
+                {
+                    "Player": p.inp.player,
+                    "From Team": p.inp.team,
+                    "Season": p.inp.season,
+                    "MPG": round(float(m.get("mpg", 0.0)), 1),
+                    "PPG": round(float(m.get("ppg", 0.0)), 1),
+                    "RPG": round(float(m.get("rpg", 0.0)), 1),
+                    "APG": round(float(m.get("apg", 0.0)), 1),
+                    "SPG": round(float(m.get("spg", 0.0)), 1),
+                    "BPG": round(float(m.get("bpg", 0.0)), 1),
+                    "FG%": round(float(m.get("fg_pct", 0.0)), 1),
+                    "3P%": round(float(m.get("tp_pct", 0.0)), 1),
+                    "FT%": round(float(m.get("ft_pct", 0.0)), 1),
+                }
+            )
+        out_data = []
+        for p, m in zip(current_players, current_player_metrics):
+            key = (str(p.inp.player).strip().lower(), mod.norm_team(p.inp.team))
+            if key in selected_base_keys:
+                continue
+            out_data.append(
+                {
+                    "Player": p.inp.player,
+                    "Team": p.inp.team,
+                    "Season": p.inp.season,
+                    "MPG": round(float(m.get("mpg", 0.0)), 1),
+                    "PPG": round(float(m.get("ppg", 0.0)), 1),
+                    "RPG": round(float(m.get("rpg", 0.0)), 1),
+                    "APG": round(float(m.get("apg", 0.0)), 1),
+                    "SPG": round(float(m.get("spg", 0.0)), 1),
+                    "BPG": round(float(m.get("bpg", 0.0)), 1),
+                    "FG%": round(float(m.get("fg_pct", 0.0)), 1),
+                    "3P%": round(float(m.get("tp_pct", 0.0)), 1),
+                    "FT%": round(float(m.get("ft_pct", 0.0)), 1),
+                }
+            )
+
+        proj_rows = []
+        for key, label in roster_sim.TEAM_DISPLAY_METRICS:
+            cur = current_summary.get(key)
+            new = team_summary.get(key)
+            delta = (new - cur) if (cur is not None and new is not None) else None
+            pool_vals = [s[key] for s in league_team_summaries.values() if key in s]
+            low_is_better = key in {"def_rating"}
+            cur_rank = roster_sim.metric_rank(cur, pool_vals, lower_is_better=low_is_better)
+            new_rank = roster_sim.metric_rank(new, pool_vals, lower_is_better=low_is_better)
+            proj_rows.append(
+                {
+                    "Metric": label,
+                    "Current Team": None if cur is None else round(float(cur), 2),
+                    "Current Rank": cur_rank,
+                    "Edited Roster": None if new is None else round(float(new), 2),
+                    "Edited Rank": new_rank,
+                    "Delta": None if delta is None else round(float(delta), 2),
+                }
+            )
+        progress.progress(100, text="Completed")
+
+        st.success("Team fit simulation completed.")
+        st.subheader("In")
+        if in_data:
+            st.dataframe(pd.DataFrame(in_data), hide_index=True, use_container_width=True)
+        else:
+            st.info("No added players selected.")
+
+        st.subheader("Out")
+        if out_data:
+            st.dataframe(pd.DataFrame(out_data), hide_index=True, use_container_width=True)
+        else:
+            st.info("No removed players.")
+
+        st.subheader("Team Projection: Current vs Edited")
+        st.dataframe(pd.DataFrame(proj_rows), hide_index=True, use_container_width=True)
+
+        if export_html:
+            out_dir = ROOT / "output" / "roster_simulator"
+            out_dir.mkdir(parents=True, exist_ok=True)
+            out_path = out_dir / out_name
+            roster_sim.render_html(
+                out_path=out_path,
+                season=season,
+                players=resolved,
+                edited_summary=team_summary,
+                total_minutes=total_minutes,
+                current_summary=current_summary,
+                base_team=team,
+                league_team_summaries=league_team_summaries,
+                in_rows=in_rows,
+                out_rows=out_rows,
+                interaction_model=interaction_model,
+            )
+            st.caption(f"HTML export: {out_path}")
+            html_bytes = out_path.read_bytes()
+            st.download_button(
+                label="Download HTML Report",
+                data=html_bytes,
+                file_name=out_path.name,
+                mime="text/html",
+                type="secondary",
+                key="r_download_html",
+            )
+
+        if missing:
+            st.warning(f"Missing matches: {len(missing)}")
+            for m in missing[:20]:
+                st.write(f"- {m.player} ({m.team}, {m.season})")
+
+
+def main() -> None:
+    st.set_page_config(page_title="NCAAW Tools", layout="centered")
+    st.title("NCAAW Player Card Creator")
+    st.caption("Created by @DBCJason")
+
+    secrets = st.secrets if hasattr(st, "secrets") else {}
+    owner = str(secrets.get("GITHUB_OWNER", "")).strip()
+    repo = str(secrets.get("GITHUB_REPO", "")).strip()
+    token = str(secrets.get("GITHUB_TOKEN", "")).strip()
+    workflow_file = str(secrets.get("GITHUB_WORKFLOW_FILE", DEFAULT_WORKFLOW_FILE)).strip() or DEFAULT_WORKFLOW_FILE
+    ref = str(secrets.get("GITHUB_REF", DEFAULT_REF)).strip() or DEFAULT_REF
+
+    if not owner or not repo or not token:
+        st.error("Missing Streamlit secrets: GITHUB_OWNER, GITHUB_REPO, GITHUB_TOKEN")
+        st.code(
+            """
+GITHUB_OWNER = "dbcjason"
+GITHUB_REPO = "NCAAWCards"
+GITHUB_TOKEN = "ghp_..."
+GITHUB_WORKFLOW_FILE = "build_player_card.yml"
+GITHUB_REF = "main"
+            """.strip()
+        )
+        st.stop()
+
+    tab_cards, tab_roster = st.tabs(["Card Creator", "Roster Simulator"])
+    with tab_cards:
+        render_card_tab(owner, repo, token, workflow_file, ref)
+    with tab_roster:
+        render_roster_tab()
 
 
 if __name__ == "__main__":
