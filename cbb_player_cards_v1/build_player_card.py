@@ -2832,10 +2832,6 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
             dst = season_map[y + 1]
             src_conf = _conference_key(bt_get(src, ["conf", "conference"]))
             dst_conf = _conference_key(bt_get(dst, ["conf", "conference"]))
-            if _conference_tier(dst_conf) != "high":
-                continue
-            if _conference_tier(src_conf) == "high":
-                continue
             src_m = _row_transfer_metrics(src)
             dst_m = _row_transfer_metrics(dst)
             if len(src_m) < 8 or len(dst_m) < 8:
@@ -2854,7 +2850,7 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
       <div class="panel draft-proj-panel">
         <h3>Transfer Projection</h3>
         <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
-        <div class="shot-meta">Not enough historical transfer-up samples to project.</div>
+        <div class="shot-meta">Not enough historical transfer samples to project.</div>
       </div>
 """
 
@@ -2918,7 +2914,7 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
       <div class="panel draft-proj-panel">
         <h3>Transfer Projection</h3>
         <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
-        <div class="shot-meta">No similar transfer-up comps found for projection.</div>
+        <div class="shot-meta">No similar transfer comps found for projection.</div>
       </div>
 """
 
@@ -2991,12 +2987,12 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
       <div class="panel draft-proj-panel">
         <h3>Transfer Projection</h3>
         <div class="draft-proj-main">{html.escape(dest_conf_raw)} Transfer Grade: {transfer_grade}</div>
-        <div class="draft-proj-sub">Projected next-season statline vs transfer-up historical comps ({len(weighted_examples)} comps weighted)</div>
+        <div class="draft-proj-sub">Projected next-season statline vs historical transfer comps ({len(weighted_examples)} comps weighted)</div>
         <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Per Game</div>
         <div class="draft-odds-grid transfer-two-col">
           {per_game_rows}
         </div>
-        <div class="draft-proj-sub" style="margin-top:8px;">The model examines historical low/mid-to-high conference transfers, weighting similar pre-transfer profiles more heavily. Using those weighted historical stat translations, it projects statistical outcomes for the new player in the selected conference.</div>
+        <div class="draft-proj-sub" style="margin-top:8px;">The model examines historical cross-conference transfers, weighting similar pre-transfer profiles more heavily. Using those weighted historical stat translations, it projects statistical outcomes for the new player in the selected conference.</div>
         <div class="draft-proj-sub">Transfer Grade compares the player’s projected impact to historical transfer-up outcomes into the selected conference.</div>
       </div>
 """
