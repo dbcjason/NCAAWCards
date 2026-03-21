@@ -223,6 +223,21 @@ def main() -> int:
     bt_csv = Path(args.bt_csv)
     if not bt_csv.is_absolute():
         bt_csv = project_root / bt_csv
+    if not bt_csv.exists():
+        candidates = [
+            project_root / "player_cards_pipeline/data/bt/bt_advstats_2019_2026.csv",
+            project_root / "player_cards_pipeline/data/bt/bt_advstats_2010_2026.csv",
+            project_root / "player_cards_pipeline/data/bt/bt_advstats_2019_2025.csv",
+            project_root / "player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv",
+            project_root / "player_cards_pipeline/data/bt/bt_advstats_2026.csv",
+        ]
+        found = next((p for p in candidates if p.exists()), None)
+        if found is None:
+            raise RuntimeError(
+                f"BT CSV not found. Tried requested path: {bt_csv} and {len(candidates)} fallback paths."
+            )
+        print(f"[batch-transfer] BT CSV fallback: {found}", flush=True)
+        bt_csv = found
     out_csv = Path(args.out_csv)
     if not out_csv.is_absolute():
         out_csv = project_root / out_csv
@@ -357,4 +372,3 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n[batch-transfer] interrupted", file=sys.stderr)
         raise SystemExit(130)
-
