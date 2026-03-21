@@ -242,5 +242,13 @@ jobs:
             exit 0
           fi
           git commit -m "Build player card: ${{ github.event.inputs.player }} (${{ github.event.inputs.year }})"
-          git pull --rebase origin main || true
-          git push origin main
+          for attempt in 1 2 3; do
+            if git push origin main; then
+              exit 0
+            fi
+            echo "Push rejected, rebasing attempt ${attempt}..."
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "Failed to push after 3 attempts"
+          exit 1
