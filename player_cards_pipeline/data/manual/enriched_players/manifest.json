@@ -12,7 +12,7 @@
       "players_all_Women_2025_Medium.json",
       "players_all_Women_2025_High.json"
     ],
-    "players_count": 2917,
+    "players_count": 2916,
     "output_json_year": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_json_year/players_all_Women_2025_combined.json",
     "output_script_season": "/home/runner/work/NCAAWCards/NCAAWCards/player_cards_pipeline/data/manual/enriched_players/by_script_season/players_all_Women_scriptSeason_2026_fromJsonYear_2025.json"
   }
