@@ -7,10 +7,6 @@ on:
         description: "Script season (e.g. 2026)"
         required: true
         default: "2026"
-      destination_conference:
-        description: "Destination conference (e.g. SEC, Big 12, ACC)"
-        required: true
-        default: "SEC"
       min_games:
         description: "Minimum GP filter"
         required: true
@@ -23,6 +19,10 @@ on:
         description: "Optional max players (0 = no limit)"
         required: true
         default: "0"
+      conferences:
+        description: "Optional comma-separated destination conferences (blank = all)"
+        required: false
+        default: ""
 
 jobs:
   run-batch-transfer:
@@ -41,24 +41,27 @@ jobs:
         run: |
           mkdir -p player_cards_pipeline/output
           TEAM_ARG=""
+          CONF_ARG=""
           if [ -n "${{ inputs.team }}" ]; then
             TEAM_ARG="--team \"${{ inputs.team }}\""
+          fi
+          if [ -n "${{ inputs.conferences }}" ]; then
+            CONF_ARG="--conferences \"${{ inputs.conferences }}\""
           fi
 
           # shellcheck disable=SC2086
           eval "python3 player_cards_pipeline/scripts/batch_transfer_projection.py \
             --project-root . \
             --season \"${{ inputs.season }}\" \
-            --destination-conference \"${{ inputs.destination_conference }}\" \
             --min-games \"${{ inputs.min_games }}\" \
             --limit \"${{ inputs.limit }}\" \
             ${TEAM_ARG} \
-            --out-csv \"player_cards_pipeline/output/transfer_projection_${{ inputs.season }}_to_$(echo '${{ inputs.destination_conference }}' | tr ' ' '_' | tr '[:upper:]' '[:lower:]').csv\""
+            ${CONF_ARG} \
+            --out-csv \"player_cards_pipeline/output/transfer_projection_${{ inputs.season }}_all_conferences.csv\""
 
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v4
         with:
-          name: transfer-projection-${{ inputs.season }}-${{ inputs.destination_conference }}
-          path: player_cards_pipeline/output/transfer_projection_${{ inputs.season }}_to_*.csv
+          name: transfer-projection-${{ inputs.season }}-all-conferences
+          path: player_cards_pipeline/output/transfer_projection_${{ inputs.season }}_all_conferences.csv
           if-no-files-found: error
-

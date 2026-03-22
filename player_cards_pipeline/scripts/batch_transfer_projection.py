@@ -20,6 +20,30 @@ def load_card_module(project_root: Path):
     return mod
 
 
+def resolve_bt_csv(project_root: Path, requested: Path) -> Path:
+    if requested.is_absolute():
+        if requested.exists():
+            return requested
+    else:
+        p = project_root / requested
+        if p.exists():
+            return p
+    candidates = [
+        project_root / "player_cards_pipeline/data/bt/bt_advstats_2010_2026.csv",
+        project_root / "player_cards_pipeline/data/bt/bt_advstats_2019_2026.csv",
+        project_root / "player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv",
+        project_root / "player_cards_pipeline/data/bt/bt_advstats_2019_2025.csv",
+        project_root / "player_cards_pipeline/data/bt/bt_advstats_2026.csv",
+    ]
+    found = next((p for p in candidates if p.exists()), None)
+    if found is None:
+        raise RuntimeError(
+            f"BT CSV not found. Tried requested path: {requested} and {len(candidates)} fallback paths."
+        )
+    print(f"[batch-transfer] BT CSV fallback: {found}", flush=True)
+    return found
+
+
 def build_transfer_examples(bpc: Any, bt_rows: list[dict[str, str]]) -> list[dict[str, Any]]:
     by_player_year: dict[str, dict[int, dict[str, str]]] = {}
     for r in bt_rows:
@@ -52,6 +76,8 @@ def build_transfer_examples(bpc: Any, bt_rows: list[dict[str, str]]) -> list[dic
             dst_m = bpc._row_transfer_metrics(dst)
             if len(src_m) < 8 or len(dst_m) < 8:
                 continue
+            if not dst_conf:
+                continue
             examples.append({"src_conf": src_conf, "dst_conf": dst_conf, "src": src_m, "dst": dst_m})
     return examples
 
@@ -77,36 +103,23 @@ def build_target_row_index(bpc: Any, bt_rows: list[dict[str, str]]) -> dict[tupl
     return idx
 
 
-def project_player_transfer(
+def project_transfer_grade(
     bpc: Any,
     source: dict[str, float],
     source_conf: str,
-    pool: list[dict[str, Any]],
-    same_dest: list[dict[str, Any]],
     dest_conf: str,
+    model: dict[str, Any],
     feat_keys: list[str],
-    out_keys: list[str],
-    scales: dict[str, float],
-) -> dict[str, Any]:
-    out: dict[str, Any] = {
-        "status": "ok",
-        "error": "",
-        "transfer_grade": "",
-        "comps_weighted": "",
-        "proj_ppg": "",
-        "proj_rpg": "",
-        "proj_apg": "",
-        "proj_spg": "",
-        "proj_bpg": "",
-        "proj_fg_pct": "",
-        "proj_tp_pct": "",
-        "proj_ft_pct": "",
-    }
-
+    impact_keys: list[str],
+) -> str:
     if len(source) < 8:
-        out["status"] = "error"
-        out["error"] = "insufficient_source_stats"
-        return out
+        return ""
+
+    pool = model["pool"]
+    scales = model["scales"]
+    cohort_scores = model["cohort_scores"]
+    if not pool or not cohort_scores:
+        return ""
 
     weighted_examples: list[tuple[float, dict[str, Any]]] = []
     for e in pool:
@@ -138,12 +151,10 @@ def project_player_transfer(
     weighted_examples.sort(key=lambda x: x[0], reverse=True)
     weighted_examples = weighted_examples[:450]
     if not weighted_examples:
-        out["status"] = "error"
-        out["error"] = "no_similar_transfer_comps"
-        return out
+        return ""
 
-    predicted: dict[str, float] = {}
-    for k in out_keys:
+    pred_impact_vals: list[float] = []
+    for k in impact_keys:
         num = 0.0
         den = 0.0
         for w, e in weighted_examples:
@@ -160,91 +171,97 @@ def project_player_transfer(
             num += w * val
             den += w
         if den > 0:
-            predicted[k] = bpc._clip_transfer_metric(k, num / den)
-    if not predicted:
-        out["status"] = "error"
-        out["error"] = "prediction_failed"
-        return out
+            pred_impact_vals.append(float(num / den))
+    if not pred_impact_vals:
+        return ""
 
-    impact_keys = ["bpm", "rapm", "net_pts"]
-    pred_impact = [predicted[k] for k in impact_keys if k in predicted]
-    impact_pct = None
-    if pred_impact:
-        pred_impact_score = sum(pred_impact) / len(pred_impact)
-        grade_pool = same_dest if len(same_dest) >= 20 else pool
-        cohort_scores: list[float] = []
-        for e in grade_pool:
-            vals = [e["dst"][k] for k in impact_keys if k in e["dst"]]
-            if vals:
-                cohort_scores.append(sum(float(v) for v in vals) / len(vals))
-        if cohort_scores:
-            impact_pct = bpc.percentile(pred_impact_score, cohort_scores)
+    pred_impact_score = sum(pred_impact_vals) / len(pred_impact_vals)
+    impact_pct = bpc.percentile(pred_impact_score, cohort_scores)
+    return bpc._transfer_grade_from_percentile(impact_pct)
 
-    out["transfer_grade"] = bpc._transfer_grade_from_percentile(impact_pct)
-    out["comps_weighted"] = str(len(weighted_examples))
-    if "ppg" in predicted:
-        out["proj_ppg"] = f"{predicted['ppg']:.1f}"
-    if "rpg" in predicted:
-        out["proj_rpg"] = f"{predicted['rpg']:.1f}"
-    if "apg" in predicted:
-        out["proj_apg"] = f"{predicted['apg']:.1f}"
-    if "spg" in predicted:
-        out["proj_spg"] = f"{predicted['spg']:.1f}"
-    if "bpg" in predicted:
-        out["proj_bpg"] = f"{predicted['bpg']:.1f}"
-    if "fg_pct" in predicted:
-        out["proj_fg_pct"] = f"{predicted['fg_pct']:.1f}"
-    if "tp_pct" in predicted:
-        out["proj_tp_pct"] = f"{predicted['tp_pct']:.1f}"
-    if "ft_pct" in predicted:
-        out["proj_ft_pct"] = f"{predicted['ft_pct']:.1f}"
-    return out
+
+def conference_display(key: str) -> str:
+    labels = {
+        "acc": "ACC",
+        "bigeast": "Big East",
+        "bigten": "Big Ten",
+        "big12": "Big 12",
+        "sec": "SEC",
+        "pac12": "Pac-12",
+        "mountainwest": "Mountain West",
+        "wcc": "WCC",
+        "a10": "A10",
+        "aac": "AAC",
+        "mvc": "MVC",
+        "mac": "MAC",
+        "cusa": "CUSA",
+        "sunbelt": "Sun Belt",
+        "bigwest": "Big West",
+        "wac": "WAC",
+        "horizon": "Horizon",
+        "socon": "SoCon",
+        "ivy": "Ivy",
+    }
+    return labels.get(key, key.upper())
+
+
+def player_class_from_row(bpc: Any, row: dict[str, str]) -> str:
+    raw = (bpc.bt_get(row, ["class", "yr", "year", "cls", "eligibility", "roster.class"]) or "").strip()
+    if not raw:
+        return ""
+    k = raw.lower().replace(".", "").strip()
+    mapping = {
+        "fr": "Freshman",
+        "freshman": "Freshman",
+        "rsfr": "Freshman",
+        "so": "Sophomore",
+        "soph": "Sophomore",
+        "sophomore": "Sophomore",
+        "rsso": "Sophomore",
+        "jr": "Junior",
+        "junior": "Junior",
+        "rsjr": "Junior",
+        "sr": "Senior",
+        "senior": "Senior",
+        "rssr": "Senior",
+        "gr": "Graduate",
+        "grad": "Graduate",
+        "graduate": "Graduate",
+        "super senior": "Graduate",
+    }
+    return mapping.get(k, raw)
 
 
 def main() -> int:
     ap = argparse.ArgumentParser(
-        description="Batch-run transfer projection for all players in a season to one destination conference.",
+        description="Batch-run transfer projection grade matrix for all destination conferences.",
     )
     ap.add_argument("--project-root", default=".", help="Repo root (default: current dir).")
     ap.add_argument(
         "--bt-csv",
-        default="player_cards_pipeline/data/bt/bt_advstats_2019_2026.csv",
+        default="player_cards_pipeline/data/bt/bt_advstats_2010_2026.csv",
         help="BT advstats CSV path (relative to project-root unless absolute).",
     )
     ap.add_argument("--season", required=True, help="Target season (script season, e.g. 2026).")
-    ap.add_argument("--destination-conference", required=True, help="Destination conference label.")
     ap.add_argument("--out-csv", required=True, help="Output CSV path.")
     ap.add_argument("--min-games", type=int, default=5, help="Minimum GP to include.")
-    ap.add_argument("--team", default="", help="Optional team filter.")
+    ap.add_argument("--team", default="", help="Optional source team filter.")
     ap.add_argument("--limit", type=int, default=0, help="Optional cap on players (0 = no cap).")
+    ap.add_argument(
+        "--conferences",
+        default="",
+        help="Optional comma-separated destination conferences (e.g. SEC,ACC,Big 12). Blank = all.",
+    )
     args = ap.parse_args()
 
     project_root = Path(args.project_root).resolve()
-    bt_csv = Path(args.bt_csv)
-    if not bt_csv.is_absolute():
-        bt_csv = project_root / bt_csv
-    if not bt_csv.exists():
-        candidates = [
-            project_root / "player_cards_pipeline/data/bt/bt_advstats_2019_2026.csv",
-            project_root / "player_cards_pipeline/data/bt/bt_advstats_2010_2026.csv",
-            project_root / "player_cards_pipeline/data/bt/bt_advstats_2019_2025.csv",
-            project_root / "player_cards_pipeline/data/bt/bt_advstats_2010_2025.csv",
-            project_root / "player_cards_pipeline/data/bt/bt_advstats_2026.csv",
-        ]
-        found = next((p for p in candidates if p.exists()), None)
-        if found is None:
-            raise RuntimeError(
-                f"BT CSV not found. Tried requested path: {bt_csv} and {len(candidates)} fallback paths."
-            )
-        print(f"[batch-transfer] BT CSV fallback: {found}", flush=True)
-        bt_csv = found
+    bt_csv = resolve_bt_csv(project_root, Path(args.bt_csv))
     out_csv = Path(args.out_csv)
     if not out_csv.is_absolute():
         out_csv = project_root / out_csv
     out_csv.parent.mkdir(parents=True, exist_ok=True)
 
     bpc = load_card_module(project_root)
-
     _, bt_rows = bpc.read_csv_rows(bt_csv)
     if not bt_rows:
         raise RuntimeError(f"No rows loaded from {bt_csv}")
@@ -255,7 +272,7 @@ def main() -> int:
     season_norm = bpc.norm_season(args.season)
     team_norm = bpc.norm_team(args.team) if args.team else ""
 
-    filtered = []
+    filtered: list[tuple[Any, dict[str, str]]] = []
     for p in players:
         if bpc.norm_season(p.season) != season_norm:
             continue
@@ -273,63 +290,58 @@ def main() -> int:
         if gp is not None and gp < args.min_games:
             continue
         filtered.append((p, row))
-
     filtered.sort(key=lambda x: (bpc.norm_team(x[0].team), bpc.norm_player_name(x[0].player)))
     if args.limit and args.limit > 0:
         filtered = filtered[: args.limit]
-
     print(f"[batch-transfer] eligible players: {len(filtered)}", flush=True)
 
     examples = build_transfer_examples(bpc, bt_rows)
     if len(examples) < 200:
         raise RuntimeError(f"Not enough historical transfer samples ({len(examples)}).")
-    dest_conf = bpc._conference_key(args.destination_conference)
-    same_dest = [e for e in examples if e["dst_conf"] == dest_conf]
-    pool = same_dest if len(same_dest) >= 35 else examples
-    print(
-        f"[batch-transfer] examples={len(examples)} pool={len(pool)} same_dest={len(same_dest)} dest={args.destination_conference}",
-        flush=True,
-    )
+
+    all_dest_keys = sorted({str(e["dst_conf"]) for e in examples if str(e["dst_conf"]).strip()})
+    if args.conferences.strip():
+        requested = [bpc._conference_key(x.strip()) for x in args.conferences.split(",") if x.strip()]
+        dest_keys = [k for k in all_dest_keys if k in set(requested)]
+    else:
+        dest_keys = all_dest_keys
+    if not dest_keys:
+        raise RuntimeError("No destination conferences resolved for projection.")
+    print(f"[batch-transfer] destinations={len(dest_keys)}", flush=True)
 
     feat_keys = [
         "mpg", "ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct",
         "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
         "stl_per", "blk_per", "orb_per", "drb_per", "rapm", "net_pts", "onoff_net_rating",
     ]
-    out_keys = feat_keys
+    impact_keys = ["bpm", "rapm", "net_pts"]
 
-    scales: dict[str, float] = {}
-    for k in feat_keys:
-        vals = sorted(
-            [float(e["src"][k]) for e in pool if k in e["src"] and float(e["src"][k]) == float(e["src"][k])]
-        )
-        if len(vals) >= 12:
-            lo = vals[max(0, int(0.1 * (len(vals) - 1)))]
-            hi = vals[min(len(vals) - 1, int(0.9 * (len(vals) - 1)))]
-            spread = hi - lo
-            scales[k] = spread if spread > 1e-6 else 1.0
-        else:
-            scales[k] = 1.0
+    conf_models: dict[str, dict[str, Any]] = {}
+    for conf in dest_keys:
+        same_dest = [e for e in examples if e["dst_conf"] == conf]
+        pool = same_dest if len(same_dest) >= 35 else examples
+        scales: dict[str, float] = {}
+        for k in feat_keys:
+            vals = sorted(
+                [float(e["src"][k]) for e in pool if k in e["src"] and float(e["src"][k]) == float(e["src"][k])]
+            )
+            if len(vals) >= 12:
+                lo = vals[max(0, int(0.1 * (len(vals) - 1)))]
+                hi = vals[min(len(vals) - 1, int(0.9 * (len(vals) - 1)))]
+                spread = hi - lo
+                scales[k] = spread if spread > 1e-6 else 1.0
+            else:
+                scales[k] = 1.0
+        grade_pool = same_dest if len(same_dest) >= 20 else pool
+        cohort_scores: list[float] = []
+        for e in grade_pool:
+            vals = [e["dst"][k] for k in impact_keys if k in e["dst"]]
+            if vals:
+                cohort_scores.append(sum(float(v) for v in vals) / len(vals))
+        conf_models[conf] = {"pool": pool, "scales": scales, "cohort_scores": cohort_scores}
 
-    headers = [
-        "season",
-        "player",
-        "team",
-        "source_conference",
-        "destination_conference",
-        "status",
-        "error",
-        "transfer_grade",
-        "comps_weighted",
-        "proj_ppg",
-        "proj_rpg",
-        "proj_apg",
-        "proj_spg",
-        "proj_bpg",
-        "proj_fg_pct",
-        "proj_tp_pct",
-        "proj_ft_pct",
-    ]
+    conf_cols = [conference_display(k) for k in dest_keys]
+    headers = ["season", "player", "team", "source_conference", "class"] + conf_cols
     with out_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=headers)
         w.writeheader()
@@ -337,25 +349,23 @@ def main() -> int:
         for idx, (p, row) in enumerate(filtered, start=1):
             source = bpc._row_transfer_metrics(row)
             source_conf = bpc._conference_key(bpc.bt_get(row, ["conf", "conference"]))
-            parsed = project_player_transfer(
-                bpc=bpc,
-                source=source,
-                source_conf=source_conf,
-                pool=pool,
-                same_dest=same_dest,
-                dest_conf=dest_conf,
-                feat_keys=feat_keys,
-                out_keys=out_keys,
-                scales=scales,
-            )
-            rec = {
+            rec: dict[str, Any] = {
                 "season": bpc.norm_season(p.season),
                 "player": p.player,
                 "team": p.team,
                 "source_conference": bpc.bt_get(row, ["conf", "conference"]),
-                "destination_conference": args.destination_conference,
-                **parsed,
+                "class": player_class_from_row(bpc, row),
             }
+            for conf_key, col_name in zip(dest_keys, conf_cols):
+                rec[col_name] = project_transfer_grade(
+                    bpc=bpc,
+                    source=source,
+                    source_conf=source_conf,
+                    dest_conf=conf_key,
+                    model=conf_models[conf_key],
+                    feat_keys=feat_keys,
+                    impact_keys=impact_keys,
+                )
             w.writerow(rec)
             if idx == 1 or idx % 100 == 0 or idx == total:
                 print(f"[batch-transfer] {idx}/{total} written")
