@@ -94,5 +94,13 @@ jobs:
             exit 0
           fi
           git commit -m "Refresh transfer projection matrix (${INPUT_SEASON})"
-          git pull --rebase origin main || true
-          git push origin main
+          for i in 1 2 3; do
+            if git push origin main; then
+              echo "Push succeeded."
+              exit 0
+            fi
+            echo "Push rejected; rebasing attempt ${i}..."
+            git pull --rebase origin main || true
+          done
+          echo "Failed to push after retries."
+          exit 1
