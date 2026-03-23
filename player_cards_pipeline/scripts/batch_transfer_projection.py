@@ -317,7 +317,7 @@ def main() -> int:
         if gp is not None and gp < args.min_games:
             continue
         min_pct = player_min_pct_from_row(bpc, row)
-        if min_pct is not None and min_pct <= float(args.min_pct):
+        if min_pct is None or min_pct <= float(args.min_pct):
             continue
         # Hard de-dupe guard: keep one row per normalized (season, player, team).
         dedupe_key = (bpc.norm_season(p.season), bpc.norm_player_name(p.player), bpc.norm_team(p.team))
