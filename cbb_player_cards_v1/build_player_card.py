@@ -2973,11 +2973,11 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
 
     per_game_rows = "".join(
         [
-            row_html("PPG", "ppg", 1),
-            row_html("RPG", "rpg", 1),
-            row_html("APG", "apg", 1),
-            row_html("SPG", "spg", 1),
-            row_html("BPG", "bpg", 1),
+            row_html("AST%", "ast_per", 1),
+            row_html("OREB%", "orb_per", 1),
+            row_html("DREB%", "drb_per", 1),
+            row_html("STL%", "stl_per", 1),
+            row_html("BLK%", "blk_per", 1),
             row_html("FG%", "fg_pct", 1),
             row_html("3P%", "tp_pct", 1),
             row_html("FT%", "ft_pct", 1),
@@ -2988,7 +2988,7 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
         <h3>Transfer Projection</h3>
         <div class="draft-proj-main">{html.escape(dest_conf_raw)} Transfer Grade: {transfer_grade}</div>
         <div class="draft-proj-sub">Projected next-season statline vs historical transfer comps ({len(weighted_examples)} comps weighted)</div>
-        <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Per Game</div>
+        <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Projected Rates</div>
         <div class="draft-odds-grid transfer-two-col">
           {per_game_rows}
         </div>
