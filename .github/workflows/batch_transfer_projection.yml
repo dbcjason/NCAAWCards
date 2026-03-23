@@ -87,7 +87,8 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           FILE="player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv"
-          git add "$FILE" || true
+          test -f "$FILE" || (echo "Missing expected output: $FILE" && exit 1)
+          git add -f "$FILE" || true
           if git diff --cached --quiet; then
             echo "No transfer projection CSV changes to commit."
             exit 0
