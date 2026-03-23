@@ -273,6 +273,7 @@ def main() -> int:
     team_norm = bpc.norm_team(args.team) if args.team else ""
 
     filtered: list[tuple[Any, dict[str, str]]] = []
+    seen_player_keys: set[tuple[str, str, str]] = set()
     for p in players:
         if bpc.norm_season(p.season) != season_norm:
             continue
@@ -286,9 +287,17 @@ def main() -> int:
         row = row_idx.get(key)
         if not row:
             continue
+        klass = player_class_from_row(bpc, row)
+        if klass.strip().lower() == "senior":
+            continue
         gp = bpc.bt_num(row, ["GP", "gp"])
         if gp is not None and gp < args.min_games:
             continue
+        # Hard de-dupe guard: keep one row per normalized (season, player, team).
+        dedupe_key = (bpc.norm_season(p.season), bpc.norm_player_name(p.player), bpc.norm_team(p.team))
+        if dedupe_key in seen_player_keys:
+            continue
+        seen_player_keys.add(dedupe_key)
         filtered.append((p, row))
     filtered.sort(key=lambda x: (bpc.norm_team(x[0].team), bpc.norm_player_name(x[0].player)))
     if args.limit and args.limit > 0:
