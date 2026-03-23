@@ -5,6 +5,7 @@ import argparse
 import csv
 import importlib.util
 import sys
+import re
 from pathlib import Path
 from typing import Any
 
@@ -257,17 +258,22 @@ def player_min_pct_from_row(bpc: Any, row: dict[str, str]) -> float | None:
 
 
 MANUAL_EXCLUDE_PLAYERS: set[tuple[str, str]] = {
-    ("liam daycogreen", ""),
-    ("tj drain", ""),
-    ("riley saunders", "northdakotast"),
-    ("ian imegwu", "cornell"),
-    ("alex mcfadden", "delaware"),
+    ("liamdaycogreen", ""),
+    ("tjdrain", ""),
+    ("rileysaunders", "northdakotast"),
+    ("ianimegwu", "cornell"),
+    ("alexmcfadden", "delaware"),
 }
 
 
+def _norm_player_key(v: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "", str(v or "").lower())
+
+
 def is_manually_excluded_player(player_norm: str, team_norm: str) -> bool:
+    pkey = _norm_player_key(player_norm)
     for pnorm, tnorm in MANUAL_EXCLUDE_PLAYERS:
-        if player_norm != pnorm:
+        if pkey != pnorm:
             continue
         if not tnorm or tnorm == team_norm:
             return True
@@ -338,16 +344,19 @@ def main() -> int:
         gp = bpc.bt_num(row, ["GP", "gp"])
         if gp is not None and gp < args.min_games:
             continue
-        mpg = bpc.bt_num(row, ["MPG", "mpg", "minutes_per_game", "min_per_game"])
+        min_pct = player_min_pct_from_row(bpc, row)
+        if min_pct is None or min_pct <= float(args.min_pct):
+            continue
+        mpg = bpc.bt_num(row, ["MPG", "mpg", "minutes_per_game", "min_per_game", "min per game"])
+        if mpg is None and min_pct is not None:
+            # Approximate MPG from minute share when explicit MPG is missing.
+            mpg = float(min_pct) * 0.4
         if mpg is None:
             try:
                 mpg = float(getattr(p, "mpg"))
             except Exception:
                 mpg = None
         if mpg is None or mpg <= float(args.min_mpg):
-            continue
-        min_pct = player_min_pct_from_row(bpc, row)
-        if min_pct is None or min_pct <= float(args.min_pct):
             continue
         # Hard de-dupe guard: keep one row per normalized (season, player, team).
         dedupe_key = (bpc.norm_season(p.season), bpc.norm_player_name(p.player), bpc.norm_team(p.team))
