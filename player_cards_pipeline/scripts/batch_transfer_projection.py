@@ -232,6 +232,28 @@ def player_class_from_row(bpc: Any, row: dict[str, str]) -> str:
     return mapping.get(k, raw)
 
 
+def player_min_pct_from_row(bpc: Any, row: dict[str, str]) -> float | None:
+    v = bpc.bt_num(
+        row,
+        [
+            "Min%",
+            "min%",
+            "min_pct",
+            "minpct",
+            "min_per",
+            "minutes_pct",
+            "mpct",
+        ],
+    )
+    if v is None:
+        return None
+    vv = float(v)
+    # Some sources store rate stats as 0..1 fractions.
+    if 0.0 <= vv <= 1.0:
+        vv *= 100.0
+    return vv
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(
         description="Batch-run transfer projection grade matrix for all destination conferences.",
@@ -245,6 +267,7 @@ def main() -> int:
     ap.add_argument("--season", required=True, help="Target season (script season, e.g. 2026).")
     ap.add_argument("--out-csv", required=True, help="Output CSV path.")
     ap.add_argument("--min-games", type=int, default=5, help="Minimum GP to include.")
+    ap.add_argument("--min-pct", type=float, default=5.0, help="Exclude players with Min% <= this value.")
     ap.add_argument("--team", default="", help="Optional source team filter.")
     ap.add_argument("--limit", type=int, default=0, help="Optional cap on players (0 = no cap).")
     ap.add_argument(
@@ -292,6 +315,9 @@ def main() -> int:
             continue
         gp = bpc.bt_num(row, ["GP", "gp"])
         if gp is not None and gp < args.min_games:
+            continue
+        min_pct = player_min_pct_from_row(bpc, row)
+        if min_pct is not None and min_pct <= float(args.min_pct):
             continue
         # Hard de-dupe guard: keep one row per normalized (season, player, team).
         dedupe_key = (bpc.norm_season(p.season), bpc.norm_player_name(p.player), bpc.norm_team(p.team))

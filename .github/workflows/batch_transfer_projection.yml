@@ -13,6 +13,10 @@ on:
         description: "Minimum GP filter"
         required: true
         default: "5"
+      min_pct:
+        description: "Exclude players with Min% <= this value"
+        required: true
+        default: "5"
       team:
         description: "Optional source team filter (blank = all teams)"
         required: false
@@ -45,6 +49,7 @@ jobs:
           INPUT_MIN_GAMES: ${{ inputs.min_games || '5' }}
           INPUT_TEAM: ${{ inputs.team || '' }}
           INPUT_LIMIT: ${{ inputs.limit || '0' }}
+          INPUT_MIN_PCT: ${{ inputs.min_pct || '5' }}
           INPUT_CONFERENCES: ${{ inputs.conferences || '' }}
         run: |
           mkdir -p player_cards_pipeline/output
@@ -62,6 +67,7 @@ jobs:
             --project-root . \
             --season \"${INPUT_SEASON}\" \
             --min-games \"${INPUT_MIN_GAMES}\" \
+            --min-pct \"${INPUT_MIN_PCT}\" \
             --limit \"${INPUT_LIMIT}\" \
             ${TEAM_ARG} \
             ${CONF_ARG} \
