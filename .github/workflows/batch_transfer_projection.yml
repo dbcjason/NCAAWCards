@@ -1,6 +1,8 @@
 name: Batch Transfer Projection
 
 on:
+  schedule:
+    - cron: "50 10 * * *" # Daily 6:50 AM ET (approx, DST-aware by UTC)
   workflow_dispatch:
     inputs:
       season:
@@ -38,30 +40,52 @@ jobs:
           python-version: "3.11"
 
       - name: Run batch transfer projection
+        env:
+          INPUT_SEASON: ${{ inputs.season || '2026' }}
+          INPUT_MIN_GAMES: ${{ inputs.min_games || '5' }}
+          INPUT_TEAM: ${{ inputs.team || '' }}
+          INPUT_LIMIT: ${{ inputs.limit || '0' }}
+          INPUT_CONFERENCES: ${{ inputs.conferences || '' }}
         run: |
           mkdir -p player_cards_pipeline/output
           TEAM_ARG=""
           CONF_ARG=""
-          if [ -n "${{ inputs.team }}" ]; then
-            TEAM_ARG="--team \"${{ inputs.team }}\""
+          if [ -n "${INPUT_TEAM}" ]; then
+            TEAM_ARG="--team \"${INPUT_TEAM}\""
           fi
-          if [ -n "${{ inputs.conferences }}" ]; then
-            CONF_ARG="--conferences \"${{ inputs.conferences }}\""
+          if [ -n "${INPUT_CONFERENCES}" ]; then
+            CONF_ARG="--conferences \"${INPUT_CONFERENCES}\""
           fi
 
           # shellcheck disable=SC2086
           eval "python3 player_cards_pipeline/scripts/batch_transfer_projection.py \
             --project-root . \
-            --season \"${{ inputs.season }}\" \
-            --min-games \"${{ inputs.min_games }}\" \
-            --limit \"${{ inputs.limit }}\" \
+            --season \"${INPUT_SEASON}\" \
+            --min-games \"${INPUT_MIN_GAMES}\" \
+            --limit \"${INPUT_LIMIT}\" \
             ${TEAM_ARG} \
             ${CONF_ARG} \
-            --out-csv \"player_cards_pipeline/output/transfer_projection_${{ inputs.season }}_all_conferences.csv\""
+            --out-csv \"player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv\""
 
       - name: Upload CSV artifact
         uses: actions/upload-artifact@v4
         with:
-          name: transfer-projection-${{ inputs.season }}-all-conferences
-          path: player_cards_pipeline/output/transfer_projection_${{ inputs.season }}_all_conferences.csv
+          name: transfer-projection-${{ inputs.season || '2026' }}-all-conferences
+          path: player_cards_pipeline/output/transfer_projection_${{ inputs.season || '2026' }}_all_conferences.csv
           if-no-files-found: error
+
+      - name: Commit and push CSV
+        env:
+          INPUT_SEASON: ${{ inputs.season || '2026' }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          FILE="player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv"
+          git add "$FILE" || true
+          if git diff --cached --quiet; then
+            echo "No transfer projection CSV changes to commit."
+            exit 0
+          fi
+          git commit -m "Refresh transfer projection matrix (${INPUT_SEASON})"
+          git pull --rebase origin main || true
+          git push origin main
