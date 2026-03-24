@@ -30,6 +30,9 @@ on:
         required: false
         default: ""
 
+permissions:
+  contents: write
+
 jobs:
   run-batch-transfer:
     runs-on: ubuntu-latest
