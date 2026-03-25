@@ -2454,7 +2454,7 @@ def build_bt_percentile_html(
             value, pct = bt_metric_percentile(target_row, cohort, key)
             if label == "STL%":
                 stl_val = bt_display_stl_pct(value)
-                rows_html += bt_row_html(label, stl_val, pct, is_percent=is_pct, digits=1, truncate=True)
+                rows_html += bt_row_html(label, stl_val, pct, is_percent=False, digits=1, truncate=True)
             elif label == "BLK%":
                 blk_val = bt_display_blk_pct(value)
                 rows_html += bt_row_html(label, blk_val, pct, is_percent=False, digits=1, truncate=True)
