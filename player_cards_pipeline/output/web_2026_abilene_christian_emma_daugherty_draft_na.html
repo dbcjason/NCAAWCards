@@ -1,0 +1,860 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Emma Daugherty - Player Card</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --panel: #141414;
+  --line: #3b3b3b;
+  --text: #f5f5f5;
+  --muted: #d4d4d4;
+  --accent: #ffffff;
+  --bar: #22c55e;
+  --panel-alt: #1f1f1f;
+  --bar-track: #2a2a2a;
+  --shot-mid: #ef4444;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+.wrap {
+  max-width: 1100px;
+  margin: 18px auto;
+  padding: 16px;
+}
+.card {
+  border: 2px solid var(--line);
+  border-radius: 12px;
+  background: #000000;
+  padding: 16px;
+}
+.title {
+  font-size: 44px;
+  line-height: 1;
+  font-weight: 800;
+  color: var(--accent);
+  margin: 0 0 8px 0;
+}
+.title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+.grade-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(96px, 1fr));
+  gap: 8px;
+  min-width: 560px;
+}
+.grade-chip {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+  background: var(--panel-alt);
+}
+.grade-k {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.1;
+}
+.grade-v {
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--accent);
+}
+.sub {
+  color: var(--muted);
+  margin-bottom: 0;
+  font-size: 15px;
+}
+.row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.panel {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px;
+  background: var(--panel);
+}
+.per-game-panel {
+  margin-top: 10px;
+}
+.panel h3 {
+  margin: 0 0 4px 0;
+  font-size: 14px;
+}
+.section-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(210px, 1fr));
+  gap: 10px;
+}
+.section-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  background: var(--panel-alt);
+}
+.section-card h4 {
+  margin: 0 0 4px 0;
+  font-size: 12px;
+  color: var(--text);
+  letter-spacing: 0.1px;
+}
+.kv {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(120px, 1fr));
+  gap: 8px;
+  font-size: 14px;
+}
+.stat-strip {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 8px;
+}
+.shot-wrap {
+  display: flex;
+  justify-content: flex-start;
+  gap: 12px;
+  align-items: stretch;
+}
+.left-wrap {
+  flex: 0 0 33%;
+  min-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.shot-panel {
+  min-width: 0;
+}
+.shot-panel svg {
+  display: block;
+  margin: 0 auto;
+  transform: translateX(-8px);
+}
+.shot-chart-col { min-width: 0; }
+.chip {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 8px;
+  text-align: center;
+  background: var(--panel-alt);
+}
+.chip .k {
+  color: var(--muted);
+  font-size: 12px;
+}
+.chip .v {
+  font-size: 20px;
+  font-weight: 700;
+}
+.chip .p {
+  margin-top: 3px;
+  color: var(--muted);
+  font-size: 10px;
+  line-height: 1;
+}
+.metric-row {
+  display: grid;
+  grid-template-columns: 72px 58px 1fr 34px;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 5px;
+}
+.metric-label {
+  color: var(--muted);
+  font-size: 12px;
+}
+.metric-val {
+  font-weight: 700;
+  font-size: 12px;
+}
+.bar-wrap {
+  height: 12px;
+  border-radius: 999px;
+  background: var(--bar-track);
+  overflow: hidden;
+}
+.bar-fill {
+  height: 12px;
+  background: var(--bar);
+}
+.metric-pct {
+  text-align: right;
+  font-weight: 700;
+  font-size: 12px;
+}
+.shot-meta {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.trend-wrap {
+  margin-top: 8px;
+}
+.shotdiet-bar {
+  width: 100%;
+  height: 16px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--bar-track);
+  border: 1px solid var(--line);
+  display: flex;
+}
+.shotdiet-seg {
+  height: 100%;
+  display: block;
+  flex: 0 0 auto;
+}
+.shotdiet-rim {
+  background: var(--bar);
+}
+.shotdiet-mid {
+  background: var(--shot-mid);
+}
+.shotdiet-three {
+  background: #60a5fa !important;
+  box-shadow: none;
+}
+.shotdiet-legend {
+  margin-top: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  color: var(--muted);
+}
+.shotdiet-key {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+.shotdiet-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.right-wrap {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-items: stretch;
+  margin-top: 14px;
+}
+.right-col {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-height: 100%;
+}
+.comp-table {
+  display: grid;
+  gap: 6px;
+}
+.comp-row {
+  display: grid;
+  grid-template-columns: 1fr 42px 42px;
+  gap: 8px;
+  font-size: 12px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  padding: 6px 8px;
+  background: var(--panel-alt);
+}
+.comp-name {
+  font-weight: 600;
+  color: var(--text);
+}
+.comp-year {
+  color: var(--muted);
+  text-align: right;
+}
+.comp-score {
+  color: var(--accent);
+  text-align: right;
+  font-weight: 700;
+}
+.play-grid {
+  display: grid;
+  gap: 11px;
+}
+.play-row {
+  display: grid;
+  grid-template-columns: 74px 1fr;
+  gap: 6px;
+  align-items: center;
+}
+.play-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+}
+.play-stack {
+  display: grid;
+  gap: 6px;
+}
+.play-line {
+  display: grid;
+  grid-template-columns: 1fr 82px;
+  gap: 6px;
+  align-items: center;
+}
+.play-track {
+  position: relative;
+  height: 10px;
+  background: var(--bar-track);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  overflow: visible;
+}
+.play-fill {
+  height: 100%;
+  border-radius: 999px;
+}
+.play-vol {
+  background: #60a5fa;
+}
+.play-ppp {
+  background: var(--bar);
+}
+.play-badge {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 15px;
+  height: 15px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #0e0e0e;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  line-height: 15px;
+  text-align: center;
+}
+.play-tag {
+  color: var(--muted);
+  font-size: 9px;
+  white-space: nowrap;
+}
+.play-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+.play-head h3 {
+  margin: 0;
+}
+.play-legend {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--muted);
+}
+.play-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.play-legend-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.playstyles-wrap {
+  flex: 1 1 auto;
+  display: flex;
+}
+.playstyles-wrap .panel {
+  width: 100%;
+}
+.team-impact-wrap {
+  margin-top: 2px;
+}
+.comp-bottom {
+  margin-top: 0;
+}
+.draft-proj-main {
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-top: 2px;
+}
+.draft-proj-panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+}
+.draft-proj-sub {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 11px;
+}
+.draft-proj-credit {
+  margin-top: auto;
+  padding-top: 8px;
+  color: #60a5fa;
+  font-size: 15px;
+  font-weight: 700;
+}
+.play-credit {
+  margin-top: 8px;
+  color: #60a5fa;
+  font-size: 15px;
+  font-weight: 700;
+}
+.draft-odds-grid {
+  margin-top: 8px;
+  display: grid;
+  gap: 4px;
+  flex: 1 1 auto;
+  align-content: start;
+}
+.transfer-two-col {
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.draft-odd-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+  align-items: center;
+  font-size: 11px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: var(--panel-alt);
+}
+.transfer-two-col .draft-odd-row {
+  font-size: 10px;
+  padding: 3px 5px;
+}
+.transfer-impact-list {
+  margin-top: 2px;
+  display: grid;
+  gap: 2px;
+  max-height: 64px;
+  overflow: hidden;
+}
+.transfer-impact-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.05;
+}
+.transfer-impact-row span:nth-child(2),
+.transfer-impact-row span:nth-child(3) {
+  color: var(--text);
+  font-weight: 700;
+  text-align: right;
+}
+.transfer-impact-head span {
+  color: var(--muted) !important;
+  font-weight: 600 !important;
+}
+.draft-odd-k {
+  color: var(--muted);
+}
+.draft-odd-v {
+  font-weight: 700;
+  color: var(--text);
+}
+.ti-comp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.ti-section {
+  margin-top: 8px;
+}
+.ti-subhead {
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 700;
+  margin: 0;
+  text-align: left !important;
+}
+.ti-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+  margin: 0 0 6px 0;
+  font-size: 11px;
+}
+.ti-table th, .ti-table td {
+  border: none;
+  padding: 2px 4px;
+}
+.ti-table th {
+  color: var(--muted);
+  font-weight: 700;
+  text-align: right;
+}
+.ti-table th:first-child {
+  text-align: left;
+}
+.ti-metric {
+  color: var(--muted);
+  text-align: left;
+  white-space: nowrap;
+}
+.ti-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 920px) {
+  .title-row { flex-direction: column; }
+  .grade-strip { min-width: 0; width: 100%; grid-template-columns: repeat(2, minmax(130px, 1fr)); }
+  .row { grid-template-columns: 1fr; }
+  .stat-strip { grid-template-columns: repeat(3, 1fr); }
+  .section-grid { grid-template-columns: 1fr; }
+  .left-wrap { width: 100%; flex: 1 1 auto; min-width: 0; }
+  .shot-panel { width: 100%; min-width: 0; }
+  .shot-chart-col { min-width: 0; }
+  .right-wrap { width: 100%; margin-top: 14px; }
+  .right-wrap { grid-template-columns: 1fr; }
+  .right-col { width: 100%; }
+}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="title-row">
+        <h1 class="title">Emma Daugherty</h1>
+        <div class="grade-strip"><div class="grade-chip"><div class="grade-k">Impact</div><div class="grade-v">F</div></div><div class="grade-chip"><div class="grade-k">Scoring</div><div class="grade-v">F</div></div><div class="grade-chip"><div class="grade-k">Playmaking</div><div class="grade-v">F</div></div><div class="grade-chip"><div class="grade-k">Defense</div><div class="grade-v">F</div></div><div class="grade-chip"><div class="grade-k">Rebounding</div><div class="grade-v">A-</div></div></div>
+      </div>
+      <div class="sub">Abilene Christian | 2026 | Position: Wing G | Height: 6&#x27;1&quot;</div>
+
+      <div class="panel per-game-panel">
+        <h3>Per Game</h3>
+        <div class="stat-strip">
+          <div class="chip"><div class="k">PPG</div><div class="v">0.9</div><div class="p">7%</div></div>
+          <div class="chip"><div class="k">RPG</div><div class="v">1.7</div><div class="p">38%</div></div>
+          <div class="chip"><div class="k">APG</div><div class="v">0.1</div><div class="p">8%</div></div>
+          <div class="chip"><div class="k">SPG</div><div class="v">0.5</div><div class="p">37%</div></div>
+          <div class="chip"><div class="k">BPG</div><div class="v">0.0</div><div class="p">29%</div></div>
+          <div class="chip"><div class="k">FG%</div><div class="v">17.6</div><div class="p">4%</div></div>
+          <div class="chip"><div class="k">3P%</div><div class="v">0.0</div><div class="p">6%</div></div>
+          <div class="chip"><div class="k">FT%</div><div class="v">50.0</div><div class="p">16%</div></div>
+        </div>
+      </div>
+
+      
+      <div class="panel" style="margin-top:14px;">
+        <h3>Advanced Percentiles</h3>
+        <div class="shot-meta">Season: 2026</div>
+        <div class="section-grid">
+          <div class="section-card"><h4>Impact</h4>
+<div class="metric-row">
+  <div class="metric-label">BPM</div>
+  <div class="metric-val">-5.4</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:25.3%;background:rgb(247, 163, 163);"></div></div>
+  <div class="metric-pct">25</div>
+</div>
+
+<div class="trend-wrap">
+<svg viewBox="0 0 330 130" width="330" height="130" xmlns="http://www.w3.org/2000/svg">
+  <rect x="38" y="10" width="282" height="96" fill="var(--panel-alt)" stroke="var(--line)" stroke-width="1"/>
+  <line x1="38" y1="106.0" x2="320" y2="106.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="82.0" x2="320" y2="82.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="58.0" x2="320" y2="58.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="34.0" x2="320" y2="34.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="10.0" x2="320" y2="10.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/>
+  <line x1="38" y1="41.4" x2="320" y2="41.4" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="38.0" y1="16.6" x2="53.7" y2="55.4" stroke="#22c55e" stroke-width="2" /><line x1="53.7" y1="55.4" x2="69.3" y2="42.0" stroke="#ef4444" stroke-width="2" /><line x1="69.3" y1="42.0" x2="85.0" y2="42.7" stroke="#ef4444" stroke-width="2" /><line x1="85.0" y1="42.7" x2="100.7" y2="49.5" stroke="#ef4444" stroke-width="2" /><line x1="100.7" y1="49.5" x2="116.3" y2="51.6" stroke="#ef4444" stroke-width="2" /><line x1="116.3" y1="51.6" x2="132.0" y2="51.6" stroke="#ef4444" stroke-width="2" /><line x1="132.0" y1="51.6" x2="147.7" y2="48.6" stroke="#ef4444" stroke-width="2" /><line x1="147.7" y1="48.6" x2="163.3" y2="22.3" stroke="#22c55e" stroke-width="2" /><line x1="163.3" y1="22.3" x2="179.0" y2="55.7" stroke="#22c55e" stroke-width="2" /><line x1="179.0" y1="55.7" x2="194.7" y2="81.2" stroke="#ef4444" stroke-width="2" /><line x1="194.7" y1="81.2" x2="210.3" y2="61.9" stroke="#ef4444" stroke-width="2" /><line x1="210.3" y1="61.9" x2="226.0" y2="44.1" stroke="#ef4444" stroke-width="2" /><line x1="226.0" y1="44.1" x2="241.7" y2="71.4" stroke="#ef4444" stroke-width="2" /><line x1="241.7" y1="71.4" x2="257.3" y2="62.8" stroke="#ef4444" stroke-width="2" /><line x1="257.3" y1="62.8" x2="273.0" y2="63.4" stroke="#ef4444" stroke-width="2" /><line x1="273.0" y1="63.4" x2="288.7" y2="40.7" stroke="#ef4444" stroke-width="2" /><line x1="288.7" y1="40.7" x2="304.3" y2="60.8" stroke="#ef4444" stroke-width="2" /><line x1="304.3" y1="60.8" x2="320.0" y2="99.4" stroke="#ef4444" stroke-width="2" />
+  <circle cx="38.0" cy="16.6" r="2.4" fill="#22c55e" /><circle cx="53.7" cy="55.4" r="2.4" fill="#ef4444" /><circle cx="69.3" cy="42.0" r="2.4" fill="#ef4444" /><circle cx="85.0" cy="42.7" r="2.4" fill="#ef4444" /><circle cx="100.7" cy="49.5" r="2.4" fill="#ef4444" /><circle cx="116.3" cy="51.6" r="2.4" fill="#ef4444" /><circle cx="132.0" cy="51.6" r="2.4" fill="#ef4444" /><circle cx="147.7" cy="48.6" r="2.4" fill="#ef4444" /><circle cx="163.3" cy="22.3" r="2.4" fill="#22c55e" /><circle cx="179.0" cy="55.7" r="2.4" fill="#ef4444" /><circle cx="194.7" cy="81.2" r="2.4" fill="#ef4444" /><circle cx="210.3" cy="61.9" r="2.4" fill="#ef4444" /><circle cx="226.0" cy="44.1" r="2.4" fill="#ef4444" /><circle cx="241.7" cy="71.4" r="2.4" fill="#ef4444" /><circle cx="257.3" cy="62.8" r="2.4" fill="#ef4444" /><circle cx="273.0" cy="63.4" r="2.4" fill="#ef4444" /><circle cx="288.7" cy="40.7" r="2.4" fill="#22c55e" /><circle cx="304.3" cy="60.8" r="2.4" fill="#ef4444" /><circle cx="320.0" cy="99.4" r="2.4" fill="#ef4444" />
+  <text x="38.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-7</text><text x="85.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-28</text><text x="132.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">12-14</text><text x="179.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">1-1</text><text x="226.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">1-15</text><text x="273.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">1-31</text><text x="320.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">2-7</text>
+  <text x="12" y="109.0" text-anchor="start" font-size="9" fill="var(--muted)">-28.9</text><text x="12" y="85.0" text-anchor="start" font-size="9" fill="var(--muted)">-18.2</text><text x="12" y="61.0" text-anchor="start" font-size="9" fill="var(--muted)">-7.4</text><text x="12" y="37.0" text-anchor="start" font-size="9" fill="var(--muted)">3.3</text><text x="12" y="13.0" text-anchor="start" font-size="9" fill="var(--muted)">14.0</text>
+  <text x="165.0" y="129" text-anchor="middle" font-size="9" fill="var(--muted)">Date</text>
+  <text x="6" y="65.0" text-anchor="start" font-size="9" fill="var(--muted)" transform="rotate(-90 6 65.0)">BPM</text>
+</svg>
+</div>
+</div>
+          <div class="section-card"><h4>Scoring</h4>
+<div class="metric-row">
+  <div class="metric-label">Usage</div>
+  <div class="metric-val">8.7</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:2.3%;background:rgb(240, 76, 76);"></div></div>
+  <div class="metric-pct">2</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">TS%</div>
+  <div class="metric-val">21.3</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:3.1%;background:rgb(240, 80, 80);"></div></div>
+  <div class="metric-pct">3</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">2P%</div>
+  <div class="metric-val">20.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:7.2%;background:rgb(241, 95, 95);"></div></div>
+  <div class="metric-pct">7</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Rim%</div>
+  <div class="metric-val">25.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:6.2%;background:rgb(241, 91, 91);"></div></div>
+  <div class="metric-pct">6</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">Mid%</div>
+  <div class="metric-val">0.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:5.3%;background:rgb(241, 88, 88);"></div></div>
+  <div class="metric-pct">5</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">3P%</div>
+  <div class="metric-val">0.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:6.9%;background:rgb(241, 94, 94);"></div></div>
+  <div class="metric-pct">7</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">3PA/100</div>
+  <div class="metric-val">0.8</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:8.1%;background:rgb(242, 98, 98);"></div></div>
+  <div class="metric-pct">8</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">FT%</div>
+  <div class="metric-val">50.0</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:17.8%;background:rgb(245, 135, 135);"></div></div>
+  <div class="metric-pct">18</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">FTr</div>
+  <div class="metric-val">23.5</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:46.5%;background:rgb(254, 242, 242);"></div></div>
+  <div class="metric-pct">46</div>
+</div>
+</div>
+          <div class="section-card">
+            <h4>Playmaking</h4>
+            
+<div class="metric-row">
+  <div class="metric-label">AST%</div>
+  <div class="metric-val">1.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:4.7%;background:rgb(241, 86, 86);"></div></div>
+  <div class="metric-pct">5</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">TO%</div>
+  <div class="metric-val">31.2</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:18.2%;background:rgb(245, 136, 136);"></div></div>
+  <div class="metric-pct">18</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">A/TO</div>
+  <div class="metric-val">0.33</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:11.6%;background:rgb(243, 111, 111);"></div></div>
+  <div class="metric-pct">12</div>
+</div>
+
+            <h4 style="margin-top:4px;">Defense</h4>
+            
+<div class="metric-row">
+  <div class="metric-label">STL%</div>
+  <div class="metric-val">1.9</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:42.3%;background:rgb(253, 226, 226);"></div></div>
+  <div class="metric-pct">42</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">BLK%</div>
+  <div class="metric-val">0.8</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:57.6%;background:rgb(221, 246, 231);"></div></div>
+  <div class="metric-pct">58</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">DBPM</div>
+  <div class="metric-val">0.4</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:66.7%;background:rgb(181, 236, 201);"></div></div>
+  <div class="metric-pct">67</div>
+</div>
+
+            <h4 style="margin-top:4px;">Rebounding</h4>
+            
+<div class="metric-row">
+  <div class="metric-label">OREB%</div>
+  <div class="metric-val">6.7</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:83.3%;background:rgb(108, 216, 148);"></div></div>
+  <div class="metric-pct">83</div>
+</div>
+
+<div class="metric-row">
+  <div class="metric-label">DREB%</div>
+  <div class="metric-val">17.9</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:92.9%;background:rgb(66, 205, 117);"></div></div>
+  <div class="metric-pct">93</div>
+</div>
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="shot-wrap">
+        <div class="left-wrap">
+          <div class="panel shot-panel shot-chart-col" style="margin-top:14px;">
+            <h3>Shot Chart</h3>
+            <div class="shot-meta">Attempts: 17 | Made: 3 | FG%: 17.6%</div>
+            <div class="shot-meta">Points per Shot Over Expectation: N/A</div>
+            
+<svg viewBox="0 0 355 250" width="355" height="250" xmlns="http://www.w3.org/2000/svg">
+  
+<rect x="20.0" y="20.0" width="315.0" height="210.0" fill="#000000" stroke="#ffffff" stroke-width="2"/>
+<rect x="139.7" y="20.0" width="75.6" height="84.9" fill="none" stroke="#ffffff" stroke-width="2"/>
+<line x1="158.6" y1="34.5" x2="196.4" y2="34.5" stroke="#ffffff" stroke-width="2"/>
+<ellipse cx="177.5" cy="37.9" rx="6.0" ry="6.0" fill="none" stroke="#ffffff" stroke-width="2"/>
+<path d="M 152.3 37.9 A 25.2 17.9 0 0 1 202.7 37.9" fill="none" stroke="#ffffff" stroke-width="2"/>
+<ellipse cx="177.5" cy="104.9" rx="37.8" ry="26.8" fill="none" stroke="#ffffff" stroke-width="2"/>
+<line x1="38.9" y1="20.0" x2="38.9" y2="49.2" stroke="#ffffff" stroke-width="2"/>
+<line x1="316.1" y1="20.0" x2="316.1" y2="49.2" stroke="#ffffff" stroke-width="2"/>
+<polyline points="38.9,49.2 42.4,62.5 45.8,70.6 49.3,76.9 52.8,82.2 56.2,86.8 59.7,90.9 63.2,94.6 66.6,97.9 70.1,101.0 73.5,103.9 77.0,106.5 80.5,109.0 83.9,111.3 87.4,113.4 90.9,115.4 94.3,117.3 97.8,119.1 101.3,120.7 104.7,122.3 108.2,123.8 111.7,125.1 115.1,126.4 118.6,127.6 122.1,128.7 125.5,129.7 129.0,130.6 132.5,131.5 135.9,132.3 139.4,133.1 142.8,133.7 146.3,134.3 149.8,134.8 153.2,135.3 156.7,135.7 160.2,136.1 163.6,136.3 167.1,136.5 170.6,136.7 174.0,136.8 177.5,136.8 181.0,136.8 184.4,136.7 187.9,136.5 191.4,136.3 194.8,136.1 198.3,135.7 201.8,135.3 205.2,134.8 208.7,134.3 212.2,133.7 215.6,133.1 219.1,132.3 222.5,131.5 226.0,130.6 229.5,129.7 232.9,128.7 236.4,127.6 239.9,126.4 243.3,125.1 246.8,123.8 250.3,122.3 253.7,120.7 257.2,119.1 260.7,117.3 264.1,115.4 267.6,113.4 271.1,111.3 274.5,109.0 278.0,106.5 281.4,103.9 284.9,101.0 288.4,97.9 291.8,94.6 295.3,90.9 298.8,86.8 302.2,82.2 305.7,76.9 309.2,70.6 312.6,62.5 316.1,49.2" fill="none" stroke="#ffffff" stroke-width="2"/>
+<line x1="20.0" y1="230.0" x2="335.0" y2="230.0" stroke="#ffffff" stroke-width="2"/>
+
+  
+  
+</svg>
+
+          </div>
+          
+      <div class="panel draft-proj-panel">
+        <h3>Statistical WNBA Draft Projection</h3>
+        <div class="draft-proj-main">Outside Top 20</div>
+        <div class="draft-proj-sub">Drafted: 5.0% | Top 20: 1.9%</div>
+        <div class="draft-odds-grid">
+          <div class="draft-odd-row"><div class="draft-odd-k">Number One Pick</div><div class="draft-odd-v">0.1%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 5</div><div class="draft-odd-v">0.3%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 10</div><div class="draft-odd-v">1.5%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 20</div><div class="draft-odd-v">1.9%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Outside Top 20</div><div class="draft-odd-v">98.1%</div></div>
+        </div>
+        <div class="draft-proj-sub">Projections based solely on statistical profile in an average draft</div>
+      </div>
+
+        </div>
+        <div class="right-wrap">
+          <div class="right-col">
+            <div class="panel"><h3>Self Creation</h3><div class="shot-meta">Missing enriched off_team_poss.value for self-creation normalization.</div></div>
+            <div class="playstyles-wrap"><div class="panel"><h3>Playstyles</h3><div class="shot-meta">No matching enriched playstyle row found for this player/team/season.</div></div></div>
+          </div>
+          <div class="right-col">
+            
+      <div class="panel">
+        <h3>Shot Diet</h3>
+        <div class="shotdiet-bar">
+          <div class="shotdiet-seg shotdiet-rim" style="width:70.59%"></div>
+          <div class="shotdiet-seg shotdiet-mid" style="width:17.65%"></div>
+          <div class="shotdiet-seg shotdiet-three" style="width:11.76%;background:#60a5fa !important;"></div>
+        </div>
+        <div class="shotdiet-legend">
+          <div class="shotdiet-key"><span class="shotdiet-dot shotdiet-rim"></span> Rim (70.6%)</div>
+          <div class="shotdiet-key"><span class="shotdiet-dot shotdiet-mid"></span> Non-Rim 2 (17.6%)</div>
+          <div class="shotdiet-key"><span class="shotdiet-dot shotdiet-three"></span> 3PA (11.8%)</div>
+        </div>
+      </div>
+
+            <div class="ti-comp-stack">
+              <div class="team-impact-wrap">
+      <div class="panel">
+        <h3>Team Impact</h3>
+        
+        <div class="ti-section">
+          <table class="ti-table">
+            <colgroup>
+              <col style="width:46%">
+              <col style="width:18%">
+              <col style="width:18%">
+              <col style="width:18%">
+            </colgroup>
+            <thead>
+              <tr><th class="ti-subhead">Offense</th><th>On</th><th>Off</th><th>Diff</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ti-metric">eFG%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">TO%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Rim%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Rim Rate</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">FTr</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">3Pr</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        
+        <div class="ti-section">
+          <table class="ti-table">
+            <colgroup>
+              <col style="width:46%">
+              <col style="width:18%">
+              <col style="width:18%">
+              <col style="width:18%">
+            </colgroup>
+            <thead>
+              <tr><th class="ti-subhead">Defense</th><th>On</th><th>Off</th><th>Diff</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ti-metric">Opp eFG%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Opp TO%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Opp Rim%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Opp Rim Rate</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Opp FTr</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Opp 3Pr</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+        
+        <div class="ti-section">
+          <table class="ti-table">
+            <colgroup>
+              <col style="width:46%">
+              <col style="width:18%">
+              <col style="width:18%">
+              <col style="width:18%">
+            </colgroup>
+            <thead>
+              <tr><th class="ti-subhead">Rebounding</th><th>On</th><th>Off</th><th>Diff</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="ti-metric">OREB%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr><tr><td class="ti-metric">Opp OREB%</td><td class="ti-num">-</td><td class="ti-num">-</td><td class="ti-num" style="color:var(--muted);font-weight:700;">-</td></tr>
+            </tbody>
+          </table>
+        </div>
+        
+      </div>
+</div>
+              <div class="comp-bottom">
+      <div class="panel">
+        <h3>Player Comparisons</h3>
+        <div class="comp-table">
+          <div class="comp-row"><span class="comp-name">Mia Hammonds</span><span class="comp-year">2025</span><span class="comp-score">91.7</span></div><div class="comp-row"><span class="comp-name">Mo&#x27;Nique Joseph</span><span class="comp-year">2026</span><span class="comp-score">91.5</span></div><div class="comp-row"><span class="comp-name">Brianna Byars</span><span class="comp-year">2025</span><span class="comp-score">91.2</span></div><div class="comp-row"><span class="comp-name">Allison Rickman</span><span class="comp-year">2026</span><span class="comp-score">89.7</span></div><div class="comp-row"><span class="comp-name">Success Prysock</span><span class="comp-year">2026</span><span class="comp-score">89.7</span></div>
+        </div>
+      </div>
+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</body>
+</html>
