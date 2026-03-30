@@ -22,6 +22,7 @@ BT_CANDIDATES = [
 
 ENRICHED_SCRIPT_DIR = "player_cards_pipeline/data/manual/enriched_players/by_script_season"
 HEIGHT_SCORE_PATTERN = "player_cards_pipeline/output/height_profile_scores_{season}.csv"
+HEIGHT_SCORE_BIG_PATTERN = "player_cards_pipeline/output/height_profile_scores_big_{season}.csv"
 RIMFLUENCE_DIR = "player_cards_pipeline/data/manual/rimfluence"
 
 
@@ -221,7 +222,9 @@ def load_height_scores(root: Path, seasons: set[int]) -> tuple[dict[tuple[int, s
     by_key: dict[tuple[int, str, str], dict[str, Any]] = {}
     by_pid: dict[tuple[int, str], dict[str, Any]] = {}
     for season in sorted(seasons):
-        p = root / HEIGHT_SCORE_PATTERN.format(season=season)
+        p_big = root / HEIGHT_SCORE_BIG_PATTERN.format(season=season)
+        p_std = root / HEIGHT_SCORE_PATTERN.format(season=season)
+        p = p_big if p_big.exists() else p_std
         if not p.exists():
             continue
         for r in read_csv_rows(p):
@@ -583,7 +586,7 @@ def build_jason_stats(rows: list[Row]) -> list[dict[str, Any]]:
                     "rimfluence_def": "N/A" if r.rimfluence_def is None else round(r.rimfluence_def, 3),
                     "rimfluence_percentile": "" if r.rimfluence is None else round(percentile(r.rimfluence, rim_vals) or 0.0, 2),
                     "gp": round(r.gp, 1),
-                    "mpg": "" if r.mpg is None else round(r.mpg, 2),
+                    "mpg": "" if r.mpg is None else round(r.mpg, 1),
                     "min_pct": round(r.min_per, 2),
                 }
             )
