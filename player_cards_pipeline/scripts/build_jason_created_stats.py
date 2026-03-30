@@ -32,6 +32,7 @@ class Row:
     team: str
     pid: str
     gp: float
+    mpg: float | None
     min_per: float
     position: str
     player_class: str
@@ -41,6 +42,8 @@ class Row:
     stat_height: str
     height_delta: float | None
     rimfluence: float | None
+    rimfluence_off: float | None
+    rimfluence_def: float | None
     a_to: float | None
     oreb: float | None
     stl_foul: float | None
@@ -67,6 +70,37 @@ def norm(s: str) -> str:
     s = re.sub(r"\b(jr|sr|ii|iii|iv|v)\b\.?", " ", s)
     s = re.sub(r"[^a-z0-9]+", "", s)
     return s
+
+
+def normalize_pos(raw: str | None) -> str:
+    p = (raw or "").strip().upper()
+    if not p:
+        return ""
+    token_map = {
+        "PG": "G",
+        "SG": "G",
+        "G": "G",
+        "GUARD": "G",
+        "SF": "F",
+        "PF": "F",
+        "F": "F",
+        "FORWARD": "F",
+        "WING": "F",
+        "C": "C",
+        "CENTER": "C",
+        "CENTRE": "C",
+    }
+    parts = [t for t in re.split(r"[^A-Z]+", p) if t]
+    for t in parts:
+        if t in token_map:
+            return token_map[t]
+    if "GUARD" in p:
+        return "G"
+    if "FORWARD" in p or "WING" in p:
+        return "F"
+    if "CENTER" in p or "CENTRE" in p:
+        return "C"
+    return ""
 
 
 def parse_height_inches(raw: str | None) -> float | None:
@@ -208,12 +242,33 @@ def _pick_col(header: list[str], candidates: list[str]) -> str | None:
     return None
 
 
-def load_rimfluence(root: Path, seasons: set[int], gender: str) -> dict[tuple[int, str, str], float]:
-    out: dict[tuple[int, str, str], float] = {}
-    d = root / RIMFLUENCE_DIR
-    if not d.exists():
+def load_rimfluence(root: Path, seasons: set[int], gender: str) -> dict[tuple[int, str, str], dict[str, float | None]]:
+    out: dict[tuple[int, str, str], dict[str, float | None]] = {}
+    search_dirs = [
+        root / RIMFLUENCE_DIR,
+        root / "player_cards_pipeline/output",
+        root / "cbbd_dump/season_2026/tables",
+        root,
+    ]
+    files: list[Path] = []
+    seen: set[str] = set()
+    for d in search_dirs:
+        if not d.exists():
+            continue
+        for f in sorted(d.glob("*rimfluence*.csv")):
+            sf = str(f.resolve())
+            if sf in seen:
+                continue
+            seen.add(sf)
+            # Skip raw lineup inputs; keep result-like files.
+            lname = f.name.lower()
+            if "lineups_" in lname and "rimfluence_from_" not in lname:
+                continue
+            files.append(f)
+
+    if not files:
         return out
-    files = sorted(d.glob("*.csv"))
+
     for f in files:
         try:
             rows = read_csv_rows(f)
@@ -225,23 +280,38 @@ def load_rimfluence(root: Path, seasons: set[int], gender: str) -> dict[tuple[in
         season_col = _pick_col(header, ["season", "year"]) or ""
         player_col = _pick_col(header, ["player", "player_name", "name", "key"]) or ""
         team_col = _pick_col(header, ["team", "school"]) or ""
-        rim_col = _pick_col(header, ["rimfluence", "rimfluence_score", "rimfluence_value", "rimfluence_pts"])
+        rim_col = _pick_col(header, ["rimfluence", "rimfluence_score", "rimfluence_value", "rimfluence_pts", "total_rimfluence"])
+        rim_off_col = _pick_col(header, ["off_rimfluence", "offensive_rimfluence", "rimfluence_off", "offrimfluence"])
+        rim_def_col = _pick_col(header, ["def_rimfluence", "defensive_rimfluence", "rimfluence_def", "defrimfluence"])
         gender_col = _pick_col(header, ["gender", "sex"])
-        if not season_col or not player_col or not rim_col:
-            continue
+        if not season_col or not player_col or (not rim_col and not rim_off_col and not rim_def_col):
+            # allow season inference from filename for older exports
+            if not player_col or (not rim_col and not rim_off_col and not rim_def_col):
+                continue
+        inferred_season = None
+        sm = re.search(r"(20\d{2})", f.name)
+        if sm:
+            try:
+                inferred_season = int(sm.group(1))
+            except Exception:
+                inferred_season = None
         for r in rows:
-            season = int(to_float(r.get(season_col), 0) or 0)
+            season = int(to_float(r.get(season_col), 0) or 0) if season_col else int(inferred_season or 0)
             if season not in seasons:
                 continue
             if gender_col:
                 g = str(r.get(gender_col, "")).strip().lower()
                 if g and ((gender.startswith("m") and "men" not in g and g != "m") or (gender.startswith("w") and "women" not in g and g != "w")):
                     continue
-            rv = to_float(r.get(rim_col))
-            if rv is None:
+            rv = to_float(r.get(rim_col)) if rim_col else None
+            rv_off = to_float(r.get(rim_off_col)) if rim_off_col else None
+            rv_def = to_float(r.get(rim_def_col)) if rim_def_col else None
+            if rv is None and rv_off is not None and rv_def is not None:
+                rv = rv_off + rv_def
+            if rv is None and rv_off is None and rv_def is None:
                 continue
             key = (season, norm(r.get(player_col, "")), norm(r.get(team_col, "")))
-            out[key] = rv
+            out[key] = {"rimfluence": rv, "rimfluence_off": rv_off, "rimfluence_def": rv_def}
     return out
 
 
@@ -351,13 +421,15 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
         em = enr.get(k, {})
         hm = hmap.get(k, {})
 
-        # Position + class from enriched; fallback to BT role.
-        pos = (em.get("pos", "") or "").strip().upper()
+        # Position + class from enriched; fallback to BT fields.
+        pos = normalize_pos(em.get("pos", ""))
         if not pos:
-            role = str(r.get("role", "")).strip().upper()
-            if role in {"PG", "SG", "SF", "PF", "C", "G", "F"}:
-                pos = role
+            pos = normalize_pos(str(r.get("role", "")))
+        if not pos:
+            pos = normalize_pos(str(r.get("type", "")))
         cls = (em.get("class", "") or "").strip()
+        if not cls:
+            cls = str(r.get("yr", "")).strip()
 
         listed_h_raw = str(r.get("ht", "")).strip() or em.get("height", "") or ""
         listed_h_in = parse_height_inches(listed_h_raw)
@@ -389,10 +461,18 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
         stat_height = str(hm.get("predicted_height", "")).strip() or "N/A"
         delta = to_float(hm.get("delta"))
 
-        rimfluence = rmap.get(k)
+        rim_row = rmap.get(k, {})
+        rimfluence = to_float(rim_row.get("rimfluence"))
+        rimfluence_off = to_float(rim_row.get("rimfluence_off"))
+        rimfluence_def = to_float(rim_row.get("rimfluence_def"))
         # Men requirement: N/A before 2024 regardless.
         if gender.lower().startswith("m") and season < men_rimfluence_cutoff:
             rimfluence = None
+            rimfluence_off = None
+            rimfluence_def = None
+
+        mp_total = to_float(r.get("mp"))
+        mpg = (mp_total / gp) if (mp_total is not None and gp > 0) else to_float(r.get("mpg"))
 
         out.append(
             Row(
@@ -401,6 +481,7 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
                 team=team,
                 pid=pid,
                 gp=gp,
+                mpg=mpg,
                 min_per=min_per,
                 position=pos,
                 player_class=cls,
@@ -410,6 +491,8 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
                 stat_height=stat_height,
                 height_delta=delta,
                 rimfluence=rimfluence,
+                rimfluence_off=rimfluence_off,
+                rimfluence_def=rimfluence_def,
                 a_to=a_to,
                 oreb=oreb,
                 stl_foul=stl_foul,
@@ -477,8 +560,11 @@ def build_jason_stats(rows: list[Row]) -> list[dict[str, Any]]:
                     "feel_plus": "" if feel is None else round(feel, 2),
                     "feel_plus_percentile": "" if feel is None else round(percentile(feel, feel_vals) or 0.0, 2),
                     "rimfluence": "N/A" if r.rimfluence is None else round(r.rimfluence, 3),
+                    "rimfluence_off": "N/A" if r.rimfluence_off is None else round(r.rimfluence_off, 3),
+                    "rimfluence_def": "N/A" if r.rimfluence_def is None else round(r.rimfluence_def, 3),
                     "rimfluence_percentile": "" if r.rimfluence is None else round(percentile(r.rimfluence, rim_vals) or 0.0, 2),
                     "gp": round(r.gp, 1),
+                    "mpg": "" if r.mpg is None else round(r.mpg, 2),
                     "min_pct": round(r.min_per, 2),
                 }
             )
@@ -543,8 +629,11 @@ def main() -> None:
         "feel_plus",
         "feel_plus_percentile",
         "rimfluence",
+        "rimfluence_off",
+        "rimfluence_def",
         "rimfluence_percentile",
         "gp",
+        "mpg",
         "min_pct",
     ]
     with out_csv.open("w", encoding="utf-8", newline="") as f:
