@@ -6,7 +6,7 @@ on:
       seasons:
         description: "Seasons to process (e.g. 2026 or 2021-2026)"
         required: true
-        default: "2026"
+        default: "2019-2026"
       min_games:
         description: "Minimum GP"
         required: true
