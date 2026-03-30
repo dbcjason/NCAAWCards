@@ -37,6 +37,7 @@ class Row:
     min_per: float
     position: str
     player_class: str
+    draft_pick: str
     age: float | None
     height_inches: float | None
     listed_height: str
@@ -268,9 +269,9 @@ def load_rimfluence(root: Path, seasons: set[int], gender: str) -> dict[tuple[in
             if sf in seen:
                 continue
             seen.add(sf)
-            # Skip raw lineup inputs; keep result-like files.
+            # Skip raw lineup dump files only (keep rimfluence result exports).
             lname = f.name.lower()
-            if "lineups_" in lname and "rimfluence_from_" not in lname:
+            if lname.startswith("lineups_"):
                 continue
             files.append(f)
 
@@ -289,8 +290,8 @@ def load_rimfluence(root: Path, seasons: set[int], gender: str) -> dict[tuple[in
         player_col = _pick_col(header, ["player", "player_name", "name", "key"]) or ""
         team_col = _pick_col(header, ["team", "school"]) or ""
         rim_col = _pick_col(header, ["rimfluence", "rimfluence_score", "rimfluence_value", "rimfluence_pts", "total_rimfluence"])
-        rim_off_col = _pick_col(header, ["off_rimfluence", "offensive_rimfluence", "rimfluence_off", "offrimfluence"])
-        rim_def_col = _pick_col(header, ["def_rimfluence", "defensive_rimfluence", "rimfluence_def", "defrimfluence"])
+        rim_off_col = _pick_col(header, ["off_rimfluence", "offensive_rimfluence", "rimfluence_off", "offrimfluence", "o_rimfluence", "orimfluence"])
+        rim_def_col = _pick_col(header, ["def_rimfluence", "defensive_rimfluence", "rimfluence_def", "defrimfluence", "d_rimfluence", "drimfluence"])
         gender_col = _pick_col(header, ["gender", "sex"])
         if not season_col or not player_col or (not rim_col and not rim_off_col and not rim_def_col):
             # allow season inference from filename for older exports
@@ -444,6 +445,10 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
         cls = (em.get("class", "") or "").strip()
         if not cls:
             cls = str(r.get("yr", "")).strip()
+        pick_raw = str(r.get("pick", "") or "").strip()
+        draft_pick = ""
+        if re.match(r"^\d+$", pick_raw):
+            draft_pick = pick_raw
 
         listed_h_raw = str(r.get("ht", "")).strip() or em.get("height", "") or ""
         listed_h_in = parse_height_inches(listed_h_raw)
@@ -507,6 +512,7 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
                 min_per=min_per,
                 position=pos,
                 player_class=cls,
+                draft_pick=draft_pick,
                 age=age,
                 height_inches=listed_h_in,
                 listed_height=listed_h_fmt,
@@ -574,6 +580,7 @@ def build_jason_stats(rows: list[Row]) -> list[dict[str, Any]]:
                     "team": r.team,
                     "position": r.position,
                     "class": r.player_class,
+                    "draft_pick": r.draft_pick,
                     "age": "" if r.age is None else round(r.age, 2),
                     "listed_height": r.listed_height,
                     "statistical_height": r.stat_height,
@@ -643,6 +650,7 @@ def main() -> None:
         "team",
         "position",
         "class",
+        "draft_pick",
         "age",
         "listed_height",
         "statistical_height",

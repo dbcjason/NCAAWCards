@@ -34,15 +34,41 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Build/refresh women's statistical height
+      - name: Build/refresh women's statistical height (big stats only)
         env:
           INPUT_SEASONS: ${{ inputs.seasons || '2026' }}
         run: |
-          SCORE_SEASON=$(echo "${INPUT_SEASONS}" | awk -F',' '{print $NF}' | awk -F'-' '{print $NF}')
-          python3 player_cards_pipeline/scripts/train_height_profile_model.py \
-            --project-root . \
-            --score-season "${SCORE_SEASON}" \
-            --out-score-csv "player_cards_pipeline/output/height_profile_scores_${SCORE_SEASON}.csv"
+          python3 - <<'PY'
+          import os
+          import subprocess
+
+          raw = os.environ.get("INPUT_SEASONS", "2026")
+          years = set()
+          for part in [x.strip() for x in raw.split(",") if x.strip()]:
+              if "-" in part:
+                  a, b = part.split("-", 1)
+                  years.update(range(int(a), int(b) + 1))
+              else:
+                  years.add(int(part))
+
+          for y in sorted(years):
+              print(f"[height-big] building {y}")
+              subprocess.run(
+                  [
+                      "python3",
+                      "player_cards_pipeline/scripts/train_height_profile_model.py",
+                      "--project-root",
+                      ".",
+                      "--score-season",
+                      str(y),
+                      "--feature-set",
+                      "big",
+                      "--out-score-csv",
+                      f"player_cards_pipeline/output/height_profile_scores_big_{y}.csv",
+                  ],
+                  check=True,
+              )
+          PY
 
       - name: Build Jason Created Stats CSV (Women)
         env:
@@ -65,6 +91,7 @@ jobs:
           path: |
             player_cards_pipeline/output/jason_created_stats.csv
             player_cards_pipeline/output/height_profile_scores_*.csv
+            player_cards_pipeline/output/height_profile_scores_big_*.csv
           if-no-files-found: error
 
       - name: Commit and push outputs
@@ -73,6 +100,7 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f player_cards_pipeline/output/jason_created_stats.csv || true
           git add -f player_cards_pipeline/output/height_profile_scores_*.csv || true
+          git add -f player_cards_pipeline/output/height_profile_scores_big_*.csv || true
           if git diff --cached --quiet; then
             echo "No Jason stats changes to commit"
             exit 0

@@ -3883,6 +3883,172 @@ def bt_per_game_overrides(target: PlayerGameStats, bt_rows: list[dict[str, str]]
     return out
 
 
+_HEIGHT_PROFILE_MODEL_CACHE: dict[str, Any] | None = None
+_HEIGHT_SCORE_DELTA_CACHE: dict[str, dict[str, dict[str, float]]] = {}
+
+
+def _load_height_profile_model() -> dict[str, Any] | None:
+    global _HEIGHT_PROFILE_MODEL_CACHE
+    if _HEIGHT_PROFILE_MODEL_CACHE is not None:
+        return _HEIGHT_PROFILE_MODEL_CACHE
+    try:
+        model_path = (
+            Path(__file__).resolve().parents[1]
+            / "player_cards_pipeline"
+            / "data"
+            / "models"
+            / "height_profile_model_v1.json"
+        )
+        if not model_path.exists():
+            _HEIGHT_PROFILE_MODEL_CACHE = {}
+            return None
+        payload = json.loads(model_path.read_text(encoding="utf-8"))
+        if not isinstance(payload, dict):
+            _HEIGHT_PROFILE_MODEL_CACHE = {}
+            return None
+        _HEIGHT_PROFILE_MODEL_CACHE = payload
+        return payload
+    except Exception:
+        _HEIGHT_PROFILE_MODEL_CACHE = {}
+        return None
+
+
+def _num_or(v: Any, default: float) -> float:
+    x = to_float(v)
+    return default if x is None or not math.isfinite(x) else float(x)
+
+
+def _load_height_score_delta_maps(season: str) -> tuple[dict[str, float], dict[str, float], dict[str, float]]:
+    """Load precomputed big-statistical-height deltas for a season."""
+    s = str(norm_season(season))
+    if s in _HEIGHT_SCORE_DELTA_CACHE:
+        cache = _HEIGHT_SCORE_DELTA_CACHE[s]
+        return cache.get("by_key", {}), cache.get("by_name", {}), cache.get("by_pid", {})
+
+    by_key: dict[str, float] = {}
+    by_name: dict[str, float] = {}
+    by_pid: dict[str, float] = {}
+    p = (
+        Path(__file__).resolve().parents[1]
+        / "player_cards_pipeline"
+        / "output"
+        / f"height_profile_scores_big_{s}.csv"
+    )
+    if p.exists():
+        try:
+            with p.open("r", encoding="utf-8-sig", newline="") as f:
+                for r in csv.DictReader(f):
+                    delta = to_float(r.get("height_delta_inches"))
+                    if delta is None or not math.isfinite(delta):
+                        continue
+                    name = norm_player_name(r.get("player_name", ""))
+                    team = norm_team(r.get("team", ""))
+                    if name:
+                        by_name[name] = float(delta)
+                        if team:
+                            by_key[f"{name}|{team}"] = float(delta)
+                    pid = str(r.get("pid", "")).strip()
+                    if pid:
+                        by_pid[pid] = float(delta)
+        except Exception:
+            by_key = {}
+            by_name = {}
+            by_pid = {}
+
+    _HEIGHT_SCORE_DELTA_CACHE[s] = {"by_key": by_key, "by_name": by_name, "by_pid": by_pid}
+    return by_key, by_name, by_pid
+
+
+def compute_statistical_height_delta(
+    target: PlayerGameStats,
+    bio: dict[str, str],
+    bt_rows: list[dict[str, str]],
+) -> float | None:
+    row = bt_find_target_row(bt_rows, target) if bt_rows else None
+    if not row:
+        return None
+    # Preferred source: precomputed big-stats-only statistical-height deltas.
+    by_key, by_name, by_pid = _load_height_score_delta_maps(target.season)
+    target_pid = str(bt_get(row, ["pid"])).strip()
+    if target_pid and target_pid in by_pid:
+        return by_pid[target_pid]
+    nk = f"{norm_player_name(target.player)}|{norm_team(target.team)}"
+    if nk in by_key:
+        return by_key[nk]
+    nn = norm_player_name(target.player)
+    if nn in by_name:
+        return by_name[nn]
+
+    listed_inches = _height_to_inches(bio.get("height", "")) or _height_to_inches(bt_get(row, ["ht"]))
+    if listed_inches is None:
+        return None
+    # Fallback path (legacy): on-the-fly model inference.
+    model = _load_height_profile_model()
+    if not model:
+        return None
+    feature_names = model.get("feature_names", [])
+    mean_x = model.get("mean_x", [])
+    std_x = model.get("std_x", [])
+    weights = model.get("weights", [])
+    bias = _num_or(model.get("bias"), 0.0)
+    if not (
+        isinstance(feature_names, list)
+        and isinstance(mean_x, list)
+        and isinstance(std_x, list)
+        and isinstance(weights, list)
+    ):
+        return None
+    n = len(feature_names)
+    if len(mean_x) != n or len(std_x) != n or len(weights) != n or n == 0:
+        return None
+
+    bt_aliases: dict[str, list[str]] = {
+        "usg": ["usg"],
+        "orb_per": ["ORB_per"],
+        "drb_per": ["DRB_per"],
+        "ast_per": ["AST_per"],
+        "to_per": ["TO_per"],
+        "blk_per": ["blk_per"],
+        "stl_per": ["stl_per"],
+        "ftr": ["ftr"],
+        "three_par": ["3par"],
+        "rim_fg_pct": ["rimmade/(rimmade+rimmiss)"],
+        "rim_att_pg": ["rimmade+rimmiss"],
+        "dunk_fg_pct": ["dunksmade/(dunksmade+dunksmiss)"],
+        "dunks_pg": ["dunksmade"],
+        "dbpm": ["dbpm"],
+        "adrtg": ["adrtg"],
+    }
+    enriched_map: dict[str, list[str]] = {
+        "he_off_ast_rim": ["off_ast_rim"],
+        "he_off_assist": ["off_assist"],
+        "he_off_usage": ["off_usage"],
+        "he_off_2prim": ["off_2prim"],
+        "he_off_2primr": ["off_2primr"],
+        "he_off_2prim_ast": ["off_2prim_ast"],
+        "he_off_team_poss_pct": ["off_team_poss_pct"],
+    }
+
+    x: list[float] = []
+    for name in feature_names:
+        if name in bt_aliases:
+            x.append(to_float(bt_num(row, bt_aliases[name]), 0.0))
+        elif name in enriched_map:
+            x.append(to_float(bt_num(row, enriched_map[name]), 0.0))
+        else:
+            x.append(0.0)
+
+    pred = bias
+    for j in range(n):
+        sd = to_float(std_x[j], 1.0)
+        if abs(sd) < 1e-9:
+            sd = 1.0
+        z = (x[j] - to_float(mean_x[j], 0.0)) / sd
+        pred += to_float(weights[j], 0.0) * z
+
+    return float(pred - listed_inches)
+
+
 def render_card(
     stats: PlayerGameStats,
     bio: dict[str, str],
@@ -3902,6 +4068,7 @@ def render_card(
     shot_pps_oe_line: str,
     draft_projection_html: str,
     per_game_overrides: dict[str, float] | None,
+    statistical_height_delta: float | None,
     out_path: Path,
 ) -> None:
     name = stats.player
@@ -3910,7 +4077,20 @@ def render_card(
 
     height = format_height(bio.get("height", ""))
     position = bio.get("position", "") or "N/A"
-    subtitle = f"{team} | {season} | Position: {position} | Height: {height}"
+    stat_height_class = "stat-height-at"
+    stat_height_text = "N/A"
+    if statistical_height_delta is not None and math.isfinite(statistical_height_delta):
+        stat_height_text = f"{statistical_height_delta:+.1f} in"
+        if statistical_height_delta > 1.0:
+            stat_height_class = "stat-height-above"
+        elif statistical_height_delta < -1.0:
+            stat_height_class = "stat-height-below"
+    subtitle_html = (
+        f"{html.escape(team)} | {html.escape(season)} | "
+        f"Position: {html.escape(position)} | "
+        f"Height: {html.escape(height)} | "
+        f"Statistical Height: <span class=\"{stat_height_class}\">{html.escape(stat_height_text)}</span>"
+    )
 
     # Use full event-derived FG totals for header stats, not only plotted (x/y) shots.
     shot_makes = shot_header_makes if shot_header_makes is not None else stats.fgm
@@ -3984,6 +4164,7 @@ body {{
   grid-template-columns: repeat(5, minmax(96px, 1fr));
   gap: 8px;
   min-width: 560px;
+  margin-top: -4px;
 }}
 .grade-chip {{
   border: 1px solid var(--line);
@@ -4008,6 +4189,9 @@ body {{
   margin-bottom: 0;
   font-size: 15px;
 }}
+.stat-height-above {{ color: #22c55e; font-weight: 700; }}
+.stat-height-below {{ color: #ef4444; font-weight: 700; }}
+.stat-height-at {{ color: #f5f5f5; font-weight: 700; }}
 .row {{
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -4480,7 +4664,7 @@ body {{
         <h1 class="title">{html.escape(name)}</h1>
         <div class="grade-strip">{grade_boxes_html}</div>
       </div>
-      <div class="sub">{html.escape(subtitle)}</div>
+      <div class="sub">{subtitle_html}</div>
 
       <div class="panel per-game-panel">
         <h3>Per Game</h3>
@@ -4901,6 +5085,7 @@ def main() -> None:
     advanced_html = build_advanced_html(target, lebron_rows, rim_rows, style_rows)
     stage("Built card section HTML blocks")
     per_game_override = bt_per_game_overrides(target, bt_rows)
+    statistical_height_delta = compute_statistical_height_delta(target, bio, bt_rows)
 
     shots: list[dict[str, Any]] = []
     season_shots: list[dict[str, Any]] = []
@@ -4953,6 +5138,7 @@ def main() -> None:
         pps_line,
         draft_projection_html,
         per_game_override,
+        statistical_height_delta,
         Path(args.out_html),
     )
     stage("Rendered HTML card")
