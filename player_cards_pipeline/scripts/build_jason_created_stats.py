@@ -23,6 +23,8 @@ BT_CANDIDATES = [
 ENRICHED_SCRIPT_DIR = "player_cards_pipeline/data/manual/enriched_players/by_script_season"
 HEIGHT_SCORE_PATTERN = "player_cards_pipeline/output/height_profile_scores_{season}.csv"
 HEIGHT_SCORE_BIG_PATTERN = "player_cards_pipeline/output/height_profile_scores_big_{season}.csv"
+HEIGHT_SCORE_BIG_ONLY_PATTERN = "player_cards_pipeline/output/height_profile_big_only_scores_{season}.csv"
+HEIGHT_SCORE_BIG_ONLY_COMBINED = "player_cards_pipeline/output/height_profile_big_only_scores_2019_2025.csv"
 RIMFLUENCE_DIR = "player_cards_pipeline/data/manual/rimfluence"
 
 
@@ -223,22 +225,39 @@ def load_height_scores(root: Path, seasons: set[int]) -> tuple[dict[tuple[int, s
     by_key: dict[tuple[int, str, str], dict[str, Any]] = {}
     by_pid: dict[tuple[int, str], dict[str, Any]] = {}
     for season in sorted(seasons):
+        p_big_only = root / HEIGHT_SCORE_BIG_ONLY_PATTERN.format(season=season)
+        p_big_only_combined = root / HEIGHT_SCORE_BIG_ONLY_COMBINED
         p_big = root / HEIGHT_SCORE_BIG_PATTERN.format(season=season)
         p_std = root / HEIGHT_SCORE_PATTERN.format(season=season)
-        p = p_big if p_big.exists() else p_std
-        if not p.exists():
-            continue
-        for r in read_csv_rows(p):
-            rec = {
-                "listed_height": r.get("listed_height", "") or "",
-                "predicted_height": r.get("predicted_profile_height", "") or "",
-                "delta": to_float(r.get("height_delta_inches")),
-            }
-            key = (season, norm(r.get("player_name", "")), norm(r.get("team", "")))
-            by_key[key] = rec
-            pid = str(r.get("pid", "")).strip()
-            if pid:
-                by_pid[(season, pid)] = rec
+        candidates = [p_big_only, p_big_only_combined, p_big, p_std]
+        loaded = False
+        for p in candidates:
+            if not p.exists():
+                continue
+            rows = read_csv_rows(p)
+            for r in rows:
+                row_season = int(to_float(r.get("season"), 0) or 0)
+                if row_season != season:
+                    continue
+                rec = {
+                    "listed_height": (r.get("listed_height") or r.get("listed_height_raw") or ""),
+                    "predicted_height": (
+                        r.get("predicted_big_profile_height")
+                        or r.get("predicted_profile_height")
+                        or ""
+                    ),
+                    "delta": to_float(r.get("big_height_delta_inches"))
+                    if to_float(r.get("big_height_delta_inches")) is not None
+                    else to_float(r.get("height_delta_inches")),
+                }
+                key = (season, norm(r.get("player_name", "")), norm(r.get("team", "")))
+                by_key[key] = rec
+                pid = str(r.get("pid", "")).strip()
+                if pid:
+                    by_pid[(season, pid)] = rec
+                loaded = True
+            if loaded:
+                break
     return by_key, by_pid
 
 

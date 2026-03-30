@@ -64,7 +64,7 @@ jobs:
                       "--feature-set",
                       "big",
                       "--out-score-csv",
-                      f"player_cards_pipeline/output/height_profile_scores_big_{y}.csv",
+                      f"player_cards_pipeline/output/height_profile_big_only_scores_{y}.csv",
                   ],
                   check=True,
               )
@@ -92,6 +92,7 @@ jobs:
             player_cards_pipeline/output/jason_created_stats.csv
             player_cards_pipeline/output/height_profile_scores_*.csv
             player_cards_pipeline/output/height_profile_scores_big_*.csv
+            player_cards_pipeline/output/height_profile_big_only_scores_*.csv
           if-no-files-found: error
 
       - name: Commit and push outputs
@@ -100,6 +101,8 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f player_cards_pipeline/output/jason_created_stats.csv || true
           git add -f player_cards_pipeline/output/height_profile_scores_*.csv || true
+          git add -f player_cards_pipeline/output/height_profile_scores_big_*.csv || true
+          git add -f player_cards_pipeline/output/height_profile_big_only_scores_*.csv || true
           git add -f player_cards_pipeline/output/height_profile_scores_big_*.csv || true
           if git diff --cached --quiet; then
             echo "No Jason stats changes to commit"

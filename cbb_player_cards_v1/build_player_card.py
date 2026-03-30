@@ -3928,17 +3928,25 @@ def _load_height_score_delta_maps(season: str) -> tuple[dict[str, float], dict[s
     by_key: dict[str, float] = {}
     by_name: dict[str, float] = {}
     by_pid: dict[str, float] = {}
-    p = (
-        Path(__file__).resolve().parents[1]
-        / "player_cards_pipeline"
-        / "output"
-        / f"height_profile_scores_big_{s}.csv"
-    )
-    if p.exists():
-        try:
+    output_dir = Path(__file__).resolve().parents[1] / "player_cards_pipeline" / "output"
+    candidates = [
+        output_dir / f"height_profile_big_only_scores_{s}.csv",
+        output_dir / "height_profile_big_only_scores_2019_2025.csv",
+        output_dir / f"height_profile_scores_big_{s}.csv",
+    ]
+    try:
+        for p in candidates:
+            if not p.exists():
+                continue
+            loaded = False
             with p.open("r", encoding="utf-8-sig", newline="") as f:
                 for r in csv.DictReader(f):
-                    delta = to_float(r.get("height_delta_inches"))
+                    row_season = norm_season(r.get("season", ""))
+                    if row_season and row_season != s:
+                        continue
+                    delta = to_float(r.get("big_height_delta_inches"))
+                    if delta is None:
+                        delta = to_float(r.get("height_delta_inches"))
                     if delta is None or not math.isfinite(delta):
                         continue
                     name = norm_player_name(r.get("player_name", ""))
@@ -3950,10 +3958,13 @@ def _load_height_score_delta_maps(season: str) -> tuple[dict[str, float], dict[s
                     pid = str(r.get("pid", "")).strip()
                     if pid:
                         by_pid[pid] = float(delta)
-        except Exception:
-            by_key = {}
-            by_name = {}
-            by_pid = {}
+                    loaded = True
+            if loaded:
+                break
+    except Exception:
+        by_key = {}
+        by_name = {}
+        by_pid = {}
 
     _HEIGHT_SCORE_DELTA_CACHE[s] = {"by_key": by_key, "by_name": by_name, "by_pid": by_pid}
     return by_key, by_name, by_pid

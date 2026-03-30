@@ -29,6 +29,19 @@ BT_FEATURE_SPECS: list[tuple[str, str]] = [
     ("adrtg", "adrtg"),
 ]
 
+BT_FEATURE_SPECS_BIG: list[tuple[str, str]] = [
+    ("orb_per", "ORB_per"),
+    ("drb_per", "DRB_per"),
+    ("blk_per", "blk_per"),
+    ("dbpm", "dbpm"),
+    ("adrtg", "adrtg"),
+    ("rim_fg_pct", "rimmade/(rimmade+rimmiss)"),
+    ("rim_att_pg", "rimmade+rimmiss"),
+    ("dunk_fg_pct", "dunksmade/(dunksmade+dunksmiss)"),
+    ("dunks_pg", "dunksmade"),
+    ("ftr", "ftr"),
+]
+
 # Optional enriched features keyed by pid/season.
 ENRICHED_FEATURE_KEYS: list[tuple[str, str]] = [
     ("he_off_ast_rim", "off_ast_rim"),
@@ -243,6 +256,8 @@ def inches_to_height_str(x: float) -> str:
 def build_samples(
     bt_rows: list[dict[str, str]],
     enriched_map: dict[tuple[int, str], dict[str, float]],
+    bt_feature_specs: list[tuple[str, str]],
+    enriched_feature_keys: list[tuple[str, str]],
     min_mp: float,
     min_g: float,
     seasons: set[int],
@@ -267,12 +282,12 @@ def build_samples(
             continue
 
         feats: dict[str, float] = {}
-        for out_key, src_key in BT_FEATURE_SPECS:
+        for out_key, src_key in bt_feature_specs:
             feats[out_key] = to_float(r.get(src_key), 0.0)
 
         pid = str(r.get("pid", "")).strip()
         em = enriched_map.get((season, pid), {}) if pid else {}
-        for out_key, _src in ENRICHED_FEATURE_KEYS:
+        for out_key, _src in enriched_feature_keys:
             feats[out_key] = to_float(em.get(out_key), 0.0)
 
         out.append(
@@ -340,6 +355,7 @@ def main() -> None:
     ap.add_argument("--out-score-csv", default="player_cards_pipeline/output/height_profile_scores_2026.csv")
     ap.add_argument("--out-dependency-csv", default="player_cards_pipeline/output/height_profile_feature_dependency.csv")
     ap.add_argument("--out-report-json", default="player_cards_pipeline/output/height_profile_report.json")
+    ap.add_argument("--feature-set", choices=["full", "big"], default="big")
     args = ap.parse_args()
 
     root = Path(args.project_root).resolve()
@@ -360,11 +376,16 @@ def main() -> None:
     all_needed = set(train_seasons)
     all_needed.add(int(args.score_season))
 
+    bt_feature_specs = BT_FEATURE_SPECS_BIG if args.feature_set == "big" else BT_FEATURE_SPECS
+    enriched_feature_keys = [] if args.feature_set == "big" else ENRICHED_FEATURE_KEYS
+
     bt_rows = read_csv_rows(bt_csv)
     enriched_map = load_enriched_map(enriched_dir, all_needed)
     all_samples = build_samples(
         bt_rows,
         enriched_map,
+        bt_feature_specs,
+        enriched_feature_keys,
         args.min_mp,
         args.min_g,
         all_needed,
@@ -375,7 +396,7 @@ def main() -> None:
     if len(all_samples) < 300:
         raise SystemExit(f"Not enough valid samples ({len(all_samples)}). Lower --min-mp/--min-g or widen seasons.")
 
-    feature_names = [k for k, _ in BT_FEATURE_SPECS] + [k for k, _ in ENRICHED_FEATURE_KEYS]
+    feature_names = [k for k, _ in bt_feature_specs] + [k for k, _ in enriched_feature_keys]
 
     train_samples = [s for s in all_samples if s.season in train_seasons and s.season not in holdout_seasons]
     test_samples = [s for s in all_samples if s.season in holdout_seasons]
@@ -419,6 +440,11 @@ def main() -> None:
                 "predicted_profile_height": inches_to_height_str(pred_h),
                 "height_delta_inches": round(delta, 2),
                 "height_profile_label": label,
+                # Big-only compatibility columns expected by downstream tools.
+                "predicted_big_profile_height_inches": round(pred_h, 2),
+                "predicted_big_profile_height": inches_to_height_str(pred_h),
+                "big_height_delta_inches": round(delta, 2),
+                "big_height_profile_label": label,
             }
         )
 
@@ -428,7 +454,7 @@ def main() -> None:
     out_model_json.write_text(
         json.dumps(
             {
-                "model": "height_profile_ridge_v1",
+                "model": f"height_profile_ridge_v1_{args.feature_set}",
                 "feature_names": feature_names,
                 "mean_x": model.mean_x,
                 "std_x": model.std_x,
@@ -469,6 +495,10 @@ def main() -> None:
             "predicted_profile_height",
             "height_delta_inches",
             "height_profile_label",
+            "predicted_big_profile_height_inches",
+            "predicted_big_profile_height",
+            "big_height_delta_inches",
+            "big_height_profile_label",
         ],
     )
 
