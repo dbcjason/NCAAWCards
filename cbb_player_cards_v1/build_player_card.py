@@ -1440,6 +1440,11 @@ def format_height(raw: str) -> str:
     return s
 
 
+def inches_to_height_str(inches: float) -> str:
+    rounded = int(round(inches))
+    return f"{rounded // 12}'{rounded % 12}\""
+
+
 def ordinal(n: int) -> str:
     if 10 <= (n % 100) <= 20:
         suffix = "th"
@@ -4101,7 +4106,12 @@ def render_card(
     stat_height_class = "stat-height-at"
     stat_height_text = "N/A"
     if statistical_height_delta is not None and math.isfinite(statistical_height_delta):
-        stat_height_text = f"{statistical_height_delta:+.1f} in"
+        listed_inches = _height_to_inches(bio.get("height", ""))
+        if listed_inches is not None:
+            stat_height_value = inches_to_height_str(float(listed_inches + statistical_height_delta))
+            stat_height_text = f"{stat_height_value}, {statistical_height_delta:+.2f} in"
+        else:
+            stat_height_text = f"{statistical_height_delta:+.2f} in"
         if statistical_height_delta > 1.0:
             stat_height_class = "stat-height-above"
         elif statistical_height_delta < -1.0:
