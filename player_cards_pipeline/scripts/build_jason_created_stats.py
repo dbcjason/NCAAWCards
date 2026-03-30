@@ -228,8 +228,7 @@ def load_height_scores(root: Path, seasons: set[int]) -> tuple[dict[tuple[int, s
         p_big_only = root / HEIGHT_SCORE_BIG_ONLY_PATTERN.format(season=season)
         p_big_only_combined = root / HEIGHT_SCORE_BIG_ONLY_COMBINED
         p_big = root / HEIGHT_SCORE_BIG_PATTERN.format(season=season)
-        p_std = root / HEIGHT_SCORE_PATTERN.format(season=season)
-        candidates = [p_big_only, p_big_only_combined, p_big, p_std]
+        candidates = [p_big_only, p_big_only_combined, p_big]
         loaded = False
         for p in candidates:
             if not p.exists():
