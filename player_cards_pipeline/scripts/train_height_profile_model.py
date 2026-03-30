@@ -75,6 +75,16 @@ class RidgeModel:
 
 
 @dataclass
+class BigProfileModel:
+    feature_names: list[str]
+    mean_x: list[float]
+    std_x: list[float]
+    positive_corr_weights: list[float]
+    linear_a: float
+    linear_b: float
+
+
+@dataclass
 class Metrics:
     mae_inches: float
     rmse_inches: float
@@ -230,10 +240,69 @@ def predict_row(model: RidgeModel, row: list[float]) -> float:
     return model.bias + sum(model.weights[j] * z[j] for j in range(len(row)))
 
 
+def train_big_profile_model(X: list[list[float]], y: list[float], feature_names: list[str]) -> BigProfileModel:
+    n = len(X)
+    d = len(X[0]) if n else 0
+    mean_x = [0.0] * d
+    std_x = [1.0] * d
+
+    for j in range(d):
+        col = [X[i][j] for i in range(n)]
+        m, s = mean_std(col)
+        mean_x[j] = m
+        std_x[j] = s
+
+    Xn = [[(X[i][j] - mean_x[j]) / std_x[j] for j in range(d)] for i in range(n)]
+
+    raw_weights = [max(0.0, pearson([Xn[i][j] for i in range(n)], y)) for j in range(d)]
+    sw = sum(raw_weights)
+    if sw <= 1e-12:
+        raw_weights = [1.0 / d for _ in range(d)] if d else []
+    else:
+        raw_weights = [w / sw for w in raw_weights]
+
+    scores = [sum(raw_weights[j] * Xn[i][j] for j in range(d)) for i in range(n)]
+    mx, sx = mean_std(scores)
+    my = sum(y) / max(1, len(y))
+    num = sum((scores[i] - mx) * (y[i] - my) for i in range(n))
+    den = sum((scores[i] - mx) ** 2 for i in range(n))
+    linear_a = 0.0 if den <= 1e-12 else num / den
+    linear_b = my - (linear_a * mx)
+
+    return BigProfileModel(
+        feature_names=feature_names,
+        mean_x=mean_x,
+        std_x=std_x,
+        positive_corr_weights=raw_weights,
+        linear_a=linear_a,
+        linear_b=linear_b,
+    )
+
+
+def predict_big_profile_row(model: BigProfileModel, row: list[float]) -> float:
+    z = [(row[j] - model.mean_x[j]) / model.std_x[j] for j in range(len(row))]
+    score = sum(model.positive_corr_weights[j] * z[j] for j in range(len(row)))
+    return model.linear_a * score + model.linear_b
+
+
 def eval_metrics(model: RidgeModel, X: list[list[float]], y: list[float]) -> Metrics:
     if not X:
         return Metrics(mae_inches=0.0, rmse_inches=0.0, r2=0.0)
     preds = [predict_row(model, r) for r in X]
+    n = len(preds)
+    mae = sum(abs(preds[i] - y[i]) for i in range(n)) / n
+    rmse = math.sqrt(sum((preds[i] - y[i]) ** 2 for i in range(n)) / n)
+    y_mean = sum(y) / n
+    ss_tot = sum((yy - y_mean) ** 2 for yy in y)
+    ss_res = sum((preds[i] - y[i]) ** 2 for i in range(n))
+    r2 = 0.0 if ss_tot <= 1e-12 else 1.0 - (ss_res / ss_tot)
+    return Metrics(mae_inches=mae, rmse_inches=rmse, r2=r2)
+
+
+def eval_big_profile_metrics(model: BigProfileModel, X: list[list[float]], y: list[float]) -> Metrics:
+    if not X:
+        return Metrics(mae_inches=0.0, rmse_inches=0.0, r2=0.0)
+    preds = [predict_big_profile_row(model, r) for r in X]
     n = len(preds)
     mae = sum(abs(preds[i] - y[i]) for i in range(n)) / n
     rmse = math.sqrt(sum((preds[i] - y[i]) ** 2 for i in range(n)) / n)
@@ -304,8 +373,12 @@ def build_samples(
     return out
 
 
-def dependency_rows(samples: list[Sample], model: RidgeModel, feature_names: list[str]) -> list[dict[str, Any]]:
+def dependency_rows(samples: list[Sample], model: RidgeModel | BigProfileModel, feature_names: list[str]) -> list[dict[str, Any]]:
     ys = [s.height_inches for s in samples]
+    if isinstance(model, BigProfileModel):
+        model_weights = model.positive_corr_weights
+    else:
+        model_weights = model.weights
     rows: list[dict[str, Any]] = []
     for j, feat in enumerate(feature_names):
         xs = [s.features.get(feat, 0.0) for s in samples]
@@ -315,8 +388,8 @@ def dependency_rows(samples: list[Sample], model: RidgeModel, feature_names: lis
                 "feature": feat,
                 "pearson_with_height": corr,
                 "abs_pearson": abs(corr),
-                "std_weight": model.weights[j],
-                "abs_std_weight": abs(model.weights[j]),
+                "std_weight": model_weights[j],
+                "abs_std_weight": abs(model_weights[j]),
             }
         )
     rows.sort(key=lambda r: (r["abs_std_weight"], r["abs_pearson"]), reverse=True)
@@ -398,28 +471,38 @@ def main() -> None:
 
     feature_names = [k for k, _ in bt_feature_specs] + [k for k, _ in enriched_feature_keys]
 
-    train_samples = [s for s in all_samples if s.season in train_seasons and s.season not in holdout_seasons]
-    test_samples = [s for s in all_samples if s.season in holdout_seasons]
+    if args.feature_set == "big":
+        train_samples = [s for s in all_samples if s.season in train_seasons]
+        test_samples = []
+    else:
+        train_samples = [s for s in all_samples if s.season in train_seasons and s.season not in holdout_seasons]
+        test_samples = [s for s in all_samples if s.season in holdout_seasons]
 
     if len(train_samples) < 250:
         raise SystemExit(f"Not enough training samples ({len(train_samples)}).")
 
     X_train = [[s.features.get(f, 0.0) for f in feature_names] for s in train_samples]
     y_train = [s.height_inches for s in train_samples]
-    model = train_ridge(X_train, y_train, lam=args.ridge_lambda, iters=args.iters, lr=args.lr)
-    model.feature_names = feature_names
-
-    train_m = eval_metrics(model, X_train, y_train)
+    if args.feature_set == "big":
+        model = train_big_profile_model(X_train, y_train, feature_names)
+        train_m = eval_big_profile_metrics(model, X_train, y_train)
+    else:
+        model = train_ridge(X_train, y_train, lam=args.ridge_lambda, iters=args.iters, lr=args.lr)
+        model.feature_names = feature_names
+        train_m = eval_metrics(model, X_train, y_train)
 
     X_test = [[s.features.get(f, 0.0) for f in feature_names] for s in test_samples]
     y_test = [s.height_inches for s in test_samples]
-    test_m = eval_metrics(model, X_test, y_test) if test_samples else Metrics(mae_inches=0.0, rmse_inches=0.0, r2=0.0)
+    if test_samples:
+        test_m = eval_big_profile_metrics(model, X_test, y_test) if args.feature_set == "big" else eval_metrics(model, X_test, y_test)
+    else:
+        test_m = Metrics(mae_inches=0.0, rmse_inches=0.0, r2=0.0)
 
     score_samples = [s for s in all_samples if s.season == int(args.score_season)]
     score_rows: list[dict[str, Any]] = []
     for s in score_samples:
         x = [s.features.get(f, 0.0) for f in feature_names]
-        pred_h = predict_row(model, x)
+        pred_h = predict_big_profile_row(model, x) if args.feature_set == "big" else predict_row(model, x)
         delta = pred_h - s.height_inches
         if delta >= 0.75:
             label = "plays_taller"
@@ -451,34 +534,56 @@ def main() -> None:
     dep_rows = dependency_rows(train_samples, model, feature_names)
 
     out_model_json.parent.mkdir(parents=True, exist_ok=True)
-    out_model_json.write_text(
-        json.dumps(
-            {
-                "model": f"height_profile_ridge_v1_{args.feature_set}",
-                "feature_names": feature_names,
-                "mean_x": model.mean_x,
-                "std_x": model.std_x,
-                "weights": model.weights,
-                "bias": model.bias,
-                "train_seasons": sorted(train_seasons),
-                "holdout_seasons": sorted(holdout_seasons),
-                "train_rows": len(train_samples),
-                "test_rows": len(test_samples),
-                "train_metrics": {
-                    "mae_inches": train_m.mae_inches,
-                    "rmse_inches": train_m.rmse_inches,
-                    "r2": train_m.r2,
-                },
-                "test_metrics": {
-                    "mae_inches": test_m.mae_inches,
-                    "rmse_inches": test_m.rmse_inches,
-                    "r2": test_m.r2,
-                },
+    if args.feature_set == "big":
+        model_payload = {
+            "model": "height_profile_big_v2",
+            "feature_names": feature_names,
+            "mean_x": model.mean_x,
+            "std_x": model.std_x,
+            "positive_corr_weights": model.positive_corr_weights,
+            "linear_map": {
+                "a": model.linear_a,
+                "b": model.linear_b,
             },
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
+            "train_seasons": sorted(train_seasons),
+            "holdout_seasons": sorted(holdout_seasons),
+            "train_rows": len(train_samples),
+            "test_rows": len(test_samples),
+            "train_metrics": {
+                "mae_inches": train_m.mae_inches,
+                "rmse_inches": train_m.rmse_inches,
+                "r2": train_m.r2,
+            },
+            "test_metrics": {
+                "mae_inches": test_m.mae_inches,
+                "rmse_inches": test_m.rmse_inches,
+                "r2": test_m.r2,
+            },
+        }
+    else:
+        model_payload = {
+            "model": f"height_profile_ridge_v1_{args.feature_set}",
+            "feature_names": feature_names,
+            "mean_x": model.mean_x,
+            "std_x": model.std_x,
+            "weights": model.weights,
+            "bias": model.bias,
+            "train_seasons": sorted(train_seasons),
+            "holdout_seasons": sorted(holdout_seasons),
+            "train_rows": len(train_samples),
+            "test_rows": len(test_samples),
+            "train_metrics": {
+                "mae_inches": train_m.mae_inches,
+                "rmse_inches": train_m.rmse_inches,
+                "r2": train_m.r2,
+            },
+            "test_metrics": {
+                "mae_inches": test_m.mae_inches,
+                "rmse_inches": test_m.rmse_inches,
+                "r2": test_m.r2,
+            },
+        }
+    out_model_json.write_text(json.dumps(model_payload, indent=2), encoding="utf-8")
 
     write_csv(
         out_score_csv,
@@ -509,32 +614,32 @@ def main() -> None:
     )
 
     out_report_json.parent.mkdir(parents=True, exist_ok=True)
-    out_report_json.write_text(
-        json.dumps(
-            {
-                "train_rows": len(train_samples),
-                "test_rows": len(test_samples),
-                "score_rows": len(score_rows),
-                "train_metrics": {
-                    "mae_inches": round(train_m.mae_inches, 4),
-                    "rmse_inches": round(train_m.rmse_inches, 4),
-                    "r2": round(train_m.r2, 4),
-                },
-                "test_metrics": {
-                    "mae_inches": round(test_m.mae_inches, 4),
-                    "rmse_inches": round(test_m.rmse_inches, 4),
-                    "r2": round(test_m.r2, 4),
-                },
-                "top_height_dependence": dep_rows[:12],
-                "notes": [
-                    "Positive height_delta_inches means a player statistically profiles as taller than listed height.",
-                    "Negative height_delta_inches means a player statistically profiles as shorter than listed height.",
-                ],
-            },
-            indent=2,
-        ),
-        encoding="utf-8",
-    )
+    report_payload: dict[str, Any] = {
+        "train_rows": len(train_samples),
+        "test_rows": len(test_samples),
+        "score_rows": len(score_rows),
+        "train_metrics": {
+            "mae_inches": round(train_m.mae_inches, 4),
+            "rmse_inches": round(train_m.rmse_inches, 4),
+            "r2": round(train_m.r2, 4),
+        },
+        "test_metrics": {
+            "mae_inches": round(test_m.mae_inches, 4),
+            "rmse_inches": round(test_m.rmse_inches, 4),
+            "r2": round(test_m.r2, 4),
+        },
+        "top_height_dependence": dep_rows[:12],
+        "notes": [
+            "Positive height_delta_inches means a player statistically profiles as taller than listed height.",
+            "Negative height_delta_inches means a player statistically profiles as shorter than listed height.",
+        ],
+    }
+    if args.feature_set == "big":
+        report_payload["positive_corr_weights"] = {
+            feature_names[i]: model.positive_corr_weights[i] for i in range(len(feature_names))
+        }
+        report_payload["linear_map"] = {"a": model.linear_a, "b": model.linear_b}
+    out_report_json.write_text(json.dumps(report_payload, indent=2), encoding="utf-8")
 
     print(f"[height-profile] train_rows={len(train_samples)} test_rows={len(test_samples)} score_rows={len(score_rows)}")
     print(

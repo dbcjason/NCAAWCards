@@ -4001,16 +4001,21 @@ def compute_statistical_height_delta(
     mean_x = model.get("mean_x", [])
     std_x = model.get("std_x", [])
     weights = model.get("weights", [])
+    positive_corr_weights = model.get("positive_corr_weights", [])
+    linear_map = model.get("linear_map", {}) if isinstance(model.get("linear_map"), dict) else {}
     bias = _num_or(model.get("bias"), 0.0)
     if not (
         isinstance(feature_names, list)
         and isinstance(mean_x, list)
         and isinstance(std_x, list)
-        and isinstance(weights, list)
     ):
         return None
     n = len(feature_names)
-    if len(mean_x) != n or len(std_x) != n or len(weights) != n or n == 0:
+    if len(mean_x) != n or len(std_x) != n or n == 0:
+        return None
+    is_big_v2 = isinstance(positive_corr_weights, list) and len(positive_corr_weights) == n
+    is_ridge = isinstance(weights, list) and len(weights) == n
+    if not is_big_v2 and not is_ridge:
         return None
 
     bt_aliases: dict[str, list[str]] = {
@@ -4049,13 +4054,18 @@ def compute_statistical_height_delta(
         else:
             x.append(0.0)
 
-    pred = bias
+    z_values: list[float] = []
     for j in range(n):
         sd = to_float(std_x[j], 1.0)
         if abs(sd) < 1e-9:
             sd = 1.0
-        z = (x[j] - to_float(mean_x[j], 0.0)) / sd
-        pred += to_float(weights[j], 0.0) * z
+        z_values.append((x[j] - to_float(mean_x[j], 0.0)) / sd)
+
+    if is_big_v2:
+        score = sum(to_float(positive_corr_weights[j], 0.0) * z_values[j] for j in range(n))
+        pred = (to_float(linear_map.get("a"), 0.0) * score) + to_float(linear_map.get("b"), 0.0)
+    else:
+        pred = bias + sum(to_float(weights[j], 0.0) * z_values[j] for j in range(n))
 
     return float(pred - listed_inches)
 
