@@ -38,37 +38,15 @@ jobs:
         env:
           INPUT_SEASONS: ${{ inputs.seasons || '2026' }}
         run: |
-          python3 - <<'PY'
-          import os
-          import subprocess
-
-          raw = os.environ.get("INPUT_SEASONS", "2026")
-          years = set()
-          for part in [x.strip() for x in raw.split(",") if x.strip()]:
-              if "-" in part:
-                  a, b = part.split("-", 1)
-                  years.update(range(int(a), int(b) + 1))
-              else:
-                  years.add(int(part))
-
-          for y in sorted(years):
-              print(f"[height-big] building {y}")
-              subprocess.run(
-                  [
-                      "python3",
-                      "player_cards_pipeline/scripts/train_height_profile_model.py",
-                      "--project-root",
-                      ".",
-                      "--score-season",
-                      str(y),
-                      "--feature-set",
-                      "big",
-                      "--out-score-csv",
-                      f"player_cards_pipeline/output/height_profile_big_only_scores_{y}.csv",
-                  ],
-                  check=True,
-              )
-          PY
+          YEARS=$(python3 -c 'import os; raw=os.environ.get("INPUT_SEASONS","2026"); years=set(); [years.update(range(int(p.split("-",1)[0]), int(p.split("-",1)[1])+1)) if "-" in p else years.add(int(p)) for p in [x.strip() for x in raw.split(",") if x.strip()]]; print(" ".join(str(y) for y in sorted(years)))')
+          for y in $YEARS; do
+            echo "[height-big] building $y"
+            python3 player_cards_pipeline/scripts/train_height_profile_model.py \
+              --project-root . \
+              --score-season "$y" \
+              --feature-set big \
+              --out-score-csv "player_cards_pipeline/output/height_profile_big_only_scores_${y}.csv"
+          done
 
       - name: Build Jason Created Stats CSV (Women)
         env:
@@ -103,7 +81,6 @@ jobs:
           git add -f player_cards_pipeline/output/height_profile_scores_*.csv || true
           git add -f player_cards_pipeline/output/height_profile_scores_big_*.csv || true
           git add -f player_cards_pipeline/output/height_profile_big_only_scores_*.csv || true
-          git add -f player_cards_pipeline/output/height_profile_scores_big_*.csv || true
           if git diff --cached --quiet; then
             echo "No Jason stats changes to commit"
             exit 0
