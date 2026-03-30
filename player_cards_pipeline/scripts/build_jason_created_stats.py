@@ -217,20 +217,25 @@ def load_enriched_lookup(root: Path, gender: str, seasons: set[int]) -> dict[tup
     return out
 
 
-def load_height_scores(root: Path, seasons: set[int]) -> dict[tuple[int, str, str], dict[str, Any]]:
-    out: dict[tuple[int, str, str], dict[str, Any]] = {}
+def load_height_scores(root: Path, seasons: set[int]) -> tuple[dict[tuple[int, str, str], dict[str, Any]], dict[tuple[int, str], dict[str, Any]]]:
+    by_key: dict[tuple[int, str, str], dict[str, Any]] = {}
+    by_pid: dict[tuple[int, str], dict[str, Any]] = {}
     for season in sorted(seasons):
         p = root / HEIGHT_SCORE_PATTERN.format(season=season)
         if not p.exists():
             continue
         for r in read_csv_rows(p):
-            key = (season, norm(r.get("player_name", "")), norm(r.get("team", "")))
-            out[key] = {
+            rec = {
                 "listed_height": r.get("listed_height", "") or "",
                 "predicted_height": r.get("predicted_profile_height", "") or "",
                 "delta": to_float(r.get("height_delta_inches")),
             }
-    return out
+            key = (season, norm(r.get("player_name", "")), norm(r.get("team", "")))
+            by_key[key] = rec
+            pid = str(r.get("pid", "")).strip()
+            if pid:
+                by_pid[(season, pid)] = rec
+    return by_key, by_pid
 
 
 def _pick_col(header: list[str], candidates: list[str]) -> str | None:
@@ -312,6 +317,10 @@ def load_rimfluence(root: Path, seasons: set[int], gender: str) -> dict[tuple[in
                 continue
             key = (season, norm(r.get(player_col, "")), norm(r.get(team_col, "")))
             out[key] = {"rimfluence": rv, "rimfluence_off": rv_off, "rimfluence_def": rv_def}
+            # fallback key when team labels don't match across sources
+            key_no_team = (season, norm(r.get(player_col, "")), "")
+            if key_no_team not in out:
+                out[key_no_team] = {"rimfluence": rv, "rimfluence_off": rv_off, "rimfluence_def": rv_def}
     return out
 
 
@@ -398,7 +407,7 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
             dedup[key] = r
     bt_rows = list(dedup.values())
     enr = load_enriched_lookup(root, gender, seasons)
-    hmap = load_height_scores(root, seasons)
+    hmap_by_key, hmap_by_pid = load_height_scores(root, seasons)
     rmap = load_rimfluence(root, seasons, gender)
 
     out: list[Row] = []
@@ -419,7 +428,9 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
         k = (season, norm(player), norm(team))
 
         em = enr.get(k, {})
-        hm = hmap.get(k, {})
+        hm = hmap_by_key.get(k, {})
+        if not hm and pid:
+            hm = hmap_by_pid.get((season, pid), {})
 
         # Position + class from enriched; fallback to BT fields.
         pos = normalize_pos(em.get("pos", ""))
@@ -462,6 +473,8 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
         delta = to_float(hm.get("delta"))
 
         rim_row = rmap.get(k, {})
+        if not rim_row:
+            rim_row = rmap.get((season, norm(player), ""), {})
         rimfluence = to_float(rim_row.get("rimfluence"))
         rimfluence_off = to_float(rim_row.get("rimfluence_off"))
         rimfluence_def = to_float(rim_row.get("rimfluence_def"))
@@ -472,7 +485,13 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
             rimfluence_def = None
 
         mp_total = to_float(r.get("mp"))
-        mpg = (mp_total / gp) if (mp_total is not None and gp > 0) else to_float(r.get("mpg"))
+        mpg = None
+        if mp_total is not None and gp > 0 and mp_total > gp:
+            mpg = mp_total / gp
+        if mpg is None:
+            mpg = to_float(r.get("mpg"))
+        if mpg is None:
+            mpg = ((min_per * 40.0) / 100.0) if min_per is not None else None
 
         out.append(
             Row(
