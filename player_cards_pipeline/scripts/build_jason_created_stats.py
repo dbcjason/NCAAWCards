@@ -510,10 +510,12 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
             rimfluence_off = None
             rimfluence_def = None
 
-        mp_total = to_float(r.get("mp"))
+        mp_value = to_float(r.get("mp"))
         mpg = None
-        if mp_total is not None and gp > 0 and mp_total > gp:
-            mpg = mp_total / gp
+        if mp_value is not None:
+            # BT `mp` is usually already MPG. Only treat it like total minutes if it is
+            # clearly outside a per-game range.
+            mpg = (mp_value / gp) if (gp > 0 and mp_value > 80.0) else mp_value
         if mpg is None:
             mpg = to_float(r.get("mpg"))
         if mpg is None:
