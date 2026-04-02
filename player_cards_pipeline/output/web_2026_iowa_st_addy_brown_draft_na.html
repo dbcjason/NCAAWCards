@@ -52,6 +52,7 @@ body {
   grid-template-columns: repeat(5, minmax(96px, 1fr));
   gap: 8px;
   min-width: 560px;
+  margin-top: -4px;
 }
 .grade-chip {
   border: 1px solid var(--line);
@@ -76,6 +77,9 @@ body {
   margin-bottom: 0;
   font-size: 15px;
 }
+.stat-height-above { color: #22c55e; font-weight: 700; }
+.stat-height-below { color: #ef4444; font-weight: 700; }
+.stat-height-at { color: #f5f5f5; font-weight: 700; }
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -548,13 +552,13 @@ body {
         <h1 class="title">Addy Brown</h1>
         <div class="grade-strip"><div class="grade-chip"><div class="grade-k">Impact</div><div class="grade-v">A+</div></div><div class="grade-chip"><div class="grade-k">Scoring</div><div class="grade-v">A</div></div><div class="grade-chip"><div class="grade-k">Playmaking</div><div class="grade-v">A+</div></div><div class="grade-chip"><div class="grade-k">Defense</div><div class="grade-v">D</div></div><div class="grade-chip"><div class="grade-k">Rebounding</div><div class="grade-v">D-</div></div></div>
       </div>
-      <div class="sub">Iowa St. | 2026 | Position: F | Height: 6&#x27;2&quot;</div>
+      <div class="sub">Iowa St. | 2026 | Position: F | Height: 6&#x27;2&quot; | Statistical Height: <span class="stat-height-at">6&#x27;2&quot;, -0.29 in</span></div>
 
       <div class="panel per-game-panel">
         <h3>Per Game</h3>
         <div class="stat-strip">
-          <div class="chip"><div class="k">PPG</div><div class="v">12.2</div><div class="p">89%</div></div>
-          <div class="chip"><div class="k">RPG</div><div class="v">8.8</div><div class="p">96%</div></div>
+          <div class="chip"><div class="k">PPG</div><div class="v">12.2</div><div class="p">90%</div></div>
+          <div class="chip"><div class="k">RPG</div><div class="v">8.8</div><div class="p">97%</div></div>
           <div class="chip"><div class="k">APG</div><div class="v">5.2</div><div class="p">100%</div></div>
           <div class="chip"><div class="k">SPG</div><div class="v">0.6</div><div class="p">51%</div></div>
           <div class="chip"><div class="k">BPG</div><div class="v">0.9</div><div class="p">84%</div></div>
@@ -579,22 +583,22 @@ body {
 
 <div class="metric-row">
   <div class="metric-label">RAPM</div>
-  <div class="metric-val">8.6</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:95.1%;background:rgb(56, 203, 110);"></div></div>
+  <div class="metric-val">8.5</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:95.0%;background:rgb(56, 203, 110);"></div></div>
   <div class="metric-pct">95</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">Net Pts</div>
-  <div class="metric-val">6.5</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:88.6%;background:rgb(84, 210, 131);"></div></div>
-  <div class="metric-pct">89</div>
+  <div class="metric-val">6.3</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:88.4%;background:rgb(85, 211, 131);"></div></div>
+  <div class="metric-pct">88</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">On/Off NetR</div>
   <div class="metric-val">14.3</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:90.1%;background:rgb(78, 208, 126);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:90.3%;background:rgb(77, 208, 125);"></div></div>
   <div class="metric-pct">90</div>
 </div>
 
@@ -602,11 +606,11 @@ body {
 <svg viewBox="0 0 330 130" width="330" height="130" xmlns="http://www.w3.org/2000/svg">
   <rect x="38" y="10" width="282" height="96" fill="var(--panel-alt)" stroke="var(--line)" stroke-width="1"/>
   <line x1="38" y1="106.0" x2="320" y2="106.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="82.0" x2="320" y2="82.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="58.0" x2="320" y2="58.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="34.0" x2="320" y2="34.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/><line x1="38" y1="10.0" x2="320" y2="10.0" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/>
-  <line x1="38" y1="98.2" x2="320" y2="98.2" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>
-  <line x1="38.0" y1="26.5" x2="52.1" y2="66.8" stroke="#22c55e" stroke-width="2" /><line x1="52.1" y1="66.8" x2="66.2" y2="41.2" stroke="#22c55e" stroke-width="2" /><line x1="66.2" y1="41.2" x2="80.3" y2="60.7" stroke="#22c55e" stroke-width="2" /><line x1="80.3" y1="60.7" x2="94.4" y2="32.4" stroke="#22c55e" stroke-width="2" /><line x1="94.4" y1="32.4" x2="108.5" y2="38.9" stroke="#22c55e" stroke-width="2" /><line x1="108.5" y1="38.9" x2="122.6" y2="60.8" stroke="#22c55e" stroke-width="2" /><line x1="122.6" y1="60.8" x2="136.7" y2="21.3" stroke="#22c55e" stroke-width="2" /><line x1="136.7" y1="21.3" x2="150.8" y2="73.3" stroke="#22c55e" stroke-width="2" /><line x1="150.8" y1="73.3" x2="164.9" y2="41.5" stroke="#22c55e" stroke-width="2" /><line x1="164.9" y1="41.5" x2="179.0" y2="41.7" stroke="#22c55e" stroke-width="2" /><line x1="179.0" y1="41.7" x2="193.1" y2="16.6" stroke="#22c55e" stroke-width="2" /><line x1="193.1" y1="16.6" x2="207.2" y2="75.0" stroke="#22c55e" stroke-width="2" /><line x1="207.2" y1="75.0" x2="221.3" y2="98.3" stroke="#22c55e" stroke-width="2" /><line x1="221.3" y1="98.3" x2="235.4" y2="79.5" stroke="#22c55e" stroke-width="2" /><line x1="235.4" y1="79.5" x2="249.5" y2="39.0" stroke="#22c55e" stroke-width="2" /><line x1="249.5" y1="39.0" x2="263.6" y2="99.4" stroke="#22c55e" stroke-width="2" /><line x1="263.6" y1="99.4" x2="277.7" y2="83.4" stroke="#22c55e" stroke-width="2" /><line x1="277.7" y1="83.4" x2="291.8" y2="93.7" stroke="#22c55e" stroke-width="2" /><line x1="291.8" y1="93.7" x2="305.9" y2="92.7" stroke="#22c55e" stroke-width="2" /><line x1="305.9" y1="92.7" x2="320.0" y2="94.9" stroke="#22c55e" stroke-width="2" />
-  <circle cx="38.0" cy="26.5" r="2.4" fill="#22c55e" /><circle cx="52.1" cy="66.8" r="2.4" fill="#22c55e" /><circle cx="66.2" cy="41.2" r="2.4" fill="#22c55e" /><circle cx="80.3" cy="60.7" r="2.4" fill="#22c55e" /><circle cx="94.4" cy="32.4" r="2.4" fill="#22c55e" /><circle cx="108.5" cy="38.9" r="2.4" fill="#22c55e" /><circle cx="122.6" cy="60.8" r="2.4" fill="#22c55e" /><circle cx="136.7" cy="21.3" r="2.4" fill="#22c55e" /><circle cx="150.8" cy="73.3" r="2.4" fill="#22c55e" /><circle cx="164.9" cy="41.5" r="2.4" fill="#22c55e" /><circle cx="179.0" cy="41.7" r="2.4" fill="#22c55e" /><circle cx="193.1" cy="16.6" r="2.4" fill="#22c55e" /><circle cx="207.2" cy="75.0" r="2.4" fill="#22c55e" /><circle cx="221.3" cy="98.3" r="2.4" fill="#ef4444" /><circle cx="235.4" cy="79.5" r="2.4" fill="#22c55e" /><circle cx="249.5" cy="39.0" r="2.4" fill="#22c55e" /><circle cx="263.6" cy="99.4" r="2.4" fill="#ef4444" /><circle cx="277.7" cy="83.4" r="2.4" fill="#22c55e" /><circle cx="291.8" cy="93.7" r="2.4" fill="#22c55e" /><circle cx="305.9" cy="92.7" r="2.4" fill="#22c55e" /><circle cx="320.0" cy="94.9" r="2.4" fill="#22c55e" />
+  <line x1="38" y1="98.1" x2="320" y2="98.1" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="38.0" y1="26.4" x2="52.1" y2="66.7" stroke="#22c55e" stroke-width="2" /><line x1="52.1" y1="66.7" x2="66.2" y2="41.2" stroke="#22c55e" stroke-width="2" /><line x1="66.2" y1="41.2" x2="80.3" y2="60.7" stroke="#22c55e" stroke-width="2" /><line x1="80.3" y1="60.7" x2="94.4" y2="32.4" stroke="#22c55e" stroke-width="2" /><line x1="94.4" y1="32.4" x2="108.5" y2="38.8" stroke="#22c55e" stroke-width="2" /><line x1="108.5" y1="38.8" x2="122.6" y2="60.7" stroke="#22c55e" stroke-width="2" /><line x1="122.6" y1="60.7" x2="136.7" y2="21.5" stroke="#22c55e" stroke-width="2" /><line x1="136.7" y1="21.5" x2="150.8" y2="73.4" stroke="#22c55e" stroke-width="2" /><line x1="150.8" y1="73.4" x2="164.9" y2="41.6" stroke="#22c55e" stroke-width="2" /><line x1="164.9" y1="41.6" x2="179.0" y2="41.9" stroke="#22c55e" stroke-width="2" /><line x1="179.0" y1="41.9" x2="193.1" y2="16.6" stroke="#22c55e" stroke-width="2" /><line x1="193.1" y1="16.6" x2="207.2" y2="75.0" stroke="#22c55e" stroke-width="2" /><line x1="207.2" y1="75.0" x2="221.3" y2="98.3" stroke="#22c55e" stroke-width="2" /><line x1="221.3" y1="98.3" x2="235.4" y2="79.5" stroke="#22c55e" stroke-width="2" /><line x1="235.4" y1="79.5" x2="249.5" y2="39.2" stroke="#22c55e" stroke-width="2" /><line x1="249.5" y1="39.2" x2="263.6" y2="99.4" stroke="#22c55e" stroke-width="2" /><line x1="263.6" y1="99.4" x2="277.7" y2="83.4" stroke="#22c55e" stroke-width="2" /><line x1="277.7" y1="83.4" x2="291.8" y2="93.6" stroke="#22c55e" stroke-width="2" /><line x1="291.8" y1="93.6" x2="305.9" y2="92.7" stroke="#22c55e" stroke-width="2" /><line x1="305.9" y1="92.7" x2="320.0" y2="94.9" stroke="#22c55e" stroke-width="2" />
+  <circle cx="38.0" cy="26.4" r="2.4" fill="#22c55e" /><circle cx="52.1" cy="66.7" r="2.4" fill="#22c55e" /><circle cx="66.2" cy="41.2" r="2.4" fill="#22c55e" /><circle cx="80.3" cy="60.7" r="2.4" fill="#22c55e" /><circle cx="94.4" cy="32.4" r="2.4" fill="#22c55e" /><circle cx="108.5" cy="38.8" r="2.4" fill="#22c55e" /><circle cx="122.6" cy="60.7" r="2.4" fill="#22c55e" /><circle cx="136.7" cy="21.5" r="2.4" fill="#22c55e" /><circle cx="150.8" cy="73.4" r="2.4" fill="#22c55e" /><circle cx="164.9" cy="41.6" r="2.4" fill="#22c55e" /><circle cx="179.0" cy="41.9" r="2.4" fill="#22c55e" /><circle cx="193.1" cy="16.6" r="2.4" fill="#22c55e" /><circle cx="207.2" cy="75.0" r="2.4" fill="#22c55e" /><circle cx="221.3" cy="98.3" r="2.4" fill="#ef4444" /><circle cx="235.4" cy="79.5" r="2.4" fill="#22c55e" /><circle cx="249.5" cy="39.2" r="2.4" fill="#22c55e" /><circle cx="263.6" cy="99.4" r="2.4" fill="#ef4444" /><circle cx="277.7" cy="83.4" r="2.4" fill="#22c55e" /><circle cx="291.8" cy="93.6" r="2.4" fill="#22c55e" /><circle cx="305.9" cy="92.7" r="2.4" fill="#22c55e" /><circle cx="320.0" cy="94.9" r="2.4" fill="#22c55e" />
   <text x="38.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-3</text><text x="80.3" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-12</text><text x="136.7" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">11-28</text><text x="179.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">12-10</text><text x="221.3" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">12-31</text><text x="277.7" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">2-25</text><text x="320.0" y="122" text-anchor="middle" font-size="9" fill="var(--muted)">3-21</text>
-  <text x="12" y="109.0" text-anchor="start" font-size="9" fill="var(--muted)">-2.4</text><text x="12" y="85.0" text-anchor="start" font-size="9" fill="var(--muted)">5.0</text><text x="12" y="61.0" text-anchor="start" font-size="9" fill="var(--muted)">12.3</text><text x="12" y="37.0" text-anchor="start" font-size="9" fill="var(--muted)">19.6</text><text x="12" y="13.0" text-anchor="start" font-size="9" fill="var(--muted)">26.9</text>
+  <text x="12" y="109.0" text-anchor="start" font-size="9" fill="var(--muted)">-2.4</text><text x="12" y="85.0" text-anchor="start" font-size="9" fill="var(--muted)">4.9</text><text x="12" y="61.0" text-anchor="start" font-size="9" fill="var(--muted)">12.3</text><text x="12" y="37.0" text-anchor="start" font-size="9" fill="var(--muted)">19.6</text><text x="12" y="13.0" text-anchor="start" font-size="9" fill="var(--muted)">26.9</text>
   <text x="165.0" y="129" text-anchor="middle" font-size="9" fill="var(--muted)">Date</text>
   <text x="6" y="65.0" text-anchor="start" font-size="9" fill="var(--muted)" transform="rotate(-90 6 65.0)">BPM</text>
 </svg>
@@ -616,29 +620,29 @@ body {
 <div class="metric-row">
   <div class="metric-label">Usage</div>
   <div class="metric-val">23.1</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:78.8%;background:rgb(127, 222, 162);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:78.9%;background:rgb(127, 222, 162);"></div></div>
   <div class="metric-pct">79</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">TS%</div>
   <div class="metric-val">55.0</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:76.2%;background:rgb(139, 225, 171);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:76.2%;background:rgb(139, 225, 170);"></div></div>
   <div class="metric-pct">76</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">2P%</div>
   <div class="metric-val">49.2</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:61.4%;background:rgb(204, 242, 218);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:61.5%;background:rgb(204, 242, 218);"></div></div>
   <div class="metric-pct">61</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">Rim Att/100</div>
   <div class="metric-val">5.4</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:22.1%;background:rgb(246, 151, 151);"></div></div>
-  <div class="metric-pct">22</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:22.6%;background:rgb(246, 153, 153);"></div></div>
+  <div class="metric-pct">23</div>
 </div>
 
 <div class="metric-row">
@@ -651,7 +655,7 @@ body {
 <div class="metric-row">
   <div class="metric-label">Mid%</div>
   <div class="metric-val">35.3</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:63.5%;background:rgb(195, 239, 212);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:63.4%;background:rgb(196, 239, 212);"></div></div>
   <div class="metric-pct">63</div>
 </div>
 
@@ -672,7 +676,7 @@ body {
 <div class="metric-row">
   <div class="metric-label">FTA/100</div>
   <div class="metric-val">5.0</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:53.7%;background:rgb(239, 251, 243);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:54.0%;background:rgb(237, 250, 242);"></div></div>
   <div class="metric-pct">54</div>
 </div>
 
@@ -703,7 +707,7 @@ body {
 <div class="metric-row">
   <div class="metric-label">TO%</div>
   <div class="metric-val">16.7</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:80.2%;background:rgb(121, 220, 158);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:80.3%;background:rgb(121, 220, 158);"></div></div>
   <div class="metric-pct">80</div>
 </div>
 
@@ -749,14 +753,14 @@ body {
 <div class="metric-row">
   <div class="metric-label">OREB%</div>
   <div class="metric-val">4.5</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:21.0%;background:rgb(246, 147, 147);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:21.0%;background:rgb(246, 146, 146);"></div></div>
   <div class="metric-pct">21</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">DREB%</div>
   <div class="metric-val">29.2</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:96.5%;background:rgb(49, 201, 105);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:96.6%;background:rgb(49, 201, 105);"></div></div>
   <div class="metric-pct">97</div>
 </div>
 
@@ -785,8 +789,8 @@ body {
 <polyline points="38.9,49.2 42.4,62.5 45.8,70.6 49.3,76.9 52.8,82.2 56.2,86.8 59.7,90.9 63.2,94.6 66.6,97.9 70.1,101.0 73.5,103.9 77.0,106.5 80.5,109.0 83.9,111.3 87.4,113.4 90.9,115.4 94.3,117.3 97.8,119.1 101.3,120.7 104.7,122.3 108.2,123.8 111.7,125.1 115.1,126.4 118.6,127.6 122.1,128.7 125.5,129.7 129.0,130.6 132.5,131.5 135.9,132.3 139.4,133.1 142.8,133.7 146.3,134.3 149.8,134.8 153.2,135.3 156.7,135.7 160.2,136.1 163.6,136.3 167.1,136.5 170.6,136.7 174.0,136.8 177.5,136.8 181.0,136.8 184.4,136.7 187.9,136.5 191.4,136.3 194.8,136.1 198.3,135.7 201.8,135.3 205.2,134.8 208.7,134.3 212.2,133.7 215.6,133.1 219.1,132.3 222.5,131.5 226.0,130.6 229.5,129.7 232.9,128.7 236.4,127.6 239.9,126.4 243.3,125.1 246.8,123.8 250.3,122.3 253.7,120.7 257.2,119.1 260.7,117.3 264.1,115.4 267.6,113.4 271.1,111.3 274.5,109.0 278.0,106.5 281.4,103.9 284.9,101.0 288.4,97.9 291.8,94.6 295.3,90.9 298.8,86.8 302.2,82.2 305.7,76.9 309.2,70.6 312.6,62.5 316.1,49.2" fill="none" stroke="#ffffff" stroke-width="2"/>
 <line x1="20.0" y1="230.0" x2="335.0" y2="230.0" stroke="#ffffff" stroke-width="2"/>
 
-  <circle cx="201.9" cy="45.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.8" cy="46.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.7" cy="46.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="202.7" cy="45.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.1" cy="45.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="202.1" cy="45.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.9" cy="46.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.5" cy="47.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.2" cy="47.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.6" cy="47.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.1" cy="47.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.0" cy="47.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="159.2" cy="44.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="159.8" cy="42.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="159.9" cy="43.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.2" cy="42.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.1" cy="144.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.6" cy="144.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="145.6" cy="145.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.7" cy="146.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="147.5" cy="145.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.9" cy="145.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.4" cy="150.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.4" cy="149.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.6" cy="150.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.6" cy="150.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.2" cy="149.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.2" cy="149.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.8" cy="149.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="154.9" cy="51.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="156.4" cy="53.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="154.4" cy="52.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="155.9" cy="53.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.2" cy="55.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.8" cy="56.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.4" cy="55.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="198.4" cy="55.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="198.6" cy="55.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="243.0" cy="140.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="242.4" cy="140.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="243.4" cy="139.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.5" cy="151.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="160.8" cy="151.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="162.0" cy="150.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="160.7" cy="151.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.3" cy="150.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="211.8" cy="143.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="213.4" cy="143.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="168.2" cy="63.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="169.2" cy="62.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="169.3" cy="62.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="117.7" cy="146.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="118.3" cy="145.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="119.6" cy="145.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="79.1" cy="120.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="78.7" cy="120.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="218.7" cy="43.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="218.2" cy="44.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="219.6" cy="44.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.2" cy="72.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="178.4" cy="73.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.7" cy="73.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="195.1" cy="148.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="193.1" cy="147.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="193.8" cy="148.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="145.3" cy="46.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="145.3" cy="46.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="147.0" cy="47.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="58.4" cy="110.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="129.8" cy="145.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="129.0" cy="145.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="129.7" cy="145.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="193.0" cy="40.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="173.8" cy="49.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="187.9" cy="69.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.6" cy="68.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.3" cy="68.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="224.5" cy="143.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="225.4" cy="142.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="162.5" cy="105.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="160.7" cy="106.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="106.8" cy="135.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="92.1" cy="126.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="90.2" cy="126.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="234.3" cy="93.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="181.5" cy="57.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="180.9" cy="57.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="206.8" cy="75.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="205.1" cy="75.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="180.4" cy="89.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="212.2" cy="48.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="212.8" cy="48.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="226.7" cy="53.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="141.5" cy="121.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="200.0" cy="125.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="278.6" cy="120.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="30.4" cy="70.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="152.3" cy="75.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="168.4" cy="73.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="163.8" cy="99.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="141.8" cy="112.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="155.5" cy="99.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="76.2" cy="53.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="78.9" cy="86.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="108.7" cy="75.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="35.5" cy="41.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="114.5" cy="137.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="70.1" cy="120.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="266.1" cy="44.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="258.9" cy="91.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="172.5" cy="82.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="240.1" cy="62.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="204.6" cy="61.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="228.7" cy="56.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="321.9" cy="57.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="230.3" cy="145.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="186.7" cy="125.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="170.9" cy="158.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="285.3" cy="112.3" r="4.2" fill="#ef4444" fill-opacity="0.8" />
-  <circle cx="203.1" cy="46.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="46.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="204.0" cy="45.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="204.1" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.1" cy="45.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="201.6" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.5" cy="45.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.6" cy="45.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.8" cy="45.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.2" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.9" cy="46.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.8" cy="46.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="201.7" cy="45.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.0" cy="45.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.5" cy="48.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.0" cy="47.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.0" cy="46.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.0" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.7" cy="47.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.6" cy="48.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.9" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.3" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.0" cy="46.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="48.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.1" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.9" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.3" cy="43.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.2" cy="44.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.8" cy="43.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.3" cy="43.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.6" cy="44.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.0" cy="43.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.3" cy="42.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.1" cy="44.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.4" cy="43.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="147.7" cy="145.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="145.6" cy="145.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="147.2" cy="145.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="178.0" cy="150.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="154.7" cy="52.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="154.8" cy="53.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="156.2" cy="52.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="200.3" cy="54.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="199.6" cy="54.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="243.8" cy="139.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="243.3" cy="139.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="211.0" cy="143.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="211.7" cy="143.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="213.2" cy="143.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="166.8" cy="62.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="118.7" cy="145.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="79.3" cy="120.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="78.8" cy="120.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="219.2" cy="44.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.4" cy="72.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.7" cy="147.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="58.8" cy="111.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="58.5" cy="110.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="178.1" cy="39.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.9" cy="41.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.9" cy="40.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.3" cy="40.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.2" cy="40.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="174.0" cy="50.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="174.1" cy="48.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="224.1" cy="142.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="105.7" cy="134.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="233.6" cy="94.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="181.7" cy="88.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="228.1" cy="52.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="141.0" cy="121.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="200.0" cy="123.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="279.2" cy="120.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="304.0" cy="93.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="303.6" cy="94.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="50.5" cy="82.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="133.1" cy="99.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="68.2" cy="112.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="54.3" cy="99.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="76.9" cy="99.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="107.7" cy="90.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="69.1" cy="44.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="253.2" cy="53.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="238.0" cy="86.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="191.2" cy="74.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="217.8" cy="125.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="219.7" cy="150.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="112.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="184.2" cy="112.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="308.6" cy="86.7" r="4.2" fill="#22c55e" fill-opacity="0.8" />
+  <circle cx="203.2" cy="46.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.4" cy="46.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="203.2" cy="45.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="202.5" cy="46.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="202.4" cy="45.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="202.5" cy="45.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="202.4" cy="45.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.8" cy="48.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.6" cy="47.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.6" cy="47.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.5" cy="47.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.9" cy="48.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="160.6" cy="43.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.5" cy="44.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="159.2" cy="44.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="160.3" cy="44.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.9" cy="144.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.4" cy="144.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="145.8" cy="145.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.5" cy="145.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.1" cy="146.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.8" cy="145.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.3" cy="149.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.6" cy="149.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.5" cy="148.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="178.0" cy="149.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="178.0" cy="150.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.4" cy="149.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="176.5" cy="149.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="156.2" cy="52.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="155.1" cy="52.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="155.2" cy="53.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="156.5" cy="53.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="200.8" cy="55.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="198.7" cy="54.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.6" cy="55.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.6" cy="55.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="198.5" cy="55.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="244.6" cy="139.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="242.5" cy="140.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="244.8" cy="139.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.4" cy="151.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="162.0" cy="151.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.5" cy="150.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.9" cy="151.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.6" cy="151.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="211.4" cy="144.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="212.0" cy="143.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="169.0" cy="63.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="167.6" cy="62.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="168.3" cy="62.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="118.5" cy="146.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="117.5" cy="146.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="119.4" cy="146.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="79.5" cy="120.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="80.7" cy="119.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="219.0" cy="44.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="218.5" cy="44.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="219.4" cy="44.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.8" cy="72.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.6" cy="72.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="177.0" cy="74.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="193.9" cy="148.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="194.5" cy="148.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="195.0" cy="147.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="145.5" cy="46.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="146.6" cy="47.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="147.1" cy="45.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="58.9" cy="111.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="128.4" cy="146.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="128.5" cy="146.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="130.3" cy="145.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="194.4" cy="40.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="174.1" cy="48.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="190.1" cy="67.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="188.9" cy="69.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="189.6" cy="68.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="225.8" cy="142.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="225.9" cy="143.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.6" cy="105.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="161.2" cy="105.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="107.4" cy="134.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="91.5" cy="126.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="90.2" cy="127.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="234.4" cy="92.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="181.2" cy="56.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="180.9" cy="56.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="204.6" cy="74.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="206.7" cy="74.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="179.8" cy="89.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="211.9" cy="49.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="211.6" cy="49.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="228.1" cy="53.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="140.4" cy="121.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="199.6" cy="124.1" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="279.3" cy="119.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="28.8" cy="70.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="153.3" cy="74.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="167.6" cy="74.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="165.3" cy="99.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="143.9" cy="111.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="156.4" cy="100.0" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="76.7" cy="53.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="79.0" cy="87.4" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="108.2" cy="73.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="34.9" cy="39.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="115.6" cy="137.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="69.7" cy="119.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="264.5" cy="44.8" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="259.6" cy="90.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="171.5" cy="82.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="240.8" cy="61.2" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="207.0" cy="62.5" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="228.1" cy="56.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="322.6" cy="57.7" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="231.6" cy="145.9" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="186.1" cy="125.3" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="171.5" cy="158.6" r="4.2" fill="#ef4444" fill-opacity="0.8" /><circle cx="284.3" cy="112.6" r="4.2" fill="#ef4444" fill-opacity="0.8" />
+  <circle cx="202.6" cy="45.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.4" cy="45.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.3" cy="46.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.6" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.2" cy="45.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.8" cy="45.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="45.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.5" cy="46.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.1" cy="46.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="203.4" cy="45.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.4" cy="45.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="201.8" cy="46.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.7" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.7" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.0" cy="47.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.4" cy="47.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.8" cy="46.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.6" cy="47.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.9" cy="47.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.5" cy="47.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="188.9" cy="48.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.2" cy="48.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.4" cy="48.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.3" cy="47.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="189.9" cy="46.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.9" cy="44.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.3" cy="43.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="159.8" cy="44.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.0" cy="43.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="161.3" cy="44.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="159.9" cy="43.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="159.7" cy="43.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.4" cy="43.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="160.8" cy="43.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="147.7" cy="144.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="147.2" cy="144.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="146.3" cy="144.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.9" cy="148.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="155.1" cy="53.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="154.7" cy="53.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="156.4" cy="53.1" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="198.9" cy="55.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="198.4" cy="55.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="243.3" cy="140.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="244.7" cy="139.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="213.2" cy="144.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="212.4" cy="143.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="212.3" cy="143.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="168.3" cy="62.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="119.4" cy="146.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="81.0" cy="121.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="80.9" cy="120.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="219.4" cy="44.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="178.1" cy="72.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="194.4" cy="148.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="56.7" cy="110.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="58.9" cy="111.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="177.4" cy="39.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="178.2" cy="41.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="176.5" cy="41.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="193.1" cy="41.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="192.1" cy="40.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="172.7" cy="49.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="173.4" cy="48.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="225.1" cy="142.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="105.4" cy="135.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="233.5" cy="93.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="180.6" cy="88.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="226.7" cy="52.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="142.0" cy="120.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="200.3" cy="124.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="277.3" cy="120.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="304.0" cy="93.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="303.0" cy="92.9" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="50.7" cy="83.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="132.5" cy="99.7" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="67.9" cy="113.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="54.2" cy="100.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="77.7" cy="100.3" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="108.6" cy="90.8" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="69.4" cy="45.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="253.8" cy="52.6" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="238.4" cy="87.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="190.9" cy="75.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="217.5" cy="124.0" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="219.5" cy="150.5" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="202.9" cy="112.2" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="184.6" cy="111.4" r="4.2" fill="#22c55e" fill-opacity="0.8" /><circle cx="308.6" cy="86.5" r="4.2" fill="#22c55e" fill-opacity="0.8" />
 </svg>
 
           </div>
@@ -796,7 +800,7 @@ body {
         <div class="draft-proj-main">Top 10</div>
         <div class="draft-proj-sub">Drafted: 99.0% | Top 20: 79.5%</div>
         <div class="draft-odds-grid">
-          <div class="draft-odd-row"><div class="draft-odd-k">Number One Pick</div><div class="draft-odd-v">13.7%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 5</div><div class="draft-odd-v">41.9%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 10</div><div class="draft-odd-v">60.4%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 20</div><div class="draft-odd-v">79.5%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Outside Top 20</div><div class="draft-odd-v">20.5%</div></div>
+          <div class="draft-odd-row"><div class="draft-odd-k">Number One Pick</div><div class="draft-odd-v">13.7%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 5</div><div class="draft-odd-v">41.9%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 10</div><div class="draft-odd-v">60.5%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Top 20</div><div class="draft-odd-v">79.5%</div></div><div class="draft-odd-row"><div class="draft-odd-k">Outside Top 20</div><div class="draft-odd-v">20.5%</div></div>
         </div>
         <div class="draft-proj-sub">Projections based solely on statistical profile in an average draft</div>
       </div>
@@ -818,15 +822,15 @@ body {
 <div class="metric-row">
   <div class="metric-label">UAsst&#x27;d Mid FGM/100</div>
   <div class="metric-val">1.25</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:77.0%;background:rgb(136, 224, 168);"></div></div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:77.1%;background:rgb(135, 224, 168);"></div></div>
   <div class="metric-pct">77</div>
 </div>
 
 <div class="metric-row">
   <div class="metric-label">UAsst&#x27;d 3PM/100</div>
   <div class="metric-val">0.09</div>
-  <div class="bar-wrap"><div class="bar-fill" style="width:52.6%;background:rgb(244, 252, 247);"></div></div>
-  <div class="metric-pct">53</div>
+  <div class="bar-wrap"><div class="bar-fill" style="width:52.5%;background:rgb(244, 252, 247);"></div></div>
+  <div class="metric-pct">52</div>
 </div>
 
 <div class="metric-row">
@@ -854,8 +858,8 @@ body {
           <div class="play-stack">
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-vol" style="width:19.1%"></div>
-                <span class="play-badge" style="left:19.1%">19</span>
+                <div class="play-fill play-vol" style="width:18.9%"></div>
+                <span class="play-badge" style="left:18.9%">19</span>
               </div>
               <div class="play-tag">2.12 poss/100</div>
             </div>
@@ -894,8 +898,8 @@ body {
           <div class="play-stack">
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-vol" style="width:14.0%"></div>
-                <span class="play-badge" style="left:14.0%">14</span>
+                <div class="play-fill play-vol" style="width:14.1%"></div>
+                <span class="play-badge" style="left:14.1%">14</span>
               </div>
               <div class="play-tag">0.24 poss/100</div>
             </div>
@@ -914,15 +918,15 @@ body {
           <div class="play-stack">
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-vol" style="width:28.6%"></div>
-                <span class="play-badge" style="left:28.6%">29</span>
+                <div class="play-fill play-vol" style="width:28.5%"></div>
+                <span class="play-badge" style="left:28.5%">28</span>
               </div>
               <div class="play-tag">1.20 poss/100</div>
             </div>
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-ppp" style="width:80.8%"></div>
-                <span class="play-badge" style="left:80.8%">81</span>
+                <div class="play-fill play-ppp" style="width:80.6%"></div>
+                <span class="play-badge" style="left:80.6%">81</span>
               </div>
               <div class="play-tag">0.77 PPP</div>
             </div>
@@ -941,10 +945,10 @@ body {
             </div>
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-ppp" style="width:99.4%"></div>
-                <span class="play-badge" style="left:99.4%">99</span>
+                <div class="play-fill play-ppp" style="width:99.3%"></div>
+                <span class="play-badge" style="left:99.3%">99</span>
               </div>
-              <div class="play-tag">1.27 PPP</div>
+              <div class="play-tag">1.26 PPP</div>
             </div>
           </div>
         </div>
@@ -954,17 +958,17 @@ body {
           <div class="play-stack">
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-vol" style="width:48.1%"></div>
-                <span class="play-badge" style="left:48.1%">48</span>
+                <div class="play-fill play-vol" style="width:48.2%"></div>
+                <span class="play-badge" style="left:48.2%">48</span>
               </div>
               <div class="play-tag">1.69 poss/100</div>
             </div>
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-ppp" style="width:96.2%"></div>
-                <span class="play-badge" style="left:96.2%">96</span>
+                <div class="play-fill play-ppp" style="width:96.1%"></div>
+                <span class="play-badge" style="left:96.1%">96</span>
               </div>
-              <div class="play-tag">1.22 PPP</div>
+              <div class="play-tag">1.21 PPP</div>
             </div>
           </div>
         </div>
@@ -981,10 +985,10 @@ body {
             </div>
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-ppp" style="width:97.2%"></div>
-                <span class="play-badge" style="left:97.2%">97</span>
+                <div class="play-fill play-ppp" style="width:97.3%"></div>
+                <span class="play-badge" style="left:97.3%">97</span>
               </div>
-              <div class="play-tag">1.13 PPP</div>
+              <div class="play-tag">1.12 PPP</div>
             </div>
           </div>
         </div>
@@ -1004,7 +1008,7 @@ body {
                 <div class="play-fill play-ppp" style="width:90.9%"></div>
                 <span class="play-badge" style="left:90.9%">91</span>
               </div>
-              <div class="play-tag">0.87 PPP</div>
+              <div class="play-tag">0.86 PPP</div>
             </div>
           </div>
         </div>
@@ -1021,10 +1025,10 @@ body {
             </div>
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-ppp" style="width:80.1%"></div>
-                <span class="play-badge" style="left:80.1%">80</span>
+                <div class="play-fill play-ppp" style="width:80.0%"></div>
+                <span class="play-badge" style="left:80.0%">80</span>
               </div>
-              <div class="play-tag">1.19 PPP</div>
+              <div class="play-tag">1.18 PPP</div>
             </div>
           </div>
         </div>
@@ -1034,15 +1038,15 @@ body {
           <div class="play-stack">
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-vol" style="width:35.0%"></div>
-                <span class="play-badge" style="left:35.0%">35</span>
+                <div class="play-fill play-vol" style="width:35.1%"></div>
+                <span class="play-badge" style="left:35.1%">35</span>
               </div>
               <div class="play-tag">2.58 poss/100</div>
             </div>
             <div class="play-line">
               <div class="play-track">
-                <div class="play-fill play-ppp" style="width:63.4%"></div>
-                <span class="play-badge" style="left:63.4%">63</span>
+                <div class="play-fill play-ppp" style="width:63.0%"></div>
+                <span class="play-badge" style="left:63.0%">63</span>
               </div>
               <div class="play-tag">1.19 PPP</div>
             </div>
@@ -1134,7 +1138,7 @@ body {
       <div class="panel">
         <h3>Player Comparisons</h3>
         <div class="comp-table">
-          <div class="comp-row"><span class="comp-name">Addy Brown</span><span class="comp-year">2025</span><span class="comp-score">91.7</span></div><div class="comp-row"><span class="comp-name">Madison Scott</span><span class="comp-year">2025</span><span class="comp-score">90.2</span></div><div class="comp-row"><span class="comp-name">Myah Selland</span><span class="comp-year">2022</span><span class="comp-score">89.8</span></div><div class="comp-row"><span class="comp-name">Lorela Cubaj</span><span class="comp-year">2022</span><span class="comp-score">89.7</span></div><div class="comp-row"><span class="comp-name">Laura Ziegler</span><span class="comp-year">2026</span><span class="comp-score">89.4</span></div>
+          <div class="comp-row"><span class="comp-name">Addy Brown</span><span class="comp-year">2025</span><span class="comp-score">91.7</span></div><div class="comp-row"><span class="comp-name">Madison Scott</span><span class="comp-year">2025</span><span class="comp-score">90.1</span></div><div class="comp-row"><span class="comp-name">Myah Selland</span><span class="comp-year">2022</span><span class="comp-score">89.8</span></div><div class="comp-row"><span class="comp-name">Lorela Cubaj</span><span class="comp-year">2022</span><span class="comp-score">89.7</span></div><div class="comp-row"><span class="comp-name">Laura Ziegler</span><span class="comp-year">2026</span><span class="comp-score">89.4</span></div>
         </div>
       </div>
 </div>
