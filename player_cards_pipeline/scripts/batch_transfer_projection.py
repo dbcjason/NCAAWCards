@@ -345,8 +345,6 @@ def main() -> int:
         if gp is not None and gp < args.min_games:
             continue
         min_pct = player_min_pct_from_row(bpc, row)
-        if min_pct is None or min_pct <= float(args.min_pct):
-            continue
         mpg = bpc.bt_num(row, ["MPG", "mpg", "minutes_per_game", "min_per_game", "min per game"])
         if mpg is None and min_pct is not None:
             # Approximate MPG from minute share when explicit MPG is missing.
@@ -356,6 +354,10 @@ def main() -> int:
                 mpg = float(getattr(p, "mpg"))
             except Exception:
                 mpg = None
+        min_pct_ok = min_pct is not None and min_pct > float(args.min_pct)
+        mpg_ok = mpg is not None and mpg > float(args.min_mpg)
+        if not min_pct_ok and not mpg_ok:
+            continue
         if mpg is None or mpg <= float(args.min_mpg):
             continue
         # Hard de-dupe guard: keep one row per normalized (season, player, team).
