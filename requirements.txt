@@ -1,1 +1,1 @@
--r player_cards_pipeline/requirements.txt
+streamlit>=1.32
