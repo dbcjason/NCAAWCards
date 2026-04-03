@@ -1,0 +1,66 @@
+name: Build NCAAW Static Card Payloads
+
+on:
+  workflow_dispatch:
+    inputs:
+      years:
+        description: "Years to build (e.g. 2019-2025 or 2026)"
+        required: true
+        default: "2019-2025"
+      min_games:
+        description: "Min games threshold for percentile context"
+        required: true
+        default: "5"
+      incremental:
+        description: "Skip unchanged players using manifest hashes"
+        required: false
+        type: boolean
+        default: true
+
+jobs:
+  build-payloads:
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas
+
+      - name: Build payloads
+        run: |
+          CMD=(python3 player_cards_pipeline/scripts/build_static_card_payloads.py \
+            --project-root "." \
+            --years "${{ github.event.inputs.years }}" \
+            --min-games "${{ github.event.inputs.min_games }}")
+          if [ "${{ github.event.inputs.incremental }}" = "true" ]; then
+            CMD+=(--incremental)
+          fi
+          echo "Running: ${CMD[*]}"
+          "${CMD[@]}"
+
+      - name: Commit and push payload updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add player_cards_pipeline/public/cards/ || true
+          if git diff --cached --quiet; then
+            echo "No payload changes to commit"
+            exit 0
+          fi
+          git commit -m "Build NCAAW static card payloads for years: ${{ github.event.inputs.years }}"
+          git push origin main
