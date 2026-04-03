@@ -517,6 +517,20 @@ def main() -> None:
                 )
                 print(f"[payload] {ys}: {i}/{len(year_players)} built={built} skipped={skipped} errors={len(errors)}")
 
+        if not year_players:
+            target_manifest_path = shard_manifest_path if args.write_shard_files else manifest_path
+            target_index_path = shard_index_path if args.write_shard_files else index_path
+            target_error_path = shard_error_path if args.write_shard_files else year_dir / "errors.json"
+            write_checkpoint(
+                manifest_path=target_manifest_path,
+                index_path=target_index_path,
+                error_path=target_error_path,
+                manifest=new_manifest,
+                index_rows=index_rows,
+                errors=errors,
+            )
+            print(f"[payload] {ys}: 0/0 built={built} skipped={skipped} errors={len(errors)}")
+
     if had_errors:
         raise SystemExit(1)
 
