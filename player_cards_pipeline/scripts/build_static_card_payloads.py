@@ -61,6 +61,25 @@ def stable_hash_payload(parts: dict[str, Any]) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
+def split_section_bundles(sections_html: dict[str, str]) -> dict[str, dict[str, str]]:
+    core_keys = (
+        "grade_boxes_html",
+        "bt_percentiles_html",
+        "self_creation_html",
+        "playstyles_html",
+        "team_impact_html",
+        "shot_diet_html",
+    )
+    heavy_keys = (
+        "player_comparisons_html",
+        "draft_projection_html",
+    )
+    return {
+        "core": {key: sections_html[key] for key in core_keys if key in sections_html},
+        "heavy": {key: sections_html[key] for key in heavy_keys if key in sections_html},
+    }
+
+
 def shard_tag(chunk_index: int, chunk_count: int) -> str:
     width = max(2, len(str(max(0, chunk_count - 1))))
     return f"chunk_{chunk_index:0{width}d}_of_{chunk_count:0{width}d}"
@@ -270,8 +289,19 @@ def build_payload_for_target(
         }
     )
 
+    sections_html = {
+        "grade_boxes_html": bpc.build_grade_boxes_html(target, bt_rows),
+        "bt_percentiles_html": bpc.build_bt_percentile_html(target, bt_rows, adv_rows, []),
+        "self_creation_html": bpc.build_self_creation_html(target, bt_rows, bt_playerstat_rows, [], pbp_games_map={}),
+        "playstyles_html": bpc.build_playstyles_html(target, bt_rows),
+        "team_impact_html": bpc.build_team_impact_html(target, bt_rows),
+        "shot_diet_html": bpc.build_shot_diet_html(target, bt_rows),
+        "player_comparisons_html": bpc.build_player_comparisons_html(target, bt_rows, bio_lookup, top_n=5),
+        "draft_projection_html": bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map),
+    }
+
     return {
-        "schema_version": "card_payload_v1",
+        "schema_version": "card_sections_v2",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_hash": src_hash,
         "player": target.player,
@@ -302,16 +332,8 @@ def build_payload_for_target(
             "pps_over_expectation_line": pps_line,
             "shots": shots,
         },
-        "sections_html": {
-            "grade_boxes_html": bpc.build_grade_boxes_html(target, bt_rows),
-            "bt_percentiles_html": bpc.build_bt_percentile_html(target, bt_rows, adv_rows, []),
-            "self_creation_html": bpc.build_self_creation_html(target, bt_rows, bt_playerstat_rows, [], pbp_games_map={}),
-            "playstyles_html": bpc.build_playstyles_html(target, bt_rows),
-            "team_impact_html": bpc.build_team_impact_html(target, bt_rows),
-            "shot_diet_html": bpc.build_shot_diet_html(target, bt_rows),
-            "player_comparisons_html": bpc.build_player_comparisons_html(target, bt_rows, bio_lookup, top_n=5),
-            "draft_projection_html": bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map),
-        },
+        "section_bundles": split_section_bundles(sections_html),
+        "sections_html": sections_html,
     }
 
 
