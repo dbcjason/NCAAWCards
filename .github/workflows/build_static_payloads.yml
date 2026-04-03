@@ -27,7 +27,6 @@ on:
 
 jobs:
   build-payloads:
-    if: ${{ matrix.shard < fromJSON(github.event.inputs.chunk_count) }}
     runs-on: ubuntu-latest
     timeout-minutes: 360
     permissions:
@@ -53,6 +52,13 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install pandas
+
+      - name: Skip inactive shard
+        run: |
+          if [ "${{ matrix.shard }}" -ge "${{ github.event.inputs.chunk_count }}" ]; then
+            echo "Shard ${{ matrix.shard }} is outside requested chunk_count=${{ github.event.inputs.chunk_count }}; skipping."
+            exit 0
+          fi
 
       - name: Build shard payloads
         id: build
