@@ -4026,8 +4026,7 @@ def build_player_comparisons_html(
     target_age_raw = age_by_row.get(id(target_row))
     if len(target_vec) < 8:
         return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">Not enough data to compute comparisons.</div></div>'
-    if target_age_raw is None or not math.isfinite(target_age_raw):
-        return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">Missing target age for strict +/-1 year age comps.</div></div>'
+    enforce_age_window = target_age_raw is not None and math.isfinite(target_age_raw)
 
     def similarity(other: dict[str, str]) -> float | None:
         if row_keys.get(id(other)) == (
@@ -4036,11 +4035,12 @@ def build_player_comparisons_html(
             norm_season(target.season),
         ):
             return None
-        other_age_raw = age_by_row.get(id(other))
-        if other_age_raw is None or not math.isfinite(other_age_raw):
-            return None
-        if abs(float(other_age_raw) - float(target_age_raw)) > 1.0:
-            return None
+        if enforce_age_window:
+            other_age_raw = age_by_row.get(id(other))
+            if other_age_raw is None or not math.isfinite(other_age_raw):
+                return None
+            if abs(float(other_age_raw) - float(target_age_raw)) > 1.0:
+                return None
 
         ov = row_vectors.get(id(other), {})
         shared = [k for k in ov if k in target_vec]
