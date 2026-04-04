@@ -525,14 +525,29 @@ def run_bootstrap_worker() -> None:
     max_parallel = max(1, env_int("MAX_PARALLEL_SHARDS", chunk_count))
     years = os.getenv("YEARS", os.getenv("WARM_SEASON", "2026"))
     section_major = env_flag("SECTION_MAJOR_BOOTSTRAP", True)
+    phase_only = os.getenv("PHASE_ONLY", "").strip()
     out_dir = output_dir_path()
     parsed_years = parse_years(years.strip() or "2026")
     gender = os.getenv("PAYLOAD_SYNC_GENDER", DEFAULT_GENDER).strip().lower() or DEFAULT_GENDER
 
     print(
         f"[railway-worker] bootstrap mode chunk_count={chunk_count} "
-        f"max_parallel={max_parallel} years={years} section_major={str(section_major).lower()}"
+        f"max_parallel={max_parallel} years={years} section_major={str(section_major).lower()} "
+        f"phase_only={phase_only or 'none'}"
     )
+
+    if phase_only:
+        valid_phase_only = {"base_metadata", "finalize", *SECTION_PHASES}
+        if phase_only not in valid_phase_only:
+            raise SystemExit(f"invalid PHASE_ONLY={phase_only!r}; expected one of {sorted(valid_phase_only)}")
+        stale_years = stale_merged_years(out_dir, parsed_years, gender)
+        if stale_years:
+            print(f"[railway-worker] removing stale merged outputs years={','.join(stale_years)}")
+            cleanup_output_years(out_dir, stale_years)
+        run_phase_wave(chunk_count, max_parallel, [phase_only])
+        backup_phase_outputs_to_endpoint(DEFAULT_GENDER, phase_only, chunk_count)
+        print(f"[railway-worker] phase-only bootstrap finished phase={phase_only}")
+        return
 
     pending_years = pending_sync_years(out_dir, parsed_years, gender)
     if pending_years:

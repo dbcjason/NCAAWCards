@@ -68,6 +68,24 @@ def bart_url(bart_prefix: str, path: str) -> str:
     return f"https://barttorvik.com/{path.lstrip('/')}"
 
 
+def parse_advstats_rows(text: str) -> list[list[str]]:
+    parsed = [r for r in csv.reader(text.splitlines()) if r]
+    if parsed and not (len(parsed) == 1 and parsed[0] and parsed[0][0].lstrip().startswith("[[")):
+        return parsed
+
+    try:
+        raw = json.loads(text)
+    except Exception:
+        return []
+
+    rows: list[list[str]] = []
+    if isinstance(raw, list):
+        for item in raw:
+            if isinstance(item, list):
+                rows.append([str(v) if v is not None else "" for v in item])
+    return rows
+
+
 def refresh_advstats_2026(bt_dir: Path, bart_prefix: str) -> None:
     urls = [
         bart_url(bart_prefix, "getadvstats.php?year=2026&csv=1"),
@@ -77,7 +95,7 @@ def refresh_advstats_2026(bt_dir: Path, bart_prefix: str) -> None:
     for url in urls:
         try:
             txt = fetch_text(url)
-            parsed = [r for r in csv.reader(txt.splitlines()) if r]
+            parsed = parse_advstats_rows(txt)
             if parsed:
                 break
         except Exception:
