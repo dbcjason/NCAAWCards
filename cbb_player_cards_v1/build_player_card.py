@@ -2236,16 +2236,16 @@ def build_bpm_trend_svg(target: PlayerGameStats, adv_rows: list[dict[str, str]])
     tick_target = 7
     tick_idx = sorted({int(round(i * (n - 1) / (tick_target - 1))) for i in range(tick_target)})
     x_ticks = "".join(
-        f'<text x="{xpx(i):.1f}" y="{h-8}" text-anchor="middle" font-size="9" fill="var(--muted)">{html.escape(points_raw[i][1] or str(points_raw[i][0]))}</text>'
+        f'<text x="{xpx(i):.1f}" y="{h-8}" text-anchor="middle" font-size="9" fill="#a1a1aa">{html.escape(points_raw[i][1] or str(points_raw[i][0]))}</text>'
         for i in tick_idx
     )
     y_vals = [ymin + k * (ymax - ymin) / 4.0 for k in range(5)]
     y_ticks = "".join(
-        f'<text x="12" y="{ypx(v)+3:.1f}" text-anchor="start" font-size="9" fill="var(--muted)">{v:.1f}</text>'
+        f'<text x="12" y="{ypx(v)+3:.1f}" text-anchor="start" font-size="9" fill="#a1a1aa">{v:.1f}</text>'
         for v in y_vals
     )
     y_grid = "".join(
-        f'<line x1="{ml}" y1="{ypx(v):.1f}" x2="{w-mr}" y2="{ypx(v):.1f}" stroke="var(--line)" stroke-width="0.8" stroke-dasharray="2 2"/>'
+        f'<line x1="{ml}" y1="{ypx(v):.1f}" x2="{w-mr}" y2="{ypx(v):.1f}" stroke="#3f3f46" stroke-width="0.8" stroke-dasharray="2 2"/>'
         for v in y_vals
     )
     dots = "".join(
@@ -2255,15 +2255,15 @@ def build_bpm_trend_svg(target: PlayerGameStats, adv_rows: list[dict[str, str]])
     return f"""
 <div class="trend-wrap">
 <svg viewBox="0 0 {w} {h}" width="{w}" height="{h}" xmlns="http://www.w3.org/2000/svg">
-  <rect x="{ml}" y="{mt}" width="{w-ml-mr}" height="{h-mt-mb}" fill="var(--panel-alt)" stroke="var(--line)" stroke-width="1"/>
+  <rect x="{ml}" y="{mt}" width="{w-ml-mr}" height="{h-mt-mb}" fill="#171717" stroke="#3f3f46" stroke-width="1"/>
   {y_grid}
-  <line x1="{ml}" y1="{ypx(0):.1f}" x2="{w-mr}" y2="{ypx(0):.1f}" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3"/>
+  <line x1="{ml}" y1="{ypx(0):.1f}" x2="{w-mr}" y2="{ypx(0):.1f}" stroke="#3f3f46" stroke-width="1" stroke-dasharray="3 3"/>
   {''.join(segs)}
   {dots}
   {x_ticks}
   {y_ticks}
-  <text x="{w/2:.1f}" y="{h-1}" text-anchor="middle" font-size="9" fill="var(--muted)">Date</text>
-  <text x="6" y="{h/2:.1f}" text-anchor="start" font-size="9" fill="var(--muted)" transform="rotate(-90 6 {h/2:.1f})">BPM</text>
+  <text x="{w/2:.1f}" y="{h-1}" text-anchor="middle" font-size="9" fill="#a1a1aa">Date</text>
+  <text x="6" y="{h/2:.1f}" text-anchor="start" font-size="9" fill="#a1a1aa" transform="rotate(-90 6 {h/2:.1f})">BPM</text>
 </svg>
 </div>
 """
