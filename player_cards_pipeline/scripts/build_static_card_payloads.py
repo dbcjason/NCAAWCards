@@ -2,9 +2,14 @@
 from __future__ import annotations
 
 import argparse
+import bisect
+import gc
 import hashlib
 import json
+import os
+import resource
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -14,6 +19,27 @@ if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
 import cbb_player_cards_v1.build_player_card as bpc
+
+
+def section_log_enabled() -> bool:
+    raw = os.getenv("PAYLOAD_SECTION_LOGS", "false").strip().lower()
+    return raw in {"1", "true", "yes", "y", "on"}
+
+
+def rss_mb() -> float | None:
+    try:
+        usage = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    except Exception:
+        return None
+    if usage <= 0:
+        return None
+    if sys.platform == "darwin":
+        return float(usage) / (1024.0 * 1024.0)
+    return float(usage) / 1024.0
+
+
+def log_payload_event(message: str) -> None:
+    print(f"[payload-detail] {message}", flush=True)
 
 
 def parse_years(spec: str) -> list[str]:
@@ -148,6 +174,18 @@ def target_matches_filter(target: bpc.PlayerGameStats, target_filters: list[dict
     return False
 
 
+def dedupe_targets_by_cache_key(players: list[bpc.PlayerGameStats]) -> list[bpc.PlayerGameStats]:
+    deduped: list[bpc.PlayerGameStats] = []
+    seen: set[str] = set()
+    for player in players:
+        ck = cache_key_for_target(player)
+        if ck in seen:
+            continue
+        seen.add(ck)
+        deduped.append(player)
+    return deduped
+
+
 def load_prior_manifest(manifest_path: Path, shard_manifest_path: Path, incremental: bool) -> dict[str, str]:
     if not incremental:
         return {}
@@ -210,6 +248,21 @@ def merge_year_outputs(year_dir: Path, chunk_count: int) -> tuple[int, int]:
     return present_shards, len(merged_index_rows)
 
 
+SECTION_ORDER = [
+    "per_game_percentiles",
+    "grade_boxes_html",
+    "bt_percentiles_html",
+    "self_creation_html",
+    "playstyles_html",
+    "team_impact_html",
+    "shot_diet_html",
+    "player_comparisons_html",
+    "draft_projection_html",
+]
+
+ALL_PHASES = ["base_metadata", *SECTION_ORDER, "finalize"]
+
+
 def find_bt_row_for_target(target: bpc.PlayerGameStats, bt_rows: list[dict[str, str]]) -> dict[str, str]:
     pk = bpc.norm_player_name(target.player)
     tk = bpc.norm_team(target.team)
@@ -225,26 +278,13 @@ def find_bt_row_for_target(target: bpc.PlayerGameStats, bt_rows: list[dict[str, 
 
 
 def find_enriched_row_for_target(target: bpc.PlayerGameStats) -> dict[str, Any]:
-    players = bpc.load_enriched_players_for_script_season(target.season)
-    if not players:
+    lookup = bpc.load_enriched_lookup_for_script_season(target.season)
+    if not lookup:
         return {}
-    pk = bpc.norm_player_name(target.player)
-    tk = bpc.norm_team(target.team)
-    yk = bpc.norm_season(target.season)
-    for p in players:
-        if (
-            bpc.norm_player_name(p.get("key", "")) == pk
-            and bpc.norm_team(p.get("team", "")) == tk
-            and bpc.norm_season(p.get("year", "")) == yk
-        ):
-            return p
-    for p in players:
-        if bpc.norm_player_name(p.get("key", "")) == pk and bpc.norm_season(p.get("year", "")) == yk:
-            return p
-    return {}
+    return bpc.find_enriched_row(lookup, target.player, target.team, target.season) or {}
 
 
-def build_payload_for_target(
+def build_base_payload_for_target(
     target: bpc.PlayerGameStats,
     bt_rows: list[dict[str, str]],
     adv_rows: list[dict[str, str]],
@@ -272,8 +312,6 @@ def build_payload_for_target(
     else:
         pps_line = "Points per Shot Over Expectation: N/A"
 
-    per_game_pcts = bpc.build_per_game_percentiles(players_all, target, min_games, bt_rows=bt_rows)
-
     bio = dict(bpc.lookup_bio_fallback(bio_lookup, target.player, target.team, target.season))
     rsci_rank = rsci_map.get(bpc.norm_player_name(target.player))
     rsci_display = f"{bpc.ordinal(rsci_rank)}" if rsci_rank else "Unranked"
@@ -289,18 +327,7 @@ def build_payload_for_target(
         }
     )
 
-    sections_html = {
-        "grade_boxes_html": bpc.build_grade_boxes_html(target, bt_rows),
-        "bt_percentiles_html": bpc.build_bt_percentile_html(target, bt_rows, adv_rows, []),
-        "self_creation_html": bpc.build_self_creation_html(target, bt_rows, bt_playerstat_rows, [], pbp_games_map={}),
-        "playstyles_html": bpc.build_playstyles_html(target, bt_rows),
-        "team_impact_html": bpc.build_team_impact_html(target, bt_rows),
-        "shot_diet_html": bpc.build_shot_diet_html(target, bt_rows),
-        "player_comparisons_html": bpc.build_player_comparisons_html(target, bt_rows, bio_lookup, top_n=5),
-        "draft_projection_html": bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map),
-    }
-
-    return {
+    payload = {
         "schema_version": "card_sections_v2",
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_hash": src_hash,
@@ -323,7 +350,7 @@ def build_payload_for_target(
             "fg_pct": target.fg_pct,
             "tp_pct": target.tp_pct,
             "ft_pct": target.ft_pct,
-            "percentiles": per_game_pcts,
+            "percentiles": {},
         },
         "shot_chart": {
             "attempts": shot_attempts,
@@ -332,9 +359,157 @@ def build_payload_for_target(
             "pps_over_expectation_line": pps_line,
             "shots": shots,
         },
-        "section_bundles": split_section_bundles(sections_html),
-        "sections_html": sections_html,
+        "section_bundles": {"core": {}, "heavy": {}},
+        "sections_html": {},
     }
+    return payload
+
+
+def build_section_html(
+    section_name: str,
+    *,
+    target: bpc.PlayerGameStats,
+    bt_rows: list[dict[str, str]],
+    adv_rows: list[dict[str, str]],
+    bt_playerstat_rows: list[dict[str, Any]],
+    bio_lookup: dict[tuple[str, str, str], dict[str, str]],
+    rsci_map: dict[str, int],
+) -> str:
+    if section_name == "grade_boxes_html":
+        return bpc.build_grade_boxes_html(target, bt_rows)
+    if section_name == "bt_percentiles_html":
+        return bpc.build_bt_percentile_html(target, bt_rows, adv_rows, [])
+    if section_name == "self_creation_html":
+        return bpc.build_self_creation_html(target, bt_rows, bt_playerstat_rows, [], pbp_games_map={})
+    if section_name == "playstyles_html":
+        return bpc.build_playstyles_html(target, bt_rows)
+    if section_name == "team_impact_html":
+        return bpc.build_team_impact_html(target, bt_rows)
+    if section_name == "shot_diet_html":
+        return bpc.build_shot_diet_html(target, bt_rows)
+    if section_name == "player_comparisons_html":
+        return bpc.build_player_comparisons_html(target, bt_rows, bio_lookup, top_n=5)
+    if section_name == "draft_projection_html":
+        return bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map)
+    raise KeyError(f"Unknown section: {section_name}")
+
+
+def build_phase_value(
+    phase_name: str,
+    *,
+    target: bpc.PlayerGameStats,
+    bt_rows: list[dict[str, str]],
+    adv_rows: list[dict[str, str]],
+    bt_playerstat_rows: list[dict[str, Any]],
+    players_all: list[bpc.PlayerGameStats],
+    bio_lookup: dict[tuple[str, str, str], dict[str, str]],
+    rsci_map: dict[str, int],
+    min_games: int,
+) -> Any:
+    if phase_name == "per_game_percentiles":
+        return bpc.build_per_game_percentiles(players_all, target, min_games, bt_rows=bt_rows)
+    return build_section_html(
+        phase_name,
+        target=target,
+        bt_rows=bt_rows,
+        adv_rows=adv_rows,
+        bt_playerstat_rows=bt_playerstat_rows,
+        bio_lookup=bio_lookup,
+        rsci_map=rsci_map,
+    )
+
+
+def finalize_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    sections_html = dict(payload.get("sections_html", {}) or {})
+    payload["section_bundles"] = split_section_bundles(sections_html)
+    return payload
+
+
+def percentile_from_sorted(value: float | None, sorted_vals: list[float]) -> float | None:
+    if value is None or not sorted_vals:
+        return None
+    left = bisect.bisect_left(sorted_vals, value)
+    right = bisect.bisect_right(sorted_vals, value)
+    return 100.0 * (left + 0.5 * (right - left)) / len(sorted_vals)
+
+
+def build_per_game_percentiles_map(
+    targets: list[bpc.PlayerGameStats],
+    players_all: list[bpc.PlayerGameStats],
+    min_games: int,
+    bt_rows: list[dict[str, str]] | None = None,
+) -> dict[str, dict[str, float | None]]:
+    if not targets:
+        return {}
+    ys = bpc.norm_season(targets[0].season)
+    season_cohort = [p for p in players_all if bpc.norm_text(p.season) == ys and p.games >= min_games]
+    fallback_cohort = [p for p in players_all if p.games >= min_games]
+    if not season_cohort:
+        season_cohort = fallback_cohort
+
+    target_bucket_by_ck: dict[str, str] = {}
+    player_bucket_by_key: dict[tuple[str, str, str], str] = {}
+    if bt_rows:
+        pos_map: dict[tuple[str, str, str], str] = {}
+        for r in bt_rows:
+            p = bpc.norm_player_name(bpc.bt_get(r, ["player_name"]))
+            t = bpc.norm_team(bpc.bt_get(r, ["team"]))
+            y = bpc.norm_season(bpc.bt_get(r, ["year"]))
+            b = bpc.bt_row_position_bucket(r)
+            if p and t and y and b:
+                pos_map[(p, t, y)] = b
+        for target in targets:
+            ck = cache_key_for_target(target)
+            target_bucket_by_ck[ck] = pos_map.get((bpc.norm_player_name(target.player), bpc.norm_team(target.team), bpc.norm_season(target.season)), "")
+        for player in season_cohort:
+            player_bucket_by_key[(bpc.norm_player_name(player.player), bpc.norm_team(player.team), bpc.norm_season(player.season))] = pos_map.get(
+                (bpc.norm_player_name(player.player), bpc.norm_team(player.team), bpc.norm_season(player.season)),
+                "",
+            )
+
+    metrics = [
+        ("ppg", lambda p: p.ppg),
+        ("rpg", lambda p: p.rpg),
+        ("apg", lambda p: p.apg),
+        ("spg", lambda p: p.spg),
+        ("bpg", lambda p: p.bpg),
+        ("fg_pct", lambda p: p.fg_pct),
+        ("tp_pct", lambda p: p.tp_pct),
+        ("ft_pct", lambda p: p.ft_pct),
+    ]
+
+    cohort_by_bucket: dict[str, list[bpc.PlayerGameStats]] = {"": season_cohort}
+    for bucket in sorted({v for v in target_bucket_by_ck.values() if v}):
+        bucket_cohort = [
+            p for p in season_cohort
+            if player_bucket_by_key.get((bpc.norm_player_name(p.player), bpc.norm_team(p.team), bpc.norm_season(p.season))) == bucket
+        ]
+        cohort_by_bucket[bucket] = bucket_cohort or season_cohort
+
+    sorted_metric_values: dict[tuple[str, str], list[float]] = {}
+    for bucket, cohort in cohort_by_bucket.items():
+        for metric_name, getter in metrics:
+            sorted_metric_values[(bucket, metric_name)] = sorted(float(getter(p)) for p in cohort)
+
+    out: dict[str, dict[str, float | None]] = {}
+    for target in targets:
+        ck = cache_key_for_target(target)
+        bucket = target_bucket_by_ck.get(ck, "")
+        target_out: dict[str, float | None] = {}
+        for metric_name, getter in metrics:
+            target_out[metric_name] = percentile_from_sorted(float(getter(target)), sorted_metric_values.get((bucket, metric_name), []))
+        out[ck] = target_out
+    return out
+
+
+def resolve_phase_list(raw: str) -> list[str]:
+    if not raw.strip():
+        return list(ALL_PHASES)
+    phases = [part.strip() for part in raw.split(",") if part.strip()]
+    unknown = [phase for phase in phases if phase not in ALL_PHASES]
+    if unknown:
+        raise SystemExit(f"Unknown phase(s): {', '.join(unknown)}")
+    return phases
 
 
 def main() -> None:
@@ -353,6 +528,11 @@ def main() -> None:
         "--targets-file",
         default="",
         help="Optional JSON list of cache_keys or {player,team,season} objects for changed-player runs.",
+    )
+    ap.add_argument(
+        "--phases",
+        default="",
+        help="Optional comma-separated subset of phases to run (base_metadata, per_game_percentiles, section names, finalize).",
     )
     ap.add_argument("--merge-shards", action="store_true", help="Merge shard manifests/indexes into canonical files.")
     args = ap.parse_args()
@@ -380,6 +560,7 @@ def main() -> None:
         return
 
     target_filters = parse_targets_file(args.targets_file)
+    run_phases = resolve_phase_list(args.phases)
 
     settings = load_settings(project_root)
     bt_csv = rel_to_pipeline(project_root, settings["bt_advstats_csv"])
@@ -434,13 +615,22 @@ def main() -> None:
             except Exception:
                 bt_playerstat_rows = []
         if not bt_playerstat_rows:
-            print(f"[payload] {ys}: local playerstat JSON missing, continuing without playerstat rows")
+            bt_ps_url_template = str(settings.get("bt_playerstat_url_template", "")).strip()
+            if bt_ps_url_template:
+                try:
+                    bt_playerstat_rows = bpc.load_bt_playerstat_rows_from_source(bt_ps_url_template.format(year=ys))
+                    print(f"[payload] {ys}: loaded playerstat rows from remote template")
+                except Exception:
+                    bt_playerstat_rows = []
+        if not bt_playerstat_rows:
+            print(f"[payload] {ys}: playerstat rows unavailable, continuing without playerstat rows")
 
         adv_rows = adv_rows_by_year.get(ys, [])
         year_players = [p for p in players_all if bpc.norm_season(p.season) == ys]
         year_players = [p for p in year_players if target_matches_filter(p, target_filters)]
         year_players = [p for p in year_players if shard_for_cache_key(cache_key_for_target(p), args.chunk_count) == args.chunk_index]
         year_players = sorted(year_players, key=lambda p: (bpc.norm_team(p.team), bpc.norm_player_name(p.player)))
+        year_players = dedupe_targets_by_cache_key(year_players)
         if args.limit > 0:
             year_players = year_players[: args.limit]
 
@@ -454,25 +644,142 @@ def main() -> None:
         errors: list[dict[str, str]] = []
         built = 0
         skipped = 0
-
-        for i, target in enumerate(year_players, start=1):
+        target_records: list[dict[str, Any]] = []
+        for target in year_players:
             ck = cache_key_for_target(target)
             player_slug = slugify(target.player)
             team_slug = slugify(target.team)
             rel_path = f"{team_slug}__{player_slug}.json"
             out_path = year_dir / rel_path
+            payload: dict[str, Any] | None = None
+            if "base_metadata" not in run_phases and out_path.exists():
+                payload = load_json(out_path, {})
+                if not isinstance(payload, dict):
+                    payload = None
+            target_records.append(
+                {
+                    "target": target,
+                    "cache_key": ck,
+                    "rel_path": rel_path,
+                    "out_path": out_path,
+                    "payload": payload,
+                }
+            )
 
-            try:
-                payload = build_payload_for_target(
-                    target=target,
+        if "base_metadata" in run_phases:
+            base_started = time.perf_counter()
+            print(f"[payload] {ys}: phase=base_metadata start players={len(year_players)}")
+            for i, record in enumerate(target_records, start=1):
+                target = record["target"]
+                try:
+                    payload = build_base_payload_for_target(
+                        target=target,
+                        bt_rows=bt_rows,
+                        adv_rows=adv_rows,
+                        bt_playerstat_rows=bt_playerstat_rows,
+                        players_all=players_all,
+                        bio_lookup=bio_lookup,
+                        rsci_map=rsci_map,
+                        min_games=args.min_games,
+                    )
+                    record["payload"] = payload
+                    record["out_path"].write_text(json.dumps(payload, ensure_ascii=True, separators=(",", ":")), encoding="utf-8")
+                except Exception as exc:
+                    had_errors = True
+                    errors.append(
+                        {
+                            "player": target.player,
+                            "team": target.team,
+                            "season": ys,
+                            "cache_key": record["cache_key"],
+                            "error": str(exc),
+                        }
+                    )
+
+                if i % args.checkpoint_every == 0 or i == len(target_records):
+                    rss = rss_mb()
+                    rss_part = f" rss_mb={rss:.1f}" if rss is not None else ""
+                    print(f"[payload] {ys}: phase=base_metadata {i}/{len(year_players)} errors={len(errors)}{rss_part}")
+
+            rss = rss_mb()
+            rss_part = f" rss_mb={rss:.1f}" if rss is not None else ""
+            print(f"[payload] {ys}: phase=base_metadata finish players={len(target_records)} errors={len(errors)} elapsed_s={time.perf_counter() - base_started:.2f}{rss_part}")
+
+        phase_names = [phase for phase in SECTION_ORDER if phase in run_phases]
+        for section_name in phase_names:
+            section_started = time.perf_counter()
+            print(f"[payload] {ys}: phase={section_name} start players={len(target_records)}")
+            per_game_percentiles_map: dict[str, dict[str, float | None]] = {}
+            if section_name == "per_game_percentiles":
+                per_game_percentiles_map = build_per_game_percentiles_map(
+                    [record["target"] for record in target_records],
+                    players_all,
+                    args.min_games,
                     bt_rows=bt_rows,
-                    adv_rows=adv_rows,
-                    bt_playerstat_rows=bt_playerstat_rows,
-                    players_all=players_all,
-                    bio_lookup=bio_lookup,
-                    rsci_map=rsci_map,
-                    min_games=args.min_games,
                 )
+            for i, record in enumerate(target_records, start=1):
+                target = record["target"]
+                if not isinstance(record.get("payload"), dict):
+                    existing_payload = load_json(record["out_path"], {})
+                    record["payload"] = existing_payload if isinstance(existing_payload, dict) else {}
+                try:
+                    if section_name == "per_game_percentiles":
+                        record["payload"]["per_game"]["percentiles"] = per_game_percentiles_map.get(record["cache_key"], {})
+                    else:
+                        section_html = build_phase_value(
+                            section_name,
+                            target=target,
+                            bt_rows=bt_rows,
+                            adv_rows=adv_rows,
+                            bt_playerstat_rows=bt_playerstat_rows,
+                            players_all=players_all,
+                            bio_lookup=bio_lookup,
+                            rsci_map=rsci_map,
+                            min_games=args.min_games,
+                        )
+                        record["payload"]["sections_html"][section_name] = section_html
+                except Exception as exc:
+                    had_errors = True
+                    errors.append(
+                        {
+                            "player": target.player,
+                            "team": target.team,
+                            "season": ys,
+                            "cache_key": record["cache_key"],
+                            "error": f"{section_name}: {exc}",
+                        }
+                    )
+                    if section_name == "per_game_percentiles":
+                        record["payload"]["per_game"]["percentiles"] = {}
+                    else:
+                        record["payload"]["sections_html"][section_name] = ""
+                finally:
+                    if isinstance(record.get("payload"), dict):
+                        record["out_path"].write_text(json.dumps(record["payload"], ensure_ascii=True, separators=(",", ":")), encoding="utf-8")
+                    gc.collect()
+
+                if i % args.checkpoint_every == 0 or i == len(target_records):
+                    rss = rss_mb()
+                    rss_part = f" rss_mb={rss:.1f}" if rss is not None else ""
+                    print(f"[payload] {ys}: phase={section_name} {i}/{len(target_records)} errors={len(errors)}{rss_part}")
+
+            rss = rss_mb()
+            rss_part = f" rss_mb={rss:.1f}" if rss is not None else ""
+            elapsed = time.perf_counter() - section_started
+            print(f"[payload] {ys}: phase={section_name} finish elapsed_s={elapsed:.2f} errors={len(errors)}{rss_part}")
+
+        if "finalize" in run_phases:
+            finalize_started = time.perf_counter()
+            print(f"[payload] {ys}: phase=finalize start players={len(target_records)}")
+            for i, record in enumerate(target_records, start=1):
+                target = record["target"]
+                ck = record["cache_key"]
+                rel_path = record["rel_path"]
+                out_path = record["out_path"]
+                if not isinstance(record.get("payload"), dict):
+                    existing_payload = load_json(out_path, {})
+                    record["payload"] = existing_payload if isinstance(existing_payload, dict) else {}
+                payload = finalize_payload(record["payload"])
                 src_hash = str(payload.get("source_hash", ""))
                 new_manifest[ck] = src_hash
                 index_rows.append(
@@ -491,31 +798,26 @@ def main() -> None:
                 else:
                     out_path.write_text(json.dumps(payload, ensure_ascii=True, separators=(",", ":")), encoding="utf-8")
                     built += 1
-            except Exception as exc:
-                had_errors = True
-                errors.append(
-                    {
-                        "player": target.player,
-                        "team": target.team,
-                        "season": ys,
-                        "cache_key": ck,
-                        "error": str(exc),
-                    }
-                )
 
-            if i % args.checkpoint_every == 0 or i == len(year_players):
-                target_manifest_path = shard_manifest_path if args.write_shard_files else manifest_path
-                target_index_path = shard_index_path if args.write_shard_files else index_path
-                target_error_path = shard_error_path if args.write_shard_files else year_dir / "errors.json"
-                write_checkpoint(
-                    manifest_path=target_manifest_path,
-                    index_path=target_index_path,
-                    error_path=target_error_path,
-                    manifest=new_manifest,
-                    index_rows=index_rows,
-                    errors=errors,
-                )
-                print(f"[payload] {ys}: {i}/{len(year_players)} built={built} skipped={skipped} errors={len(errors)}")
+                if i % args.checkpoint_every == 0 or i == len(target_records):
+                    target_manifest_path = shard_manifest_path if args.write_shard_files else manifest_path
+                    target_index_path = shard_index_path if args.write_shard_files else index_path
+                    target_error_path = shard_error_path if args.write_shard_files else year_dir / "errors.json"
+                    write_checkpoint(
+                        manifest_path=target_manifest_path,
+                        index_path=target_index_path,
+                        error_path=target_error_path,
+                        manifest=new_manifest,
+                        index_rows=index_rows,
+                        errors=errors,
+                    )
+                    rss = rss_mb()
+                    rss_part = f" rss_mb={rss:.1f}" if rss is not None else ""
+                    print(f"[payload] {ys}: phase=finalize {i}/{len(target_records)} built={built} skipped={skipped} errors={len(errors)}{rss_part}")
+
+            rss = rss_mb()
+            rss_part = f" rss_mb={rss:.1f}" if rss is not None else ""
+            print(f"[payload] {ys}: phase=finalize finish built={built} skipped={skipped} errors={len(errors)} elapsed_s={time.perf_counter() - finalize_started:.2f}{rss_part}")
 
         if not year_players:
             target_manifest_path = shard_manifest_path if args.write_shard_files else manifest_path

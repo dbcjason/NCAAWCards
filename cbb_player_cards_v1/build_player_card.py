@@ -52,6 +52,20 @@ BIO_ALIAS_MAP = {
 
 CACHE_SCHEMA_VERSION = 1
 ENRICHED_GENDER = "Women"
+_ENRICHED_LOOKUP_META: dict[int, dict[str, Any]] = {}
+_ENRICHED_LOOKUP_CACHE: dict[tuple[str, str], dict[tuple[str, str, str], dict[str, Any]]] = {}
+_ENRICHED_PLAYERS_CACHE: dict[tuple[str, str], list[dict[str, Any]]] = {}
+_PPS_OE_CONTEXT_CACHE: dict[tuple[str, int], dict[str, Any]] = {}
+_BT_ROW_INDEX_CACHE: dict[int, dict[str, Any]] = {}
+_BT_COHORT_CACHE: dict[tuple[int, str], list[dict[str, str]]] = {}
+_PLAYER_COMPARISON_CACHE: dict[tuple[int, int, str, str], dict[str, Any]] = {}
+_BT_POSITION_BUCKET_CACHE: dict[int, str | None] = {}
+_BT_POSITION_FILTERED_COHORT_CACHE: dict[tuple[int, str], list[dict[str, str]]] = {}
+_BT_METRIC_VALUE_CACHE: dict[tuple[int, str], float | None] = {}
+_PER_GAME_PERCENTILE_CONTEXT_CACHE: dict[tuple[int, int | None, int, str, str], dict[str, Any]] = {}
+_GRADE_BOX_CONTEXT_CACHE: dict[tuple[int, str, str], dict[str, Any]] = {}
+_SELF_CREATION_CONTEXT_CACHE: dict[tuple[int, int, str], dict[str, Any]] = {}
+_DRAFT_PROJECTION_CONTEXT_CACHE: dict[tuple[int, int, int, int], dict[str, Any]] = {}
 
 
 def enriched_gender_token(raw: str) -> str:
@@ -307,6 +321,10 @@ def load_enriched_lookup_for_script_season(
             / "enriched_players"
             / "by_script_season"
         )
+    cache_key = (ys, str(base_dir.resolve()))
+    cached_lookup = _ENRICHED_LOOKUP_CACHE.get(cache_key)
+    if cached_lookup is not None:
+        return cached_lookup
     if not base_dir.exists():
         return {}
 
@@ -328,6 +346,7 @@ def load_enriched_lookup_for_script_season(
         return {}
     players = obj.get("players", []) if isinstance(obj, dict) else []
     out: dict[tuple[str, str, str], dict[str, Any]] = {}
+    by_player_season: dict[tuple[str, str], list[tuple[str, dict[str, Any]]]] = defaultdict(list)
     for r in players:
         if not isinstance(r, dict):
             continue
@@ -336,6 +355,9 @@ def load_enriched_lookup_for_script_season(
         if not player or not team:
             continue
         out[(player, team, ys)] = r
+        by_player_season[(player, ys)].append((team, r))
+    _ENRICHED_LOOKUP_META[id(out)] = {"by_player_season": dict(by_player_season)}
+    _ENRICHED_LOOKUP_CACHE[cache_key] = out
     return out
 
 
@@ -351,21 +373,20 @@ def find_enriched_row(
     exact = lookup.get((np, nt, ys))
     if exact:
         return exact
-    # Fallback: if a player-season is unique in enriched, use it despite team label differences.
-    player_season = [row for (p, _t, y), row in lookup.items() if p == np and y == ys]
-    if len(player_season) == 1:
-        return player_season[0]
-    if len(player_season) > 1 and nt:
-        scored = sorted(
+    meta = _ENRICHED_LOOKUP_META.get(id(lookup), {})
+    player_season_entries = list(meta.get("by_player_season", {}).get((np, ys), []))
+    if len(player_season_entries) == 1:
+        return player_season_entries[0][1]
+    if len(player_season_entries) > 1 and nt:
+        scored = [
             (
                 difflib.SequenceMatcher(None, nt, t).ratio(),
                 row,
             )
-            for (p, t, y), row in lookup.items()
-            if p == np and y == ys
-        )
+            for t, row in player_season_entries
+        ]
         if scored:
-            best_score, best_row = scored[-1]
+            best_score, best_row = max(scored, key=lambda item: item[0])
             if best_score >= 0.65:
                 return best_row
     return None
@@ -387,6 +408,10 @@ def load_enriched_players_for_script_season(
             / "enriched_players"
             / "by_script_season"
         )
+    cache_key = (ys, str(base_dir.resolve()))
+    cached_players = _ENRICHED_PLAYERS_CACHE.get(cache_key)
+    if cached_players is not None:
+        return cached_players
     if not base_dir.exists():
         return []
     year = int(ys)
@@ -406,7 +431,9 @@ def load_enriched_players_for_script_season(
     if obj is None:
         return []
     players = obj.get("players", []) if isinstance(obj, dict) else []
-    return [r for r in players if isinstance(r, dict)]
+    out = [r for r in players if isinstance(r, dict)]
+    _ENRICHED_PLAYERS_CACHE[cache_key] = out
+    return out
 
 
 def inject_enriched_fields_into_bt_rows(
@@ -588,85 +615,99 @@ def pps_over_expected_from_enriched(
     players = load_enriched_players_for_script_season(target.season)
     if not players:
         return None, None, None, None
+    ys = norm_season(target.season)
+    cache_key = (ys, id(players))
+    context = _PPS_OE_CONTEXT_CACHE.get(cache_key)
+    if context is None:
+        bin_pts: dict[str, float] = defaultdict(float)
+        bin_att: dict[str, float] = defaultdict(float)
+        player_rows: dict[tuple[str, str], dict[str, Any]] = {}
+        for p in players:
+            pk = norm_player_name(p.get("key", ""))
+            tk = norm_team(p.get("team", ""))
+            if pk and tk:
+                player_rows[(pk, tk)] = p
+            keys = _enriched_nested_value(p, "shotInfo", "data", "keys")
+            info = _enriched_nested_value(p, "shotInfo", "data", "info")
+            if not isinstance(keys, list) or not isinstance(info, list):
+                continue
+            n = min(len(keys), len(info))
+            for i in range(n):
+                rec = info[i]
+                if not isinstance(rec, list) or len(rec) < 4:
+                    continue
+                pts = to_float(rec[2])
+                att = to_float(rec[3])
+                if pts is None or att is None or att <= 0:
+                    continue
+                k = str(keys[i])
+                bin_pts[k] += float(pts)
+                bin_att[k] += float(att)
 
-    # League expected PPS by shot bin key.
-    bin_pts: dict[str, float] = defaultdict(float)
-    bin_att: dict[str, float] = defaultdict(float)
-    for p in players:
-        keys = _enriched_nested_value(p, "shotInfo", "data", "keys")
-        info = _enriched_nested_value(p, "shotInfo", "data", "info")
-        if not isinstance(keys, list) or not isinstance(info, list):
-            continue
-        n = min(len(keys), len(info))
-        for i in range(n):
-            rec = info[i]
-            if not isinstance(rec, list) or len(rec) < 4:
-                continue
-            pts = to_float(rec[2])
-            att = to_float(rec[3])
-            if pts is None or att is None or att <= 0:
-                continue
-            k = str(keys[i])
-            bin_pts[k] += float(pts)
-            bin_att[k] += float(att)
-    exp_pps_by_key = {k: (bin_pts[k] / bin_att[k]) for k in bin_att if bin_att[k] > 0}
-    if not exp_pps_by_key:
-        return None, None, None, None
+        exp_pps_by_key = {k: (bin_pts[k] / bin_att[k]) for k in bin_att if bin_att[k] > 0}
+        if not exp_pps_by_key:
+            return None, None, None, None
 
-    def player_pps_oe(p: dict[str, Any]) -> tuple[float | None, float | None, float | None]:
-        keys = _enriched_nested_value(p, "shotInfo", "data", "keys")
-        info = _enriched_nested_value(p, "shotInfo", "data", "info")
-        if not isinstance(keys, list) or not isinstance(info, list):
-            return None, None, None
-        n = min(len(keys), len(info))
-        act_pts = 0.0
-        att_sum = 0.0
-        exp_pts = 0.0
-        for i in range(n):
-            rec = info[i]
-            if not isinstance(rec, list) or len(rec) < 4:
+        player_results: dict[tuple[str, str], tuple[float | None, float | None, float | None]] = {}
+        cohort_vals: list[float] = []
+        for p in players:
+            keys = _enriched_nested_value(p, "shotInfo", "data", "keys")
+            info = _enriched_nested_value(p, "shotInfo", "data", "info")
+            if not isinstance(keys, list) or not isinstance(info, list):
                 continue
-            pts = to_float(rec[2])
-            att = to_float(rec[3])
-            if pts is None or att is None or att <= 0:
-                continue
-            k = str(keys[i])
-            exp_pps = exp_pps_by_key.get(k)
-            if exp_pps is None:
-                continue
-            act_pts += float(pts)
-            att_sum += float(att)
-            exp_pts += float(exp_pps) * float(att)
-        if att_sum <= 0:
-            return None, None, None
-        actual_pps = act_pts / att_sum
-        expected_pps = exp_pts / att_sum
-        if expected_pps <= 0:
-            return actual_pps, expected_pps, None
-        pct_change = ((actual_pps - expected_pps) / expected_pps) * 100.0
-        return actual_pps, expected_pps, pct_change
+            n = min(len(keys), len(info))
+            act_pts = 0.0
+            att_sum = 0.0
+            exp_pts = 0.0
+            for i in range(n):
+                rec = info[i]
+                if not isinstance(rec, list) or len(rec) < 4:
+                    continue
+                pts = to_float(rec[2])
+                att = to_float(rec[3])
+                if pts is None or att is None or att <= 0:
+                    continue
+                exp_pps = exp_pps_by_key.get(str(keys[i]))
+                if exp_pps is None:
+                    continue
+                act_pts += float(pts)
+                att_sum += float(att)
+                exp_pts += float(exp_pps) * float(att)
+            result: tuple[float | None, float | None, float | None]
+            if att_sum <= 0:
+                result = (None, None, None)
+            else:
+                actual_pps = act_pts / att_sum
+                expected_pps = exp_pts / att_sum
+                if expected_pps <= 0:
+                    result = (actual_pps, expected_pps, None)
+                else:
+                    pct_change = ((actual_pps - expected_pps) / expected_pps) * 100.0
+                    result = (actual_pps, expected_pps, pct_change)
+                    if math.isfinite(pct_change):
+                        cohort_vals.append(float(pct_change))
+            pk = norm_player_name(p.get("key", ""))
+            tk = norm_team(p.get("team", ""))
+            if pk and tk:
+                player_results[(pk, tk)] = result
 
-    target_row = None
-    tk = (norm_player_name(target.player), norm_team(target.team), norm_season(target.season))
-    for p in players:
-        if (
-            norm_player_name(p.get("key", "")) == tk[0]
-            and norm_team(p.get("team", "")) == tk[1]
-        ):
-            target_row = p
-            break
+        context = {
+            "player_rows": player_rows,
+            "player_results": player_results,
+            "cohort_vals": cohort_vals,
+        }
+        _PPS_OE_CONTEXT_CACHE[cache_key] = context
+
+    tk = (norm_player_name(target.player), norm_team(target.team))
+    target_row = context["player_rows"].get(tk)
     if target_row is None:
         return None, None, None, None
 
-    targ_actual, targ_expected, targ_pct = player_pps_oe(target_row)
+    targ_actual, targ_expected, targ_pct = context["player_results"].get(tk, (None, None, None))
     if targ_actual is None or targ_expected is None or targ_pct is None:
         return targ_actual, targ_expected, targ_pct, None
 
-    cohort_vals: list[float] = []
-    for p in players:
-        _, _, c = player_pps_oe(p)
-        if c is not None and math.isfinite(c):
-            cohort_vals.append(float(c))
+    cohort_vals = context["cohort_vals"]
     pctile = percentile(float(targ_pct), cohort_vals) if cohort_vals else None
     return targ_actual, targ_expected, targ_pct, pctile
 
@@ -1743,33 +1784,37 @@ def bt_num_priority(row: dict[str, str], aliases: list[str]) -> float | None:
 
 
 def bt_find_target_row(rows: list[dict[str, str]], target: PlayerGameStats) -> dict[str, str] | None:
-    np = norm_player_key(target.player)
+    np = norm_text(target.player)
     nt = norm_team(target.team)
     ny = norm_text(target.season)
-
-    by_name_year = []
-    for r in rows:
-        rp = norm_player_key(bt_get(r, ["player_name"]))
-        rt = norm_team(bt_get(r, ["team"]))
-        ry = norm_text(bt_get(r, ["year"]))
-        if rp == np and ry == ny:
-            by_name_year.append(r)
-            if rt == nt:
-                return r
+    index = _get_bt_row_index(rows)
+    exact = index["exact"].get((np, nt, ny))
+    if exact:
+        return exact
+    by_name_year = index["by_name_year"].get((np, ny), [])
     return by_name_year[0] if by_name_year else None
 
 
 def bt_cohort_for_year(rows: list[dict[str, str]], season: str) -> list[dict[str, str]]:
     ys = norm_text(season)
-    cohort = [r for r in rows if norm_text(bt_get(r, ["year"])) == ys]
+    cache_key = (id(rows), ys)
+    cohort = _BT_COHORT_CACHE.get(cache_key)
+    if cohort is None:
+        cohort = [r for r in rows if norm_text(bt_get(r, ["year"])) == ys]
+        _BT_COHORT_CACHE[cache_key] = cohort
     return cohort if cohort else rows
 
 
 def bt_row_position_bucket(row: dict[str, str]) -> str | None:
+    cached = _BT_POSITION_BUCKET_CACHE.get(id(row))
+    if id(row) in _BT_POSITION_BUCKET_CACHE:
+        return cached
     # Prefer explicit enriched roster position when available.
     rp = norm_text(bt_get(row, ["roster.pos"]))
     if rp in {"g", "f", "c"}:
-        return rp.upper()
+        bucket = rp.upper()
+        _BT_POSITION_BUCKET_CACHE[id(row)] = bucket
+        return bucket
 
     raw = " ".join(
         [
@@ -1794,11 +1839,15 @@ def bt_row_position_bucket(row: dict[str, str]) -> str | None:
     # Fallbacks for compact codes like "SPG", "PFC".
     compact = re.sub(r"[^A-Z0-9]+", "", raw)
     if "PG" in compact or "SG" in compact or "CG" in compact or compact.endswith("G"):
+        _BT_POSITION_BUCKET_CACHE[id(row)] = "G"
         return "G"
     if "SF" in compact or "PF" in compact or "WF" in compact or compact.endswith("F"):
+        _BT_POSITION_BUCKET_CACHE[id(row)] = "F"
         return "F"
     if "C" in compact:
+        _BT_POSITION_BUCKET_CACHE[id(row)] = "C"
         return "C"
+    _BT_POSITION_BUCKET_CACHE[id(row)] = None
     return None
 
 
@@ -1809,8 +1858,36 @@ def bt_position_filtered_cohort(
     target_bucket = bt_row_position_bucket(target_row)
     if not target_bucket:
         return cohort_rows
-    filtered = [r for r in cohort_rows if bt_row_position_bucket(r) == target_bucket]
+    cache_key = (id(cohort_rows), target_bucket)
+    filtered = _BT_POSITION_FILTERED_COHORT_CACHE.get(cache_key)
+    if filtered is None:
+        filtered = [r for r in cohort_rows if bt_row_position_bucket(r) == target_bucket]
+        _BT_POSITION_FILTERED_COHORT_CACHE[cache_key] = filtered
     return filtered if filtered else cohort_rows
+
+
+def _build_bt_row_index(rows: list[dict[str, str]]) -> dict[str, Any]:
+    exact: dict[tuple[str, str, str], dict[str, str]] = {}
+    by_name_year: dict[tuple[str, str], list[dict[str, str]]] = defaultdict(list)
+    for r in rows:
+        rp = norm_text(bt_get(r, ["player_name"]))
+        rt = norm_team(bt_get(r, ["team"]))
+        ry = norm_text(bt_get(r, ["year"]))
+        if not rp or not ry:
+            continue
+        if rt:
+            exact[(rp, rt, ry)] = r
+        by_name_year[(rp, ry)].append(r)
+    return {"exact": exact, "by_name_year": dict(by_name_year)}
+
+
+def _get_bt_row_index(rows: list[dict[str, str]]) -> dict[str, Any]:
+    key = id(rows)
+    cached = _BT_ROW_INDEX_CACHE.get(key)
+    if cached is None:
+        cached = _build_bt_row_index(rows)
+        _BT_ROW_INDEX_CACHE[key] = cached
+    return cached
 
 
 def pbp_find_target_row(rows: list[dict[str, str]], target: PlayerGameStats) -> dict[str, str] | None:
@@ -1945,6 +2022,46 @@ def find_bt_playerstat_row(
     return scored[0][1] if scored and scored[0][0] >= 0.55 else by_name[0]
 
 
+def build_bt_playerstat_index(
+    rows: list[dict[str, Any]],
+) -> tuple[dict[tuple[str, str], dict[str, Any]], dict[str, list[dict[str, Any]]]]:
+    exact: dict[tuple[str, str], dict[str, Any]] = {}
+    by_name: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        np = norm_player_name(row.get("player", ""))
+        nt = norm_team(row.get("team", ""))
+        if not np:
+            continue
+        by_name[np].append(row)
+        if nt and (np, nt) not in exact:
+            exact[(np, nt)] = row
+    return exact, dict(by_name)
+
+
+def find_bt_playerstat_row_indexed(
+    exact_index: dict[tuple[str, str], dict[str, Any]],
+    by_name_index: dict[str, list[dict[str, Any]]],
+    player: str,
+    team: str,
+) -> dict[str, Any] | None:
+    np = norm_player_name(player)
+    nt = norm_team(team)
+    exact = exact_index.get((np, nt))
+    if exact:
+        return exact
+    by_name = by_name_index.get(np, [])
+    if not by_name:
+        return None
+    if len(by_name) == 1:
+        return by_name[0]
+    scored = sorted(
+        ((difflib.SequenceMatcher(None, nt, norm_team(r.get("team", ""))).ratio(), r) for r in by_name),
+        key=lambda x: x[0],
+        reverse=True,
+    )
+    return scored[0][1] if scored and scored[0][0] >= 0.55 else by_name[0]
+
+
 def build_pbp_off_possessions_map(pbp_rows: list[dict[str, str]]) -> dict[tuple[str, str, str], float]:
     out: dict[tuple[str, str, str], float] = defaultdict(float)
     for r in pbp_rows:
@@ -1971,6 +2088,10 @@ def adjust_possessions_to_bart_games(
 
 
 def bt_metric_value(row: dict[str, str], key: str) -> float | None:
+    cache_key = (id(row), key)
+    if cache_key in _BT_METRIC_VALUE_CACHE:
+        return _BT_METRIC_VALUE_CACHE[cache_key]
+
     def bt_possessions_estimate(r: dict[str, str]) -> float | None:
         # Only use enrichedPlayers possessions for all possession-normalized BT stats.
         poss = bt_num(r, ["off_team_poss.value"])
@@ -1978,109 +2099,119 @@ def bt_metric_value(row: dict[str, str], key: str) -> float | None:
             return float(poss)
         return None
 
+    result: float | None
     if key == "net_rating":
         ortg = bt_num(row, ["ORtg"])
         drtg = bt_num(row, ["drtg", "DRtg", " drtg"])
         if ortg is None or drtg is None:
-            return None
-        return ortg - drtg
-    if key == "rapm":
+            result = None
+        else:
+            result = ortg - drtg
+    elif key == "rapm":
         # Interpreted as net RAPM: offense minus defense.
         off_rapm = bt_num(row, ["off_adj_rapm.value"])
         def_rapm = bt_num(row, ["def_adj_rapm.value"])
         if off_rapm is None or def_rapm is None:
-            return None
-        return float(off_rapm) - float(def_rapm)
-    if key == "onoff_net_rating":
+            result = None
+        else:
+            result = float(off_rapm) - float(def_rapm)
+    elif key == "onoff_net_rating":
         on_off = bt_num(row, ["on.off_adj_ppp.value"])
         on_def = bt_num(row, ["on.def_adj_ppp.value"])
         off_off = bt_num(row, ["off.off_adj_ppp.value"])
         off_def = bt_num(row, ["off.def_adj_ppp.value"])
         if on_off is None or on_def is None or off_off is None or off_def is None:
-            return None
-        return (float(on_off) - float(on_def)) - (float(off_off) - float(off_def))
-    if key == "net_pts":
+            result = None
+        else:
+            result = (float(on_off) - float(on_def)) - (float(off_off) - float(off_def))
+    elif key == "net_pts":
         v = bt_num(row, ["net_pts.value"])
         if v is not None:
-            return v
-        o = bt_num(row, ["net_pts.o"])
-        d = bt_num(row, ["net_pts.d"])
-        if o is None or d is None:
-            return None
-        return float(o) + float(d)
-    if key == "rim_pct":
-        return bt_num(row, ["rimmade/(rimmade+rimmiss)", " rimmade/(rimmade+rimmiss)"])
-    if key == "mid_pct":
-        return bt_num(row, ["midmade/(midmade+midmiss)", " midmade/(midmade+midmiss)"])
-    if key == "fta100_bt":
+            result = v
+        else:
+            o = bt_num(row, ["net_pts.o"])
+            d = bt_num(row, ["net_pts.d"])
+            result = None if o is None or d is None else float(o) + float(d)
+    elif key == "rim_pct":
+        result = bt_num(row, ["rimmade/(rimmade+rimmiss)", " rimmade/(rimmade+rimmiss)"])
+    elif key == "mid_pct":
+        result = bt_num(row, ["midmade/(midmade+midmiss)", " midmade/(midmade+midmiss)"])
+    elif key == "fta100_bt":
         fta = bt_num(row, ["FTA"])
         poss = bt_possessions_estimate(row)
         if fta is None or poss is None or poss <= 0:
-            return None
-        return 100.0 * float(fta) / float(poss)
-    if key == "rim_att_100_bt":
+            result = None
+        else:
+            result = 100.0 * float(fta) / float(poss)
+    elif key == "rim_att_100_bt":
         rim_att = bt_num(row, ["rimmade+rimmiss", " rimmade+rimmiss", "rimatt", " rimatt"])
         poss = bt_possessions_estimate(row)
         if rim_att is None or poss is None or poss <= 0:
-            return None
-        return 100.0 * float(rim_att) / float(poss)
-    if key == "dunks_100_bt":
+            result = None
+        else:
+            result = 100.0 * float(rim_att) / float(poss)
+    elif key == "dunks_100_bt":
         dunks_made = bt_num(row, ["dunksmade", " dunksmade"])
         poss = bt_possessions_estimate(row)
         if dunks_made is None or poss is None or poss <= 0:
-            return None
-        return 100.0 * float(dunks_made) / float(poss)
-    if key == "bpm":
+            result = None
+        else:
+            result = 100.0 * float(dunks_made) / float(poss)
+    elif key == "bpm":
         # Use game-BPM columns from Bart exports per user preference.
-        return bt_num_priority(row, ["gbpm", "GBPM", " gbpm", "bpm", "BPM", " bpm"])
-    if key == "obpm":
-        return bt_num(row, ["obpm", "OBPM", "Obpm", " obpm"])
-    if key == "dbpm":
+        result = bt_num_priority(row, ["gbpm", "GBPM", " gbpm", "bpm", "BPM", " bpm"])
+    elif key == "obpm":
+        result = bt_num(row, ["obpm", "OBPM", "Obpm", " obpm"])
+    elif key == "dbpm":
         # Use defensive game-BPM columns from Bart exports per user preference.
-        return bt_num_priority(row, ["dgbpm", "DGBPM", " dgbpm", "dbpm", "DBPM", "Dbpm", " dbpm"])
-    if key == "rim_assists_100_btposs":
+        result = bt_num_priority(row, ["dgbpm", "DGBPM", " dgbpm", "dbpm", "DBPM", "Dbpm", " dbpm"])
+    elif key == "rim_assists_100_btposs":
         poss = bt_possessions_estimate(row)
         if poss is None or poss <= 0:
-            return None
+            result = None
+        else:
+            ast_total = bt_num(row, ["AST_total", "ast_total", "assists", "AST", "ast"])
+            gp = bt_num(row, ["GP", "gp"])
+            if ast_total is not None and gp is not None and gp > 0:
+                ast_total = float(ast_total) * float(gp)
+            if ast_total is None:
+                result = None
+            else:
+                rim_ast_pct = bt_num(row, ["off_ast_rim.value", "off_ast_rim.old_value", "off_ast_rim"])
+                if rim_ast_pct is None:
+                    result = None
+                else:
+                    p = float(rim_ast_pct) / 100.0 if float(rim_ast_pct) > 1.0 else float(rim_ast_pct)
+                    p = max(0.0, min(1.0, p))
+                    rim_ast_total = float(ast_total) * p
+                    result = 100.0 * rim_ast_total / float(poss)
+    else:
+        key_aliases = {
+            "bpm": ["bpm", " bpm"],
+            "obpm": ["obpm", " obpm"],
+            "dbpm": ["dbpm", " dbpm"],
+            "usg": ["usg"],
+            "ts_per": ["TS_per"],
+            "twop_per": ["twoP_per"],
+            "dunksmade": ["dunksmade", " dunksmade"],
+            "tp_per": ["TP_per"],
+            "threepa100": ["3p/100?"],
+            "ft_per": ["FT_per"],
+            "ftr": ["ftr"],
+            "ast_per": ["AST_per"],
+            "to_per": ["TO_per"],
+            "ast_tov": ["ast/tov", " ast/tov"],
+            "stl_per": ["stl_per"],
+            "blk_per": ["blk_per"],
+            "orb_per": ["ORB_per"],
+            "drb_per": ["DRB_per"],
+            "possessions": ["possessions", " possessions"],
+        }
+        aliases = key_aliases.get(key, [key])
+        result = bt_num(row, aliases)
 
-        ast_total = bt_num(row, ["AST_total", "ast_total", "assists", "AST", "ast"])
-        gp = bt_num(row, ["GP", "gp"])
-        if ast_total is not None and gp is not None and gp > 0:
-            # In this pipeline AST/ast is typically per-game; convert to season total assists.
-            ast_total = float(ast_total) * float(gp)
-        if ast_total is None:
-            return None
-
-        rim_ast_pct = bt_num(row, ["off_ast_rim.value", "off_ast_rim.old_value", "off_ast_rim"])
-        if rim_ast_pct is None:
-            return None
-        p = float(rim_ast_pct) / 100.0 if float(rim_ast_pct) > 1.0 else float(rim_ast_pct)
-        p = max(0.0, min(1.0, p))
-        rim_ast_total = float(ast_total) * p
-        return 100.0 * rim_ast_total / float(poss)
-    key_aliases = {
-        "bpm": ["bpm", " bpm"],
-        "obpm": ["obpm", " obpm"],
-        "dbpm": ["dbpm", " dbpm"],
-        "usg": ["usg"],
-        "ts_per": ["TS_per"],
-        "twop_per": ["twoP_per"],
-        "dunksmade": ["dunksmade", " dunksmade"],
-        "tp_per": ["TP_per"],
-        "threepa100": ["3p/100?"],
-        "ft_per": ["FT_per"],
-        "ftr": ["ftr"],
-        "ast_per": ["AST_per"],
-        "to_per": ["TO_per"],
-        "ast_tov": ["ast/tov", " ast/tov"],
-        "stl_per": ["stl_per"],
-        "blk_per": ["blk_per"],
-        "orb_per": ["ORB_per"],
-        "drb_per": ["DRB_per"],
-        "possessions": ["possessions", " possessions"],
-    }
-    aliases = key_aliases.get(key, [key])
-    return bt_num(row, aliases)
+    _BT_METRIC_VALUE_CACHE[cache_key] = result
+    return result
 
 
 def bt_metric_percentile(
@@ -2119,6 +2250,119 @@ def bt_display_blk_pct(value: float | None) -> float | None:
     if abs(value) >= 10.0:
         return value * 0.01
     return value
+
+
+def _build_grade_box_context(
+    bt_rows: list[dict[str, str]],
+    season: str,
+    target_bucket: str,
+    categories: list[tuple[str, list[str]]],
+) -> dict[str, Any]:
+    cohort = bt_cohort_for_year(bt_rows, season)
+    if target_bucket:
+        filtered = [r for r in cohort if bt_row_position_bucket(r) == target_bucket]
+        if filtered:
+            cohort = filtered
+
+    metric_vals_by_key: dict[str, list[float]] = {}
+    for _label, keys in categories:
+        for key in keys:
+            if key in metric_vals_by_key:
+                continue
+            vals: list[float] = []
+            for r in cohort:
+                v = bt_metric_value(r, key)
+                if v is not None and math.isfinite(v):
+                    vals.append(v)
+            metric_vals_by_key[key] = vals
+
+    category_scores_by_label: dict[str, dict[int, float]] = {}
+    category_cohort_scores: dict[str, list[float]] = {}
+    for label, keys in categories:
+        row_scores: dict[int, float] = {}
+        cohort_scores: list[float] = []
+        for row in cohort:
+            pcts: list[float] = []
+            for key in keys:
+                vals = metric_vals_by_key.get(key, [])
+                if not vals:
+                    continue
+                v = bt_metric_value(row, key)
+                if v is None or not math.isfinite(v):
+                    continue
+                p = percentile(v, vals)
+                if key == "to_per":
+                    p = 100.0 - p
+                pcts.append(p)
+            if not pcts:
+                continue
+            score = sum(pcts) / len(pcts)
+            row_scores[id(row)] = score
+            cohort_scores.append(score)
+        category_scores_by_label[label] = row_scores
+        category_cohort_scores[label] = cohort_scores
+
+    return {
+        "category_scores_by_label": category_scores_by_label,
+        "category_cohort_scores": category_cohort_scores,
+    }
+
+
+def _build_self_creation_context(
+    target: PlayerGameStats,
+    bt_rows: list[dict[str, str]],
+    bt_playerstat_rows: list[dict[str, Any]],
+) -> dict[str, Any]:
+    exact_ps_index, by_name_ps_index = build_bt_playerstat_index(bt_playerstat_rows)
+    enriched_lookup = load_enriched_lookup_for_script_season(target.season)
+    poss_cache: dict[tuple[str, str, str], float | None] = {}
+
+    def enriched_off_poss(player_name: str, team_name: str, season: str) -> float | None:
+        key = (norm_player_name(player_name), norm_team(team_name), norm_season(season))
+        if key in poss_cache:
+            return poss_cache[key]
+        er = find_enriched_row(enriched_lookup, player_name, team_name, season)
+        if not er:
+            poss_cache[key] = None
+            return None
+        v = to_float(_enriched_nested_value(er, "off_team_poss", "value"))
+        if v is None or not math.isfinite(v) or v <= 0:
+            poss_cache[key] = None
+            return None
+        poss_cache[key] = float(v)
+        return poss_cache[key]
+
+    metric_vals: dict[str, list[float]] = defaultdict(list)
+    metrics_by_key: dict[tuple[str, str, str], dict[str, float]] = {}
+    cohort_bt = bt_cohort_for_year(bt_rows, target.season)
+    for r in cohort_bt:
+        player_name = bt_get(r, ["player_name"])
+        team_name = bt_get(r, ["team"])
+        season = bt_get(r, ["year"])
+        ps = find_bt_playerstat_row_indexed(
+            exact_ps_index,
+            by_name_ps_index,
+            player_name,
+            team_name,
+        )
+        if not ps:
+            continue
+        poss = enriched_off_poss(player_name, team_name, season)
+        m = bt_playerstat_metrics_from_row(ps, poss)
+        if not m:
+            continue
+        player_key = (norm_player_name(player_name), norm_team(team_name), norm_season(season))
+        metrics_by_key[player_key] = m
+        for k, v in m.items():
+            if math.isfinite(v):
+                metric_vals[k].append(v)
+
+    return {
+        "exact_ps_index": exact_ps_index,
+        "by_name_ps_index": by_name_ps_index,
+        "metric_vals": dict(metric_vals),
+        "metrics_by_key": metrics_by_key,
+    }
 
 
 def bt_row_html(
@@ -2366,10 +2610,17 @@ def build_grade_boxes_html(target: PlayerGameStats, bt_rows: list[dict[str, str]
             f'<div class="grade-chip"><div class="grade-k">{html.escape(label)}</div><div class="grade-v">--</div></div>'
             for label, _ in categories
         )
-    cohort = bt_position_filtered_cohort(bt_cohort_for_year(bt_rows, target.season), target_row)
+    target_bucket = bt_row_position_bucket(target_row) or ""
+    cache_key = (id(bt_rows), norm_season(target.season), target_bucket)
+    ctx = _GRADE_BOX_CONTEXT_CACHE.get(cache_key)
+    if ctx is None:
+        ctx = _build_grade_box_context(bt_rows, target.season, target_bucket, categories)
+        _GRADE_BOX_CONTEXT_CACHE[cache_key] = ctx
     chips = []
     for label, keys in categories:
-        p = bt_category_percentile(target_row, cohort, keys)
+        target_score = ctx["category_scores_by_label"].get(label, {}).get(id(target_row))
+        cohort_scores = ctx["category_cohort_scores"].get(label, [])
+        p = percentile(target_score, cohort_scores) if target_score is not None and cohort_scores else None
         g = grade_from_percentile(p)
         chips.append(
             f'<div class="grade-chip"><div class="grade-k">{html.escape(label)}</div><div class="grade-v">{g}</div></div>'
@@ -2503,39 +2754,21 @@ def build_self_creation_html(
     if not bt_playerstat_rows:
         return '<div class="panel"><h3>Self Creation</h3><div class="shot-meta">No Bart playerstat JSON loaded.</div></div>'
     target_bt = bt_find_target_row(bt_rows, target) if bt_rows else None
-    target_ps = find_bt_playerstat_row(bt_playerstat_rows, target.player, target.team)
+    cache_key = (id(bt_rows), id(bt_playerstat_rows), norm_season(target.season))
+    ctx = _SELF_CREATION_CONTEXT_CACHE.get(cache_key)
+    if ctx is None:
+        ctx = _build_self_creation_context(target, bt_rows, bt_playerstat_rows)
+        _SELF_CREATION_CONTEXT_CACHE[cache_key] = ctx
+    exact_ps_index = ctx["exact_ps_index"]
+    by_name_ps_index = ctx["by_name_ps_index"]
+    target_ps = find_bt_playerstat_row_indexed(exact_ps_index, by_name_ps_index, target.player, target.team)
     if not target_bt or not target_ps:
         return '<div class="panel"><h3>Self Creation</h3><div class="shot-meta">No matching player/team/season in Bart playerstat JSON.</div></div>'
-
-    enriched_lookup = load_enriched_lookup_for_script_season(target.season)
-
-    def enriched_off_poss(player_name: str, team_name: str, season: str) -> float | None:
-        er = find_enriched_row(enriched_lookup, player_name, team_name, season)
-        if not er:
-            return None
-        v = to_float(_enriched_nested_value(er, "off_team_poss", "value"))
-        if v is None or not math.isfinite(v) or v <= 0:
-            return None
-        return float(v)
-
-    target_poss = enriched_off_poss(target.player, target.team, target.season)
-    target_metrics = bt_playerstat_metrics_from_row(target_ps, target_poss)
+    target_key = (norm_player_name(target.player), norm_team(target.team), norm_season(target.season))
+    target_metrics = ctx["metrics_by_key"].get(target_key)
     if not target_metrics:
         return '<div class="panel"><h3>Self Creation</h3><div class="shot-meta">Missing enriched off_team_poss.value for self-creation normalization.</div></div>'
-
-    cohort_bt = bt_cohort_for_year(bt_rows, target.season)
-    metric_vals: dict[str, list[float]] = defaultdict(list)
-    for r in cohort_bt:
-        ps = find_bt_playerstat_row(bt_playerstat_rows, bt_get(r, ["player_name"]), bt_get(r, ["team"]))
-        if not ps:
-            continue
-        poss = enriched_off_poss(bt_get(r, ["player_name"]), bt_get(r, ["team"]), bt_get(r, ["year"]))
-        m = bt_playerstat_metrics_from_row(ps, poss)
-        if not m:
-            continue
-        for k, v in m.items():
-            if math.isfinite(v):
-                metric_vals[k].append(v)
+    metric_vals = ctx["metric_vals"]
 
     rows_html = ""
     specs = [
@@ -3653,6 +3886,105 @@ def _bio_age_height_for_row(row: dict[str, str], bio_lookup: dict[tuple[str, str
     return age_val, height_val
 
 
+def _build_player_comparison_context(
+    bt_rows: list[dict[str, str]],
+    bio_lookup: dict[tuple[str, str, str], dict[str, str]],
+    season: str,
+    target_bucket: str,
+    metric_keys: list[str],
+) -> dict[str, Any]:
+    bt_rows_pool = [
+        r for r in bt_rows
+        if (norm_season(bt_get(r, ["year"])).isdigit() and int(norm_season(bt_get(r, ["year"]))) >= 2019)
+    ]
+    if target_bucket:
+        by_pos = [r for r in bt_rows_pool if bt_row_position_bucket(r) == target_bucket]
+        if by_pos:
+            bt_rows_pool = by_pos
+
+    by_year: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for r in bt_rows_pool:
+        by_year[norm_season(bt_get(r, ["year"]))].append(r)
+
+    def build_pct_lookup(items: list[tuple[int, float]]) -> dict[int, float]:
+        if not items:
+            return {}
+        n = len(items)
+        s = sorted(items, key=lambda x: x[1])
+        out: dict[int, float] = {}
+        i = 0
+        while i < n:
+            j = i + 1
+            while j < n and s[j][1] == s[i][1]:
+                j += 1
+            p = 100.0 * (i + 0.5 * (j - i)) / n
+            for k in range(i, j):
+                out[s[k][0]] = p
+            i = j
+        return out
+
+    metric_pct_map: dict[tuple[str, str], dict[int, float]] = {}
+    for year, rows in by_year.items():
+        for key in metric_keys:
+            vals: list[tuple[int, float]] = []
+            for r in rows:
+                v = bt_metric_value(r, key)
+                if v is None or not math.isfinite(v):
+                    continue
+                vals.append((id(r), float(v)))
+            mp = build_pct_lookup(vals)
+            if key == "to_per":
+                mp = {rk: 100.0 - pv for rk, pv in mp.items()}
+            metric_pct_map[(year, key)] = mp
+
+    age_by_row: dict[int, float] = {}
+    hgt_by_row: dict[int, float] = {}
+    for r in bt_rows_pool:
+        age_v, h_v = _bio_age_height_for_row(r, bio_lookup)
+        if age_v is not None and math.isfinite(age_v):
+            age_by_row[id(r)] = age_v
+        if h_v is not None and math.isfinite(h_v):
+            hgt_by_row[id(r)] = h_v
+
+    age_pct_map: dict[str, dict[int, float]] = {}
+    hgt_pct_map: dict[str, dict[int, float]] = {}
+    for year, rows in by_year.items():
+        age_items = [(id(r), age_by_row[id(r)]) for r in rows if id(r) in age_by_row]
+        hgt_items = [(id(r), hgt_by_row[id(r)]) for r in rows if id(r) in hgt_by_row]
+        age_pct_map[year] = build_pct_lookup(age_items)
+        hgt_pct_map[year] = build_pct_lookup(hgt_items)
+
+    row_vectors: dict[int, dict[str, float]] = {}
+    row_keys: dict[int, tuple[str, str, str]] = {}
+    for r in bt_rows_pool:
+        rid = id(r)
+        year = norm_season(bt_get(r, ["year"]))
+        vec: dict[str, float] = {}
+        for key in metric_keys:
+            p = metric_pct_map.get((year, key), {}).get(rid)
+            if p is not None:
+                vec[key] = float(p)
+        age_pct = age_pct_map.get(year, {}).get(rid)
+        if age_pct is not None:
+            vec["age_pct"] = float(age_pct)
+        hgt_pct = hgt_pct_map.get(year, {}).get(rid)
+        if hgt_pct is not None:
+            vec["height_pct"] = float(hgt_pct)
+        row_vectors[rid] = vec
+        row_keys[rid] = (
+            norm_player_name(bt_get(r, ["player_name"])),
+            norm_team(bt_get(r, ["team"])),
+            norm_season(bt_get(r, ["year"])),
+        )
+
+    return {
+        "bt_rows_pool": bt_rows_pool,
+        "row_vectors": row_vectors,
+        "age_by_row": age_by_row,
+        "row_keys": row_keys,
+    }
+
+
 def build_player_comparisons_html(
     target: PlayerGameStats,
     bt_rows: list[dict[str, str]],
@@ -3676,115 +4008,45 @@ def build_player_comparisons_html(
         # Defense/Rebounding
         "stl_per", "blk_per", "dbpm", "orb_per", "drb_per",
     ]
-
-    # Build per-season cohorts once (comparison pool: 2019+).
-    bt_rows_pool = [r for r in bt_rows if (norm_season(bt_get(r, ["year"])).isdigit() and int(norm_season(bt_get(r, ["year"]))) >= 2019)]
+    target_bucket = bt_row_position_bucket(target_row)
+    cache_key = (id(bt_rows), id(bio_lookup), norm_season(target.season), target_bucket or "")
+    ctx = _PLAYER_COMPARISON_CACHE.get(cache_key)
+    if ctx is None:
+        ctx = _build_player_comparison_context(bt_rows, bio_lookup, target.season, target_bucket or "", metric_keys)
+        _PLAYER_COMPARISON_CACHE[cache_key] = ctx
+    bt_rows_pool: list[dict[str, str]] = list(ctx["bt_rows_pool"])
     if target_row not in bt_rows_pool:
         bt_rows_pool.append(target_row)
-    # Keep player comps position-consistent (G/F/C) now that percentiles are position-based.
-    target_bucket = bt_row_position_bucket(target_row)
-    if target_bucket:
-        by_pos = [r for r in bt_rows_pool if bt_row_position_bucket(r) == target_bucket]
-        if by_pos:
-            bt_rows_pool = by_pos
-    by_year: dict[str, list[dict[str, str]]] = defaultdict(list)
-    for r in bt_rows_pool:
-        by_year[norm_season(bt_get(r, ["year"]))].append(r)
-
-    def build_pct_lookup(items: list[tuple[int, float]]) -> dict[int, float]:
-        # Percentile with midrank tie handling in O(n log n).
-        if not items:
-            return {}
-        n = len(items)
-        s = sorted(items, key=lambda x: x[1])
-        out: dict[int, float] = {}
-        i = 0
-        while i < n:
-            j = i + 1
-            while j < n and s[j][1] == s[i][1]:
-                j += 1
-            p = 100.0 * (i + 0.5 * (j - i)) / n
-            for k in range(i, j):
-                out[s[k][0]] = p
-            i = j
-        return out
-
-    # Precompute metric percentile lookup maps by year/key.
-    metric_pct_map: dict[tuple[str, str], dict[int, float]] = {}
-    for year, rows in by_year.items():
-        for key in metric_keys:
-            vals: list[tuple[int, float]] = []
-            for r in rows:
-                v = bt_metric_value(r, key)
-                if v is None or not math.isfinite(v):
-                    continue
-                vals.append((id(r), float(v)))
-            mp = build_pct_lookup(vals)
-            if key == "to_per":
-                mp = {rk: 100.0 - pv for rk, pv in mp.items()}
-            metric_pct_map[(year, key)] = mp
-
-    def metric_pct_for_row(r: dict[str, str], key: str) -> float | None:
-        year = norm_season(bt_get(r, ["year"]))
-        return metric_pct_map.get((year, key), {}).get(id(r))
-
-    hgt_by_row: dict[int, float] = {}
-    for r in bt_rows_pool:
-        _age_v, h_v = _bio_age_height_for_row(r, bio_lookup)
-        if h_v is not None and math.isfinite(h_v):
-            hgt_by_row[id(r)] = h_v
-
-    hgt_pct_map: dict[str, dict[int, float]] = {}
-    for year, rows in by_year.items():
-        hgt_items = [(id(r), hgt_by_row[id(r)]) for r in rows if id(r) in hgt_by_row]
-        hgt_pct_map[year] = build_pct_lookup(hgt_items)
-
-    def hgt_pct_for_row(r: dict[str, str]) -> float | None:
-        year = norm_season(bt_get(r, ["year"]))
-        return hgt_pct_map.get(year, {}).get(id(r))
+    row_vectors: dict[int, dict[str, float]] = ctx["row_vectors"]
+    age_by_row: dict[int, float] = ctx["age_by_row"]
+    row_keys: dict[int, tuple[str, str, str]] = ctx["row_keys"]
 
     target_vec: dict[str, float] = {}
-    for k in metric_keys:
-        p = metric_pct_for_row(target_row, k)
-        if p is not None:
-            target_vec[k] = p
-    tp_hgt = hgt_pct_for_row(target_row)
-    if tp_hgt is not None:
-        target_vec["height_pct"] = tp_hgt
-
+    target_vec.update(row_vectors.get(id(target_row), {}))
+    target_age_raw = age_by_row.get(id(target_row))
     if len(target_vec) < 8:
         return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">Not enough data to compute comparisons.</div></div>'
+    if target_age_raw is None or not math.isfinite(target_age_raw):
+        return '<div class="panel"><h3>Player Comparisons</h3><div class="shot-meta">Missing target age for strict +/-1 year age comps.</div></div>'
 
     def similarity(other: dict[str, str]) -> float | None:
-        # Exclude exact same player-season.
-        if (
-            norm_player_name(bt_get(other, ["player_name"])) == norm_player_name(target.player)
-            and norm_team(bt_get(other, ["team"])) == norm_team(target.team)
-            and norm_season(bt_get(other, ["year"])) == norm_season(target.season)
+        if row_keys.get(id(other)) == (
+            norm_player_name(target.player),
+            norm_team(target.team),
+            norm_season(target.season),
         ):
             return None
+        other_age_raw = age_by_row.get(id(other))
+        if other_age_raw is None or not math.isfinite(other_age_raw):
+            return None
+        if abs(float(other_age_raw) - float(target_age_raw)) > 1.0:
+            return None
 
-        keys = list(metric_keys)
-        ov: dict[str, float] = {}
-        for k in keys:
-            tv = target_vec.get(k)
-            if tv is None:
-                continue
-            pv = metric_pct_for_row(other, k)
-            if pv is None:
-                continue
-            ov[k] = pv
-
-        if "height_pct" in target_vec:
-            pv = hgt_pct_for_row(other)
-            if pv is not None:
-                ov["height_pct"] = pv
-
+        ov = row_vectors.get(id(other), {})
         shared = [k for k in ov if k in target_vec]
         if len(shared) < 8:
             return None
 
-        # Percentile-space similarity: 100 - average absolute percentile gap.
         diffs = [abs(float(target_vec[k]) - float(ov[k])) for k in shared]
         score = 100.0 - (sum(diffs) / len(diffs))
         return max(0.0, min(100.0, score))
