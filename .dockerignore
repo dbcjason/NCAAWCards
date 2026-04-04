@@ -1,0 +1,24 @@
+.git
+.github
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+
+# Local caches and generated outputs.
+player_cards_pipeline/output/
+player_cards_pipeline/public/cards/
+player_cards_pipeline/data/cache/
+player_cards_pipeline/data/.cache/
+
+# Large source archives not needed by Railway workers.
+player_cards_pipeline/data/bt/raw_advgames_json/
+player_cards_pipeline/data/bt/advgames_labeled/
+player_cards_pipeline/data/bt/raw_playerstat_json/
+player_cards_pipeline/data/manual/plays_by_year/
+player_cards_pipeline/data/manual/pbp_metrics/
+player_cards_pipeline/data/manual/enriched_players/dropbox_history_source/
+player_cards_pipeline/data/manual/enriched_players/dropbox_2025_source/
+player_cards_pipeline/data/manual/enriched_players/by_json_year/
