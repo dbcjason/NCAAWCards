@@ -722,6 +722,8 @@ def main() -> None:
                 if not isinstance(record.get("payload"), dict):
                     existing_payload = load_json(record["out_path"], {})
                     record["payload"] = existing_payload if isinstance(existing_payload, dict) else {}
+                record["payload"].setdefault("per_game", {})
+                record["payload"].setdefault("sections_html", {})
                 try:
                     if section_name == "per_game_percentiles":
                         record["payload"]["per_game"]["percentiles"] = per_game_percentiles_map.get(record["cache_key"], {})
