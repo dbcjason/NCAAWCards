@@ -471,8 +471,17 @@ def backup_phase_outputs_to_endpoint(default_gender: str, phase_name: str, chunk
         return
     timeout_seconds = max(5, env_int("PAYLOAD_SYNC_TIMEOUT_SECONDS", 120))
     rows = build_phase_backup_rows(default_gender, phase_name, chunk_count)
-    print(f"[railway-worker] phase backup start endpoint={endpoint} phase={phase_name} chunks={len(rows)}")
-    post_sync_batch(endpoint, token, rows, timeout_seconds)
+    batch_size = max(1, env_int("PAYLOAD_PHASE_BACKUP_BATCH_SIZE", 1))
+    print(
+        f"[railway-worker] phase backup start endpoint={endpoint} phase={phase_name} "
+        f"chunks={len(rows)} batch_size={batch_size}"
+    )
+    sent = 0
+    for start in range(0, len(rows), batch_size):
+        batch = rows[start : start + batch_size]
+        post_sync_batch(endpoint, token, batch, timeout_seconds)
+        sent += len(batch)
+        print(f"[railway-worker] phase backup progress phase={phase_name} chunks={sent}/{len(rows)}")
     print(f"[railway-worker] phase backup finished phase={phase_name} chunks={len(rows)}")
 
 
