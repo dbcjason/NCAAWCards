@@ -88,7 +88,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Jyah LoVett,Arizona St.,B12,Junior,B,C,A,B,A-,C,C,B-,C+,A+,A+,A-,B+,B+,B,B,B+,A-,A,B,B,A+,A-,C-,A,B+,A-,C,A,B+,A+,B,B+
 2026,Martina Fantini,Arizona St.,B12,Freshman,C+,C,B+,B-,A-,C,C,C+,B,A-,A-,C,B-,B-,B,B+,A-,B,B+,B,B-,A,B,C+,B+,B,B,C,B+,B+,A,C,B+
 2026,McKinna Brackens,Arizona St.,B12,Sophomore,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B-,A+,A,A+,B,A+,A,A+,A,A
-2026,Ashlynn Chlarson,Arkansas,SEC,Junior,C+,D+,B-,C+,B,D+,D+,C,D+,A,A-,C+,B-,C+,B-,B-,B,B,B-,C+,C+,B+,C+,D,B-,B-,C+,D,B-,B-,B-,C+,B-
+2026,Ashlynn Chlarson,Arkansas,SEC,Junior,C+,D+,B-,C+,B,D+,D+,C,C-,A,A-,C+,B-,C+,B-,B-,B,B,B-,C+,C+,B+,C+,D,B-,B-,C+,D,B-,B-,B-,C+,B-
 2026,Bonnie Deas,Arkansas,SEC,Freshman,B-,C-,A-,B-,B+,C-,C,C+,C+,A+,A,B+,B,B,B,B,A-,B+,A,B,B,A,B+,D+,A-,B+,B+,C-,A-,B+,A-,B,B
 2026,Cristina Sánchez Cerqueira,Arkansas,SEC,Junior,C,D+,C+,C,B,D+,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,C+,B-,B,C+,C-,C+,C+,C,C-,C+,B,A-,D+,B
 2026,Danika Galea,Arkansas,SEC,Sophomore,C+,C-,B,C+,A-,C-,C,C+,B,B+,A-,C,B-,B-,B-,B,A-,B,B,B,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
@@ -98,7 +98,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Jenna Lawrence,Arkansas,SEC,Junior,B+,C+,A+,A-,A,C+,C+,B,B-,A+,A+,A+,A-,A,B+,B+,A-,A,A+,A-,B+,A+,A+,C+,A+,A-,A+,C+,A+,A-,A+,B+,A-
 2026,Maria Anais Rodriguez,Arkansas,SEC,Sophomore,C+,D,B+,C,B-,D,D+,C-,D+,A-,A-,C,C+,C+,B-,B-,B+,B-,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
 2026,Maryn Archer,Arkansas,SEC,Junior,C+,C-,B,C+,A-,C-,C,C+,B,B+,A-,C,B-,B-,C+,B,A-,B,B,B-,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
-2026,Indiya Bowen,Arkansas Pine Bluff,SWAC,Junior,D,F,C+,D-,C-,F,F,D-,D-,B-,C+,C,D,C,D+,C-,C+,C-,B-,D,D,B,C+,F,C+,D+,C,F,C+,D+,B-,D,D+
+2026,Indiya Bowen,Arkansas Pine Bluff,SWAC,Junior,D,F,C+,D-,C-,F,F,D-,D-,B-,C+,C,D,C,D+,C-,C+,C-,B-,D,D+,B,C+,F,C+,D+,C,F,C+,D+,B-,D,D+
 2026,Jailah Pelly,Arkansas Pine Bluff,SWAC,Junior,D+,D-,B-,D,C,D-,D-,D,D,B+,B-,C+,D+,C+,C-,C,B-,C+,B,D+,D+,B+,B-,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Jakyra Jackson,Arkansas Pine Bluff,SWAC,Freshman,D,D-,C,D,C-,D-,D-,D-,D-,B,C+,C-,D,C-,D+,C-,C,C,C+,D+,D+,B-,C,F,C,D+,C-,F,C,D+,C+,D,D+
 2026,Jasmine Davis,Arkansas Pine Bluff,SWAC,Junior,D-,F,D+,F,D-,F,F,F,F,C-,D+,D,D-,D,D,D,C-,D,C-,D-,D-,C+,D+,F,D+,D-,D+,F,D+,D-,C-,D-,D-
@@ -248,22 +248,22 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Ally Carman,Buffalo,MAC,Junior,C-,D+,D,C-,B,D,D+,C-,C+,B,B,D+,C,C,C+,B-,B,C+,D+,C+,C+,C-,D,D+,D,C,D,D+,D,B,B+,D,C+
 2026,Amber Howard,Buffalo,MAC,Sophomore,D,D-,D+,D,C-,D-,D-,D-,D-,B,C+,D,D,D,C-,C-,D+,C,D+,D+,D+,C,D,F,D+,D+,D,F,D+,D+,C-,D,D+
 2026,Aniya Rowe,Buffalo,MAC,Sophomore,D+,D-,B-,D,C,D-,D-,D,D,B+,B-,C+,D+,B,C,C,B-,C+,B,D+,D+,B+,B-,D-,B-,C-,B-,F,B-,C,B,D+,C-
-2026,Deana Thompson,Buffalo,MAC,Freshman,D+,D-,C-,D,C,D-,D-,D,D-,B,B-,D+,D+,D+,C-,C,C,C,C,D+,D+,B-,C-,D-,C-,C-,C-,F,C-,C-,C,D+,D+
+2026,Deana Thompson,Buffalo,MAC,Freshman,D+,D-,C-,D,C,D-,D-,D,D-,B,B-,D+,D,D+,C-,C,C,C,C,D+,D+,B-,C-,D-,C-,C-,C-,F,C-,C-,C,D+,D+
 2026,Diann Jackson,Buffalo,MAC,Freshman,D,D-,D+,D,C-,D-,D-,D-,D-,B-,C+,D,D,D,C-,C-,D+,C,D+,D+,D+,C+,D,F,D+,D+,D,F,D+,D+,C-,D,D+
 2026,Ella Corry,Buffalo,MAC,Freshman,D+,D-,C+,D+,C+,D-,D-,D,D,B+,B,C,C-,C,C,C,B-,C+,B-,C-,C-,B,C+,D-,C+,C,C+,F,C+,C+,B-,D+,C-
 2026,Janyah Bohanon,Buffalo,MAC,Junior,D,F,C-,D-,D+,F,F,D-,D-,B-,C+,D+,D,D+,C-,D+,C,C,C,D+,D,B-,C-,F,C-,D+,C-,F,C-,D+,C,D,D
 2026,Meg Lucas,Buffalo,MAC,Freshman,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,B,C,C,B-,C+,B,C-,C-,B+,B-,D-,B-,C,C+,F,B-,C,B,D+,C-
 2026,Paula Lopez,Buffalo,MAC,Junior,D-,F,C-,D-,D,F,F,D-,D-,C+,C,D,D-,C,D,D+,C-,D+,C-,D,D,C+,D+,F,C-,D,D+,F,C-,D,C-,D-,D
-2026,Addison Baxter,Butler,BE,Freshman,B-,D+,B+,C+,B+,C-,C-,C+,C,A+,A,B,B-,B,B-,B-,B+,B+,B+,B-,B-,A,B,D+,B+,B,B,D+,B+,B,B+,B-,B
+2026,Addison Baxter,Butler,BE,Freshman,B-,D+,B+,C+,B+,D+,C-,C+,C,A+,A,B,B-,B,B-,B-,B+,B+,B+,B-,B-,A,B,D+,B+,B,B,D+,B+,B,B+,B-,B
 2026,Anna Wypych,Butler,BE,Freshman,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A,B+,A-,B,B+,A-,A,A+,B+,B+,A+,A,C,A,A-,A,C,A,B+,A,B+,B+
-2026,Caroline Dotsey,Butler,BE,Junior,B-,D+,B+,B-,B+,C-,C-,C+,C,A+,A,B+,B-,B,B,B-,A-,B+,A-,B-,B-,A,B+,D+,B+,B,B+,D+,B+,B,B+,B-,B
+2026,Caroline Dotsey,Butler,BE,Junior,B-,D+,B+,B-,B+,C-,C-,C+,C,A+,A,B-,B-,B,B,B-,A-,B+,A-,B-,B-,A,B+,D+,B+,B,B+,D+,B+,B,B+,B-,B
 2026,Gabby Wilke,Butler,BE,Sophomore,C+,C-,B-,C+,B+,C-,C,C+,B-,B+,B+,C,C+,B-,B-,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A-,C-,B
 2026,Kennedy Langham,Butler,BE,Junior,C+,D,B-,C+,B,D+,D+,C,D+,A,A-,C,C+,B-,B-,B-,B+,B,B,C+,C+,B+,B-,D,B-,B-,B-,D,B,B-,A-,C+,B-
-2026,Lily Zeinstra,Butler,BE,Sophomore,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A+,B+,B,B+,B,B,A-,A-,A,B,B,A,A-,C-,A-,B+,B+,C-,A-,B+,A-,B,B
+2026,Lily Zeinstra,Butler,BE,Sophomore,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A+,B+,B,B+,B,B,A-,B+,A,B,B,A,A-,C-,A-,B+,B+,C-,A-,B+,A-,B,B
 2026,Mallory Miller,Butler,BE,Sophomore,C+,D,B+,C,B,D,D+,C-,D+,A,A-,C,C+,B-,B-,B-,B,B,A-,C+,C+,A,B+,D,B+,B-,B+,D,B+,B-,A-,C+,C+
-2026,McKenna Johnson,Butler,BE,Sophomore,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C-,C-,C+,C+,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C,C+,F,B-,C,B-,D+,C-
+2026,McKenna Johnson,Butler,BE,Sophomore,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C+,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Nevaeh Jackson,Butler,BE,Junior,B-,C-,A-,B-,B+,C-,C-,C+,C,A+,A,B+,B,B,B,B,B+,B+,A,B-,B-,A,A-,D+,A-,B,B+,D+,A-,B,A,B-,B
-2026,Saniya Jackson,Butler,BE,Sophomore,B+,C+,A+,A-,A,C+,C+,B,B,A+,A+,A+,A-,A,B+,B+,A,A,A+,A-,B+,A+,A+,C+,A+,A,A+,C+,A+,A-,A,B+,A-
+2026,Saniya Jackson,Butler,BE,Sophomore,B+,C+,A+,B+,A,C+,C+,B,B,A+,A+,A+,A-,A,B+,B+,A,A,A+,A-,B+,A+,A+,C+,A+,A,A+,C+,A+,A-,A,B+,A-
 2026,Arielle Mackey-Williams,BYU,B12,Junior,B-,C,B+,B-,A-,C,C+,B-,B,A-,A-,C+,B-,B,B-,B+,A-,B,A-,B,B,A,B+,C+,B+,B,B+,C+,A-,B+,A,C,B+
 2026,Bolanle Yussuf,BYU,B12,Freshman,B,C,B+,B,A-,C,C,B-,C+,A+,A+,B+,B+,B,B,B,B+,A-,A-,B,B,A,B+,C-,A-,B+,B+,C,A-,B+,A+,B,B+
 2026,Braeden Gunlock,BYU,B12,Freshman,B-,C,B+,B-,A-,C,C+,C+,B,A-,A-,C+,B-,B,B-,B+,A-,B,A-,B,B,A,B+,C+,B+,B-,B+,C,B+,B+,A,C,B+
@@ -396,7 +396,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Ava Card,Chattanooga,SC,Sophomore,D,D-,C+,D,C-,D-,D-,D-,D-,B-,C+,C,D,C,C-,C-,C+,C,C+,D+,D+,B,C+,F,C+,D+,C,F,C+,D+,C+,D,D+
 2026,Caia Elisaldez,Chattanooga,SC,Junior,B-,D+,B,B-,B,C-,C-,C+,C,A+,A,B,B,B,B-,B-,B,B+,B+,B-,B-,A,B,D+,B+,B,B,D+,B+,B,B+,B-,B
 2026,Evie Bruce,Chattanooga,SC,Freshman,D+,D,D-,D+,B-,D,D,D+,C,B-,B-,D,C-,C-,C,B-,B,C+,D-,C,C,D,D-,D,D-,D+,D-,D,D-,B-,B,D,C+
-2026,Falon Bedke,Chattanooga,SC,Junior,D,D-,D+,D-,D+,F,F,D-,D-,B-,C+,D,D,D,D+,D+,D+,C-,D+,D+,D+,C,D,F,D,D+,D,F,D+,D+,D+,D,D
+2026,Falon Bedke,Chattanooga,SC,Junior,D,D-,D+,D-,C-,F,D-,D-,D-,B-,C+,D,D,D,D+,D+,D+,C-,D+,D+,D+,C,D,F,D,D+,D,F,D+,D+,D+,D,D
 2026,Gianna Corbitt,Chattanooga,SC,Sophomore,A,B,A+,A,A+,B,B+,B+,A-,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
 2026,Izzy McPherson,Chattanooga,SC,Sophomore,D,D-,C+,D,C-,D-,D-,D-,D-,B-,C+,D,D,C+,C-,C-,C+,C,C+,D+,D+,B,C,F,C+,D+,C,F,C+,D+,C+,D,D+
 2026,London Weaver,Chattanooga,SC,Freshman,D+,D,D-,D+,B-,D,D+,D+,C+,B-,B-,D,C-,C,C,B-,B-,C+,D,C,C,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
@@ -475,16 +475,16 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Audrey Chen,Cornell,Ivy,Sophomore,D,D-,C-,D,C-,D-,D-,D-,D-,B-,C+,D+,D,D+,D+,C-,C,C,C,D+,D+,B-,C-,F,C-,D+,C-,F,C-,D+,C,D,D+
 2026,Clarke Jackson,Cornell,Ivy,Junior,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C-,C,B-,C+,B-,C-,C-,B+,B-,D-,B-,C,C+,F,B-,C+,B-,C-,C-
 2026,Grace Renners,Cornell,Ivy,Freshman,C+,D+,C+,C,B+,D+,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C,C-,C+,B-,C,C-,C+,B,A-,D+,B
-2026,Kelsey Langston,Cornell,Ivy,Sophomore,D-,F,D+,D-,D,F,F,D-,D-,C,C-,D,D-,D,D,D,D+,C-,D+,D-,D-,C,D,F,D,D-,D,F,D+,D-,D+,D-,D-
+2026,Kelsey Langston,Cornell,Ivy,Sophomore,D-,F,D+,D-,D,F,F,D-,D-,C,C-,D,D-,D,D,D,D+,D+,D+,D-,D-,C,D,F,D+,D-,D,F,D+,D-,D+,D-,D-
 2026,Paige Engels,Cornell,Ivy,Sophomore,D-,F,C,D-,D+,F,F,D-,D-,C+,C,D+,D-,C+,D,D+,C,C-,C+,D,D,B-,C-,F,C,D,C-,F,C,D,C+,D-,D
 2026,Rachel Kaus,Cornell,Ivy,Junior,C,D,B-,C-,B-,D,D,D+,D,A-,B+,C+,C+,C+,C+,C+,B,B-,B,C,C,B+,B-,D-,B-,C+,C+,D-,B-,C+,B-,C,C+
 2026,Willa Chinn,Cornell,Ivy,Freshman,C-,D,D,D+,B,D,D+,C-,C+,B,B-,D+,C-,C,C-,B-,B,C+,D,C+,C+,C-,D-,D,D,C,D-,D,D,B-,B+,D,C+
 2026,Allison Heathcock,Creighton,BE,Sophomore,B-,C-,A-,B-,B+,C-,C-,C+,C,A+,A,B+,B,B,B,B,A-,B+,A,B,B-,A,A-,D+,A-,B,B+,C-,A-,B,A,B,B
 2026,Ava Zediker,Creighton,BE,Freshman,B+,B-,A,A-,A,B-,B-,B,B,A+,A+,A,A-,A-,B+,A-,A+,A+,A+,A-,A-,A+,A,C+,A,A,A,B-,A,A-,A-,A-,A-
 2026,Elizabeth Gentry,Creighton,BE,Sophomore,C+,D,B,C,B,D,D+,C-,D+,A,A-,B,C+,B-,B-,B-,A,B,B+,C+,C+,A-,B,D,B,B-,B,D,B,B-,B,C+,B-
-2026,Kendall McGee,Creighton,BE,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,C+,B-,B-,B-,B-,A-,B,A-,C+,B-,A,B+,D,B+,B,B+,D+,B+,B,B+,B-,B-
+2026,Kendall McGee,Creighton,BE,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,C+,B-,B-,B-,B-,A-,B,A-,C+,B-,A,B+,D,B+,B,B+,D,B+,B,B+,B-,B-
 2026,Neleigh Gessert,Creighton,BE,Freshman,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A,B+,A,B,B+,A-,A-,A+,B+,B,A+,A,C,A,B+,A,C,A,B+,A+,B+,B+
-2026,Norah Gessert,Creighton,BE,Freshman,C+,D+,A,C+,B,D+,D+,C,C-,A,A,C+,B-,B-,B-,B-,A-,B,A,B-,B-,A+,A-,D,A,B,A-,D+,A-,B,A,B-,B-
+2026,Norah Gessert,Creighton,BE,Freshman,C+,D+,A,C+,B,D+,D+,C,C-,A,A,C+,B-,B-,B-,B-,A-,B,A,C+,B-,A+,A-,D,A,B,A-,D+,A-,B,A,B-,B-
 2026,Alexandra Eldredge,Dartmouth,Ivy,Junior,D,F,C-,D-,D+,F,F,D-,D-,B-,C+,D+,D,D+,D+,D+,C,C-,C,D,D,B-,C-,F,C-,D,C-,F,C,D+,C,D,D
 2026,Cate MacDonald,Dartmouth,Ivy,Junior,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C+,C,B-,C+,B,C-,C-,B+,B-,D-,B-,C,C+,F,B-,C,B-,D+,C-
 2026,Debra Hill,Dartmouth,Ivy,Freshman,C+,C,B,C+,A-,C,C,C+,B,B+,A-,C,B-,B-,B,B,A-,B,B,B-,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
@@ -523,7 +523,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Iman Addison,Delaware St.,MEAC,Freshman,C-,D+,C-,C,B,D+,D+,C,C+,B+,B,D+,C+,C+,C+,B-,B+,B-,C-,C+,C+,C+,D+,D+,D+,C,D+,D+,C-,B,B+,D+,B-
 2026,Jermesha Frierson,Delaware St.,MEAC,Junior,D,D-,B-,D-,C-,D-,D-,D-,D-,B-,C+,C+,D,C+,D+,C-,B-,C,B-,D+,D+,B+,C+,F,B-,D+,C+,F,B-,D+,B-,D,D+
 2026,Kaitlyn Adams,Delaware St.,MEAC,Junior,C,D+,C-,C,B+,D+,C-,C,B-,B+,B,D+,C+,C+,B-,B,B+,B-,C,C+,C+,B-,C-,C-,C-,C+,C-,D+,C,B,B+,D+,B-
-2026,Layla Burton,Delaware St.,MEAC,Freshman,D+,D,D-,D+,C+,D,D,D+,C,B-,B-,D,D+,C-,D-,B-,B-,C+,D-,C,C,D,D-,D,D-,C-,F,D,D-,B-,B,D,C+
+2026,Layla Burton,Delaware St.,MEAC,Freshman,D+,D,D-,D+,C+,D,D,D+,C,B-,B-,D,D+,C-,D-,B-,B-,C+,D-,C,C,D,D-,D,D-,C-,F,D,D-,B-,B,D,C
 2026,Liliana Harrison,Delaware St.,MEAC,Freshman,D+,D-,C-,D,C,D-,D-,D,D,B+,B-,D+,D+,D+,C,C,C-,C+,C-,D+,C-,C+,D+,D-,C-,C-,D+,F,C-,C,C-,D+,C-
 2026,Mahogany Cottingham,Delaware St.,MEAC,Junior,C+,D+,C-,C,B+,C-,C-,C,C+,B+,B,D+,C+,C+,C+,B-,B+,C+,C-,C+,C+,C+,D+,D+,C-,C+,D+,C-,C-,B,B+,D+,B-
 2026,Nevaeh Reaves,Delaware St.,MEAC,Freshman,D+,D-,B-,D,C+,D-,D-,D,D,B+,B-,C+,D+,C+,C,C,B-,C+,B,C-,C-,B+,B-,D-,B-,C-,C+,F,B-,C,B-,D+,C-
@@ -542,7 +542,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Aizhanique Mayo,DePaul,BE,Junior,C+,C-,B-,C+,B+,C-,C,C+,B-,B+,B+,C,C+,B-,C+,B,B+,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A,C-,B
 2026,Alayna West,DePaul,BE,Freshman,D+,D-,B,D,C+,D-,D-,D,D,B+,B-,B,D+,B,C,C,B-,C+,B+,C-,C-,A-,B,D-,B,C-,B,F,B,C,B,D+,C-
 2026,Ally Timm,DePaul,BE,Freshman,C+,D,B,C,B-,D,D+,C-,D+,A,A-,B-,C+,B-,B-,B-,B+,B,B+,C+,C+,A-,B,D,B,B-,B,D,B,B-,B,C+,B-
-2026,Devin Hagemann,DePaul,BE,Freshman,D+,D-,B-,D,C+,D-,D-,D,D,B+,B,D+,C-,B,C,C,B-,C+,B-,C-,C-,B+,B-,D-,B-,C-,C+,F,B-,C,B-,D+,C-
+2026,Devin Hagemann,DePaul,BE,Freshman,D+,D-,B-,D,C+,D-,D-,D,D,B+,B-,D+,D+,B,C,C,B-,C+,B-,C-,C-,B+,B-,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Gina Davorija,DePaul,BE,Freshman,D+,D-,C+,D,C,D-,D-,D,D,B+,B-,C,D+,C-,C,C,C+,C+,B-,C-,C-,B,C+,D-,C+,C-,C+,F,C+,C,B-,D+,C-
 2026,Kate Novik,DePaul,BE,Junior,B+,C+,A+,B+,A,C+,C+,B,B-,A+,A+,A+,A-,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A+,A-,A+,C+,A+,A-,A,B+,A-
 2026,Natiah Nelson,DePaul,BE,Sophomore,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,B,B,B+,C+,B-,A,B,D,B+,B,B,D,B+,B,A,B-,B-
@@ -559,7 +559,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Brooklin Dailey,Drake,MVC,Junior,D+,D-,C-,D,C,D-,D-,D,D,B+,B-,D+,D+,C+,C,C,B,C+,C+,D+,D+,B-,C-,D-,C-,C-,C-,F,C,C,C,D+,C-
 2026,Grace Knutson,Drake,MVC,Sophomore,C-,D-,B,D+,C+,D-,D,D,D,B+,B,C-,C-,B-,C,C+,B,C+,B,C-,C-,A-,B,D-,B,C,B-,D-,B,C+,B,C-,C
 2026,Lexi Carlsen,Drake,MVC,Freshman,C+,D,B,C,B-,D,D,C-,D+,A-,A-,C,C+,B-,C+,B-,B,B,B+,C+,C+,A-,B,D,B,B-,B,D,B,B-,B,C+,C+
-2026,Maggie Taylor,Drake,MVC,Sophomore,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,C+,B-,B-,B-,B-,B+,B,A-,C+,B-,A,B+,D,B+,B,B,D,B+,B,A,C+,B-
+2026,Maggie Taylor,Drake,MVC,Sophomore,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,C+,B-,B-,B-,B-,B+,B,A-,C+,B-,A,B+,D,B+,B,B,D,B+,B,A,B-,B-
 2026,Peyton McCabe,Drake,MVC,Sophomore,C,D+,C,C,B+,C-,C-,C,B-,B+,B,D+,C+,C+,B-,B,B+,B-,C+,C+,B-,B-,C,C-,C,C+,C-,C-,C,B,B+,D+,B-
 2026,Quinn Vice,Drake,MVC,Freshman,C-,D,B-,D+,C+,D,D,D+,D,B+,B,C,C,B-,C+,C+,B+,C+,B,C,C,B+,B-,D-,B-,C+,C+,D-,B-,C+,B,C,C
 2026,Shannon Fornshell,Drake,MVC,Junior,C+,C-,B-,C+,B,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,B+,B,B,B-,B-,B+,B-,C,B-,B-,C+,C-,B-,B+,A-,C-,B
@@ -609,7 +609,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Kailani Lindsey,Eastern Kentucky,ASun,Junior,B-,C-,B+,B-,B+,C-,C-,C+,C,A+,A,B+,B,B,B,B,B+,B+,A-,B-,B-,A,B+,D+,B+,B,B+,D+,B+,B,B+,B-,B
 2026,Kenleigh Woods,Eastern Kentucky,ASun,Freshman,B,C-,B+,B-,B+,C,C,B-,C+,A+,A+,B,B,B,B,B,B+,A-,B+,B,B,A,B,C-,B+,B+,B,C-,B+,B+,B+,B,B+
 2026,Liz Freihofer,Eastern Kentucky,ASun,Sophomore,B,C,A,B,A-,C,C+,B-,C+,A+,A+,A,B+,A-,B,B+,A,A-,A+,B,B,A+,A,C,A,A-,A,C,A,B+,A,B+,B+
-2026,Love Mays,Eastern Kentucky,ASun,Junior,C+,C-,C+,C,B,C-,C-,C+,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C+,C-,C+,B-,C,C-,C+,B,A-,D+,B
+2026,Love Mays,Eastern Kentucky,ASun,Junior,C+,C-,C+,C,B,C-,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C+,C-,C+,B-,C,C-,C+,B,A-,D+,B
 2026,Madison Lewis,Eastern Kentucky,ASun,Junior,C,D+,C-,C,B,D+,D+,C,C+,B+,B,D+,C+,C+,C+,B-,B+,B-,C-,C+,C+,C+,D+,D+,C-,C+,D+,D+,C-,B,B+,D+,B-
 2026,Alli Zajac,Eastern Michigan,MAC,Freshman,C-,D+,D,C-,B,D,D+,C-,C+,B,B,D+,C,C+,C,B-,B,C+,D+,C+,C+,C,D,D+,D,C+,D,D+,D+,B,B+,D,B-
 2026,Believe Tshibangu,Eastern Michigan,MAC,Freshman,C+,C-,C+,C+,B+,C-,C,C+,B-,B+,B+,C-,C+,B-,B,B,B+,B,B-,B-,B-,B+,C+,C,C+,B-,C+,C,B-,B+,A-,C-,B
@@ -620,19 +620,19 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Brielle Magnuson,Eastern Washington,BSky,Junior,D+,D,D-,D+,B-,D,D+,C-,C+,B-,B-,D,C-,C,C+,B-,B-,C+,D,C,C,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
 2026,Caitie Gingras,Eastern Washington,BSky,Sophomore,D+,D-,C+,D,C,D-,D-,D,D-,B,B-,C-,D,C,C-,C,C+,C,C+,D+,D+,B,C+,D-,C+,C-,C,F,C+,C-,C+,D+,D+
 2026,Elyn Bowers,Eastern Washington,BSky,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,B,B-,B,B-,B-,B+,B,B+,C+,C+,A,B,D,B+,B,B,D,B+,B-,B+,C+,B-
-2026,Emily McElmurry,Eastern Washington,BSky,Sophomore,D-,F,D+,D-,D+,F,F,D-,D-,C+,C,D,D-,D+,D,D+,C-,D+,C-,D,D,C+,D+,F,D+,D,D+,F,D+,D,C-,D-,D
+2026,Emily McElmurry,Eastern Washington,BSky,Sophomore,D-,F,D+,D-,D+,F,F,D-,D-,C+,C,D,D-,D+,D,D+,C-,D+,C-,D+,D,C+,D+,F,D+,D,D+,F,D+,D,C-,D-,D
 2026,Jaecy Eggers,Eastern Washington,BSky,Sophomore,C,D,B,C-,B-,D,D,D+,D,A-,B+,B-,C+,B-,C+,C+,C+,B-,B,C,C+,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C+
 2026,Kourtney Grossman,Eastern Washington,BSky,Sophomore,B-,C-,A,B-,B+,C-,C,C+,C+,A+,A,A,B,B,B,B,A-,B+,A+,B,B,A+,A,D+,A,B,A,C-,A,B+,A,B,B
 2026,Madeline Gibbs,Eastern Washington,BSky,Freshman,D,D-,C-,D-,C-,F,D-,D-,D-,B-,C+,D+,D,D+,D+,C-,C-,C,C-,D+,D+,C+,D+,F,C-,D+,D+,F,C-,D+,C,D,D
 2026,Carmen Richardson,East Tennessee St.,SC,Sophomore,C-,D-,C+,D+,C+,D-,D,D+,D,B+,B,C,C-,C,C,C+,C+,C+,B-,C-,C-,B,C+,D-,C+,C+,C+,D-,B-,C+,B-,C-,C
 2026,Daniela López,East Tennessee St.,SC,Junior,B-,C,B+,B-,A-,C+,C+,C+,B,A-,A-,C+,B-,B,B,B+,A-,B,A-,B,B,A,B+,C+,B+,B,B,C+,B+,B+,A,C,B+
-2026,Emmah McAmis,East Tennessee St.,SC,Freshman,D+,D-,C+,D+,C+,D-,D-,D,D,B+,B-,D+,C-,C-,C,C,B-,C+,C+,C-,C-,B,C,D-,C+,C-,C,F,C+,C,C+,D+,C-
+2026,Emmah McAmis,East Tennessee St.,SC,Freshman,D+,D-,C+,D+,C+,D-,D-,D,D,B+,B-,D+,C-,C-,C+,C,B-,C+,C+,C-,C-,B,C,D-,C+,C-,C,F,C+,C,C+,D+,C-
 2026,Jaidyn Harper,East Tennessee St.,SC,Sophomore,C+,D,B,C,B-,D,D+,C-,D+,A-,A-,B,C+,B-,B-,B-,B+,B,B+,C+,C+,A-,B,D,B,B-,B,D,B,B-,B,C+,C+
-2026,Kennedy Younkin,East Tennessee St.,SC,Sophomore,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,D+,D+,D+,C-,C,C,D,D,B-,C-,F,C-,D,D+,F,C-,D,C,D-,D
+2026,Kennedy Younkin,East Tennessee St.,SC,Sophomore,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,D+,D,D+,C-,C,C,D,D,B-,C-,F,C-,D,D+,F,C-,D,C,D-,D
 2026,Lucia France,East Tennessee St.,SC,Freshman,B-,C+,A,B-,A,C+,C+,B-,B+,A-,A,C+,B,B,B,B+,A-,B+,A,B,B,A+,A-,C+,A,B,A-,C+,A,A-,A,C+,B+
 2026,Lucy Hood,East Tennessee St.,SC,Sophomore,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C-,C-,C+,C,C,B-,C+,B-,C-,C-,B+,B-,D-,B-,C,C+,F,B-,C,B-,D+,C-
 2026,SaBreya Monsanto,East Tennessee St.,SC,Freshman,C-,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C+,B-,B,C+,D+,C+,C+,C,D,D+,D+,C,D,D+,D+,B,B+,D,B-
-2026,Yanessa Boyd,East Tennessee St.,SC,Junior,D+,D,D-,D+,C+,D,D,D+,C,B-,B-,D,C-,C-,C+,B-,B-,C+,D-,C,C,D+,D-,D,D-,C-,D-,D,D-,B-,B,D,C+
+2026,Yanessa Boyd,East Tennessee St.,SC,Junior,D+,D,D-,D+,C+,D,D,D+,C,B-,B-,D,C-,C,C+,B-,B-,C+,D-,C,C,D+,D-,D,D-,C-,D-,D,D-,B-,B,D,C+
 2026,Cora Horvath,East Texas A&M,Slnd,Junior,D-,F,D+,D-,D+,F,F,D-,D-,C+,C,D,D-,D,D,D+,D+,C-,D+,D,D,C,D,F,D+,D,D,F,D+,D,D+,D-,D
 2026,Nina Horvath,East Texas A&M,Slnd,Junior,D+,D-,B-,D,C,D-,D-,D,D,B+,B-,C+,D+,B,C,C,B-,C+,B-,D+,D+,B+,C+,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Nyaluak Dak,East Texas A&M,Slnd,Sophomore,C+,C,B,C+,B+,C,C,C+,B,B+,A-,C,B-,B-,B,B,A-,B,B,B-,B-,B+,B-,C,B-,B,B-,C,B,B+,A,C-,B
@@ -660,7 +660,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Mireia Mustaros,Evansville,MVC,Junior,C+,D,B-,C,B,D,D+,C-,D+,A,A-,C+,C+,C+,C+,B-,B-,B,B,C+,C+,B+,B-,D,B-,B-,C+,D,B-,B-,B-,C+,B-
 2026,Sydney Huber,Evansville,MVC,Freshman,D+,D-,C+,D,C+,D-,D-,D,D,B+,B-,C,D+,C,C,C,C+,C+,B-,D+,D+,B,C+,D-,C+,C-,C,F,C+,C,B-,D+,C-
 2026,Christina Pham,Fairfield,MAAC,Freshman,C,D,B-,C-,C+,D,D,D+,D,B+,B+,C+,C,C+,C+,C+,B-,B-,B,C,C,B+,B-,D-,B-,C+,C+,D-,B-,C+,B-,C,C
-2026,Cyanne Coe,Fairfield,MAAC,Sophomore,A,B,A+,A+,A+,B,B+,A-,A-,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
+2026,Cyanne Coe,Fairfield,MAAC,Sophomore,A,B,A+,A,A+,B,B+,A-,A-,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
 2026,Jillian Huerter,Fairfield,MAAC,Sophomore,A-,B-,A+,A,A,B-,B,B+,B+,A+,A+,A+,A,A,B+,A-,A+,A+,A+,A,A-,A+,A,B-,A+,A,A,B-,A+,A,A+,A,A-
 2026,Kaety L'Amoreaux,Fairfield,MAAC,Junior,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Keyarah Gregory,Fairfield,MAAC,Freshman,B-,C+,A,B-,A-,C+,C+,B-,B+,A,A,C+,B,B,B,B+,A,B+,A,B,B,A+,A,C+,A,B,A,C+,A,A-,A,C+,B+
@@ -762,9 +762,9 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Alexia Araujo-Dagba,Georgetown,BE,Sophomore,B-,C,A-,B-,B+,C,C+,B-,B,A-,A,C+,B-,B,B-,B+,A-,B+,A,B,B,A,B+,C+,A-,B,B+,C+,A-,B+,A,C,B+
 2026,Brianna Byars,Georgetown,BE,Junior,C,D,B+,C-,B-,D,D,D+,D,B+,B+,B,C,B+,C+,C+,B+,B-,B+,C,C,A,B,D-,B+,C+,B,D-,B+,C+,B+,C,C
 2026,Cristen Carter,Georgetown,BE,Junior,B,C,A-,B,A-,C,C,B-,C+,A+,A+,A-,B,B+,B,B,A+,A-,A,B,B,A,A-,C-,A-,B+,A-,C,A-,B+,A,B,B+
-2026,Destiny Agubata,Georgetown,BE,Sophomore,B+,B-,A+,A-,A,C+,B-,B,B,A+,A+,A+,A-,A-,B+,B+,A-,A,A+,A-,B+,A+,A,C+,A+,A,A,C+,A+,A-,A+,A-,A-
+2026,Destiny Agubata,Georgetown,BE,Sophomore,B+,B-,A+,A-,A,C+,B-,B,B,A+,A+,A+,A-,A-,B+,B+,A-,A,A+,A-,B+,A+,A,C+,A+,A-,A,C+,A+,A-,A+,A-,A-
 2026,Indya Davis,Georgetown,BE,Sophomore,B,B-,A+,B+,A,B-,B-,B,A-,A,A,B-,B+,B,B+,A-,A,A-,A+,B+,B+,A+,A+,B-,A+,B+,A+,B-,A+,A-,A+,C+,A-
-2026,Khadee Hession,Georgetown,BE,Sophomore,B,C,A-,B,A-,C+,C,B-,C+,A+,A+,B+,B+,B+,B,B,A-,A-,A,B+,B,A,A-,C,A-,B+,B+,C,A-,B+,A-,B,B+
+2026,Khadee Hession,Georgetown,BE,Sophomore,B,C,A-,B,A-,C,C,B-,C+,A+,A+,B+,B+,B+,B,B,A-,A-,A,B+,B,A,A-,C-,A-,B+,B+,C,A-,B+,A-,B,B+
 2026,Khia Miller,Georgetown,BE,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A,A-,B,B,B,B,A+,B+,A,B,B,A+,A-,C-,A,B+,A-,C-,A,B+,A,B,B
 2026,Summer Davis,Georgetown,BE,Sophomore,B,C,A,B,A-,C,C,B-,C+,A+,A+,A-,B,B+,B,B,A,A-,A,B,B,A+,A-,C-,A,B+,A-,C,A,B+,A,B,B+
 2026,Colleen Phiri,George Washington,A10,Freshman,C,D,B,C-,B-,D,D,C-,D+,A-,B+,C-,C+,C+,C+,C+,B+,B-,B+,C,C+,A-,B,D-,B+,C+,B,D,B+,C+,B+,C,C+
@@ -833,20 +833,20 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Maren Westin,Green Bay,Horz,Sophomore,D,D-,D-,D,C+,D,D,D,C-,B-,C+,D,D+,C-,C-,C+,C+,C,F,C-,C-,D-,F,D,F,D+,F,D-,F,C+,B,D-,C
 2026,Meghan Schultz,Green Bay,Horz,Sophomore,B+,B-,A,A,A,B-,B,B+,B+,A+,A+,A,A-,A,A-,A-,A+,A+,A+,A,A-,A+,A,B-,A,A,A,B-,A,A-,A+,A,A-
 2026,Aaryn Battle,Hampton,CAA,Junior,D,F,C,D-,C-,F,F,D-,D-,B-,C+,D+,D,D+,C-,C-,C,C,C+,D+,D+,B-,C-,F,C,D+,C-,F,C,D+,C+,D,D+
-2026,Akilah Shelton,Hampton,CAA,Freshman,D+,D-,C-,D,C-,D-,D-,D-,D-,B,B-,D+,D,D+,C-,C-,C,C+,C+,D+,D+,B-,C-,F,C-,D+,C-,F,C,C-,C+,D,D+
+2026,Akilah Shelton,Hampton,CAA,Freshman,D,D-,C-,D,C-,D-,D-,D-,D-,B,B-,D+,D,D+,C-,C-,C,C+,C+,D+,D+,B-,C-,F,C-,D+,C-,F,C,C-,C+,D,D+
 2026,Arlisha Boston,Hampton,CAA,Junior,D+,D-,D-,D,C+,D,D,D+,C,B-,B-,D,D+,C-,C,C+,B-,C,D-,C-,C-,D-,F,D,F,D+,F,D-,D-,C+,B,D-,C
-2026,Janaye Walker,Hampton,CAA,Freshman,D,D-,F,D,C+,D-,D-,D,D+,C+,C+,D-,D,D+,C+,C+,C+,C,F,D+,D+,F,F,D-,F,D+,F,D-,F,C+,B-,D-,C-
+2026,Janaye Walker,Hampton,CAA,Freshman,D,D-,F,D,C+,D-,D-,D,D+,C+,C+,D-,D,D+,C+,C+,C+,C,F,C-,D+,F,F,D-,F,D+,F,D-,F,C+,B-,D-,C-
 2026,Kayla Lezama,Hampton,CAA,Junior,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C,C+,F,B-,C,B-,D+,C-
 2026,Kiarra Mcelrath,Hampton,CAA,Junior,D,D-,B-,D,C,D-,D-,D-,D-,B,B-,C+,D,C+,C,C-,B-,C,B-,D+,D+,B+,C+,F,B-,D+,C+,F,B-,C-,B-,D,D+
 2026,Abigail Wright,Harvard,Ivy,Junior,B+,B-,A,A-,A,B-,B-,B+,B,A+,A+,A,A-,A-,A-,A-,A,A+,A+,A-,A-,A+,A,C+,A,A,A,B-,A,A-,A+,A-,A-
 2026,Alayna Rocco,Harvard,Ivy,Sophomore,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A,B+,B,B,B,B,A,B+,A,B,B,A,A-,D+,A-,B,B+,C-,A-,B+,A-,B,B
-2026,Aubrey Shaw,Harvard,Ivy,Freshman,C+,C,B+,B-,A-,C,C,C+,B,A-,A-,C,B-,B-,B,B+,A-,B,B+,B,B,A,B,C+,B+,B,B,C,B+,B+,A,C,B+
+2026,Aubrey Shaw,Harvard,Ivy,Freshman,C+,C,B+,B-,A-,C,C,C+,B,A-,A-,C,B-,B-,B,B+,A-,B,B+,B,B,A,B,C+,B+,B,B,C,B+,B+,A,C,B
 2026,Karlee White,Harvard,Ivy,Junior,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Lydia Chatira,Harvard,Ivy,Sophomore,C,D+,C-,C,B,D+,C-,C,B-,B+,B,D+,C+,C+,C,B,B+,B-,C+,C+,C+,B-,C-,C-,C,C+,C-,D+,C,B,B+,D+,B-
 2026,Mary Hollensteiner,Harvard,Ivy,Junior,B,B-,A+,B,A,C+,B-,B,B+,A,A,B-,B,B,B+,A-,A,B+,A+,B+,B+,A+,A,B-,A+,B+,A,B-,A+,A-,A+,C+,A-
 2026,Nina Emnace,Harvard,Ivy,Sophomore,C+,D,B-,C,B-,D,D+,C-,D+,A-,A-,C+,C+,B-,C+,B-,A,B,B,C+,C+,B+,B-,D,B-,B-,B-,D,B,B-,B,C+,C+
 2026,Olivia Jones,Harvard,Ivy,Freshman,A-,B-,A+,A-,A,B-,B,B+,B,A+,A+,A+,A-,A+,A-,A-,A+,A+,A+,A,A-,A+,A+,B-,A+,A,A+,B-,A+,A-,A,A-,A-
-2026,Bailey Flavell,Hawaii,BW,Freshman,C+,D,B,C-,B-,D,D,C-,D+,A-,B+,C-,C+,B-,C+,C+,B+,B-,B,C,C+,B+,B-,D-,B-,C+,B-,D,B,B-,B,C,C+
+2026,Bailey Flavell,Hawaii,BW,Freshman,C,D,B,C-,B-,D,D,C-,D+,A-,B+,C-,C+,B-,C+,C+,B+,B-,B,C,C+,B+,B-,D-,B-,C+,B-,D,B,B-,B,C,C+
 2026,Danijela Kujovic,Hawaii,BW,Freshman,B-,C+,A-,B-,A-,C+,C+,B-,B+,A-,A,C+,B,B,B,B+,A-,B+,A,B,B,A,A-,C+,A-,B,B+,C+,A-,B+,A,C,B+
 2026,Jade Peacock,Hawaii,BW,Junior,C-,D-,B,D+,C+,D-,D-,D,D,B+,B,B-,C-,B-,C+,C+,B-,C+,B+,C,C-,A-,B,D-,B,C,B,D-,B,C+,B,C-,C
 2026,Jovi Lefotu,Hawaii,BW,Junior,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,C+,B,B+,B,B-,B-,B-,B,C+,C-,C+,B-,C+,C-,B-,B,A-,C-,B
@@ -868,7 +868,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Sana'a Garrett,Hofstra,CAA,Junior,D,F,D,D-,D+,F,F,D-,D-,B-,C+,D-,D,D-,D+,D+,C,C-,D,D+,D+,C-,D,F,D,D+,D,F,D,D+,D,D,D
 2026,Asia Wilson,Holy Cross,Pat,Freshman,D,D-,D,D,C-,D-,D-,D-,D-,B-,C+,D,D,C,C-,C-,C+,C,D,D+,D+,C-,D,F,D,D+,D,F,D,D+,D,D,D+
 2026,Brianna McDermott,Holy Cross,Pat,Freshman,C-,D,D,C-,B,D+,D+,C-,C+,B,B,D+,C,C,C,B-,B,C+,D+,C+,C+,C,D,D+,D,C,D,D+,D+,B-,B+,D,B-
-2026,Hannah Griffin,Holy Cross,Pat,Junior,C+,D,B-,C-,B-,D,D,C-,D+,A-,B+,C+,C+,C+,C+,C+,B+,B-,B-,C+,C+,B+,B-,D-,B-,C+,C+,D,B-,C+,B-,C,C+
+2026,Hannah Griffin,Holy Cross,Pat,Junior,C,D,B-,C-,B-,D,D,C-,D+,A-,B+,C+,C+,C+,C+,C+,B+,B-,B-,C+,C+,B+,B-,D-,B-,C+,C+,D,B-,C+,B-,C,C+
 2026,Janie Bachmann,Holy Cross,Pat,Junior,B,C-,B+,B-,B+,C,C,C+,C+,A+,A+,B,B,B,B,B,A-,B+,A-,B,B,A,B,C-,B+,B+,B,C-,B+,B+,B,B,B
 2026,Kendall Eddy,Holy Cross,Pat,Junior,C+,D+,A,C+,B,D+,D+,C,C-,A,A,A-,B-,B+,B-,B-,A-,B,A,C+,B-,A+,A-,D,A,B,A-,D,A,B,A,B-,B-
 2026,Simone Lewis,Holy Cross,Pat,Junior,C+,C-,B-,C+,B+,C-,C,C+,B,B+,A-,C,B-,B-,B-,B,B+,B,B,B-,B-,B+,B-,C,B-,B-,B-,C,B,B+,A,C-,B
@@ -879,7 +879,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Shun'teria Anumele,Houston,B12,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A-,B,B-,B-,B-,B-,A-,B,B+,C+,B-,A-,B,D,B+,B-,B,D,B+,B-,B+,C+,B-
 2026,Dasia Hyams,Houston Christian,Slnd,Freshman,D-,F,D,D-,D,F,F,D-,D-,C,C-,D,D-,C,D,D,D+,D+,D+,D,D-,C-,D,F,D,D-,D,F,D,D-,D+,D-,D-
 2026,Grace Booth,Houston Christian,Slnd,Sophomore,C-,D-,B,D+,B-,D,D,D+,D,B+,B,B-,C,B-,C+,C+,B-,C+,B+,C,C,A-,B,D-,B,C+,B,D-,B,C+,B,C,C
-2026,Hannah Fields,Houston Christian,Slnd,Junior,D,D-,C-,D,C-,D-,D-,D,D-,B,B-,D+,D,D+,C-,C-,C,C,C,D+,D+,B-,C-,F,C-,D+,C-,F,C,C-,C,D,D+
+2026,Hannah Fields,Houston Christian,Slnd,Junior,D,D-,C-,D,C-,D-,D-,D-,D-,B,B-,D+,D,D+,C-,C-,C,C,C,D+,D+,B-,C-,F,C-,D+,C-,F,C,C-,C,D,D+
 2026,Jordan Jackson,Houston Christian,Slnd,Junior,C-,D-,B,D+,C+,D,D,D+,D,B+,B,B-,C,B-,C+,C+,B,C+,B,C-,C,A-,B,D-,B,C+,B-,D-,B,C+,B,C-,C
 2026,Kamryn McLaurin,Houston Christian,Slnd,Freshman,D+,D-,C+,D+,C+,D-,D-,D,D,B+,B,C,C-,C,C,C,C+,C+,B-,C-,C-,B,C+,D-,C+,C-,C+,F,C+,C,B-,D+,C-
 2026,Madelyne Davis,Houston Christian,Slnd,Sophomore,D,D-,C-,D,C-,D-,D-,D-,D-,B-,C+,D+,D,D+,C-,C-,C,C,C,D+,D+,B-,C-,F,C-,D+,C-,F,C-,D+,C,D,D+
@@ -914,11 +914,11 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Lety Vasconcelos,Illinois,B10,Sophomore,B+,C+,A,B+,A-,C+,C+,B,B-,A+,A+,A,B+,B+,B+,B+,A-,A,A,B+,B+,A+,A,C+,A,A-,A-,C+,A,A-,A+,B+,B+
 2026,Maddie Webber,Illinois,B10,Sophomore,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A+,A-,A,A,A+,A+,A,A,A+,A+,B-,A+,A,A+,B,A+,A,A+,A,A
 2026,Amelia Strong,Illinois Chicago,MVC,Junior,B-,C-,B+,B-,B+,C,C,C+,C+,A+,A,B,B,B,B,B,A,B+,B+,B,B,A,B,C-,B+,B+,B,C-,B+,B+,B+,B,B
-2026,Grace Harris,Illinois Chicago,MVC,Junior,C,D+,C-,C-,B,D+,D+,C,B-,B+,B,D+,C+,C+,C+,B,B,B-,C,C+,C+,B-,C-,D+,C-,C+,D+,D+,C-,B,B+,D+,B-
+2026,Grace Harris,Illinois Chicago,MVC,Junior,C,D+,C-,C-,B,D+,D+,C,B-,B+,B,D+,C+,C+,C+,B-,B,B-,C,C+,C+,B-,C-,D+,C-,C+,D+,D+,C-,B,B+,D+,B-
 2026,Julia Coleman,Illinois Chicago,MVC,Junior,B-,C-,A,B-,B+,C-,C,C+,C+,A+,A,A,B,A-,B,B,A-,B+,A,B,B,A+,A,C-,A,B+,A,C-,A,B+,A,B,B
 2026,Magdalena Winter,Illinois Chicago,MVC,Sophomore,C,D,B-,C-,B-,D,D,D+,D,A-,B+,C-,C+,C+,C+,C+,B+,B-,B,C,C,B+,B-,D-,B-,C+,C+,D-,B-,C+,B-,C,C
 2026,Megen Sanaj,Illinois Chicago,MVC,Junior,C-,D,D+,C-,B,D,D+,C-,C+,B,B,D+,C,C+,C+,B-,B,C+,D+,C+,C+,C,D,D+,D+,C,D,D+,D+,B,B+,D,C+
-2026,Samantha Serrano,Illinois Chicago,MVC,Sophomore,D+,D-,C-,D+,C+,D-,D-,D,D,B+,B,D+,C-,D+,C+,C,B-,C+,C,C-,C-,B-,C-,D-,C-,C,D+,D-,C-,C,C,D+,C-
+2026,Samantha Serrano,Illinois Chicago,MVC,Sophomore,D+,D-,C-,D+,C+,D-,D-,D,D,B+,B,D+,C-,D+,C+,C,B-,C+,C,C-,C-,B-,C-,D-,C-,C-,D+,D-,C-,C,C,D+,C-
 2026,Tutu Clayton,Illinois Chicago,MVC,Sophomore,D+,D-,C+,D,C,D-,D-,D,D-,B+,B-,D+,D+,C+,C-,C,B,C+,B-,D+,D+,B,C+,D-,C+,C-,C+,F,C+,C,B-,D+,C-
 2026,Doneelah Washington,Illinois St.,MVC,Sophomore,B+,B-,A+,A-,A,C+,B-,B,B,A+,A+,A+,A-,A+,B+,A-,A,A,A+,A-,B+,A+,A+,C+,A+,A,A+,C+,A+,A-,A+,A-,A-
 2026,Grace Nelson,Illinois St.,MVC,Sophomore,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B+,B-,B-,B-,B-,B+,B,A-,C+,B-,A,B+,D,B+,B,B+,D,A-,B,B+,B-,B-
@@ -955,7 +955,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Mya Zaccagnini,Iona,MAAC,Junior,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C,C+,F,B-,C+,B-,C-,C-
 2026,Yannie Chan,Iona,MAAC,Junior,C-,D+,D,C-,B,D,D+,C-,C+,B,B,D+,C,C,C,B-,B,C+,D,C+,C+,C-,D,D+,D,C+,D,D+,D,B-,B+,D,C+
 2026,Zoey Ward,Iona,MAAC,Junior,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,B-,C+,B,C-,C-,B+,B-,D-,B-,C,C+,D-,B-,C+,B,C-,C-
-2026,Addison Deal,Iowa,B10,Freshman,B-,C-,B+,B-,B+,C-,C-,C+,C+,A+,A,B,B,B,B,B,B+,B+,A-,B,B,A,B+,D+,B+,B,B,C-,B+,B,B+,B,B
+2026,Addison Deal,Iowa,B10,Freshman,B-,C-,B+,B-,B+,C-,C,C+,C+,A+,A,B,B,B,B,B,A,B+,A-,B,B,A,B+,D+,B+,B,B,C-,B+,B,B+,B,B
 2026,Ava Heiden,Iowa,B10,Sophomore,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+
 2026,Callie Levin,Iowa,B10,Sophomore,B-,C,B+,B-,A-,C,C,B-,B,A-,A-,C+,B-,B,B,B+,A-,B,A-,B,B,A,B+,C+,B+,B,B+,C,B+,B+,A,C,B+
 2026,Chazadi Wright,Iowa,B10,Sophomore,A+,A,A+,A+,A+,A,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A-,A+,A+,A+,A+,A+
@@ -978,7 +978,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Jemma Amoore,IU Indy,Horz,Sophomore,D+,D,D-,D+,B-,D,D+,D+,C+,B-,B-,D,C-,C,C,B-,B-,C+,D,C,C,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
 2026,Julia Hall,IU Indy,Horz,Freshman,D,D-,C-,D,C-,D-,D-,D-,D-,B,B-,D+,D,D+,C-,C-,C+,C,C-,D+,D+,C+,D+,F,C-,D+,D+,F,C-,C-,C,D,D+
 2026,Kamara Mills,IU Indy,Horz,Sophomore,D+,D-,C,D,C,D-,D-,D,D-,B,B-,C-,D+,C-,C-,C,C+,C,C+,D+,D+,B-,C,D-,C,C-,C-,F,C,C-,C+,D+,D+
-2026,Nevaeh Foster,IU Indy,Horz,Junior,C+,D,B+,C,B,D,D+,C-,D+,A,A-,B,C+,B,B-,B-,B,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
+2026,Nevaeh Foster,IU Indy,Horz,Junior,C+,D,B+,C,B,D,D+,C-,D+,A,A-,B,C+,B,B-,B-,B,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,B-
 2026,Olivia Smith,IU Indy,Horz,Junior,C,D,B-,C-,B-,D,D,D+,D,A-,B+,C+,C,C+,C+,C+,B-,B-,B,C,C,B+,B-,D-,B-,C+,B-,D-,B-,C+,B,C,C
 2026,Angel Wilkinson,Jackson St.,SWAC,Junior,D,F,C+,D-,D+,F,F,D-,D-,B-,C+,C-,D,C+,C-,D+,C+,C-,C+,D,D,B,C+,F,C+,D,C,F,C+,D+,C+,D,D
 2026,Camryn O'Neil,Jackson St.,SWAC,Junior,F,F,D-,F,D-,F,F,F,F,D+,D,F,F,F,D-,D-,D-,D-,D-,D-,D-,D,F,F,F,F,F,F,D-,D-,D-,F,F
@@ -987,12 +987,12 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Skyler Christmas,Jackson St.,SWAC,Sophomore,D+,D,D-,D+,B,D,D,D+,C,B-,B-,D,D+,C-,C-,B-,B-,C+,D-,C,C,D,F,D,F,C-,F,D,D-,B-,B,D,C+
 2026,Aniah Smith,Jacksonville,ASun,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B+,B-,B,B-,B-,B+,B,A-,B-,B-,A,B+,D,A-,B,B+,D+,A-,B,A-,B-,B-
 2026,Bailey Burns,Jacksonville,ASun,Junior,C-,D-,C,D+,C+,D,D,D+,D,B+,B,D+,C-,C+,C+,C+,C,C+,C+,C-,C,B-,C-,D-,C,C,C-,D-,C,C+,C+,C-,C
-2026,Carmaya Bowman,Jacksonville,ASun,Junior,B-,C-,A-,B-,B+,C-,C,C+,C+,A+,A,B+,B,B+,B,B,A-,B+,A,B,B,A,A-,D+,A-,B,B+,C-,A-,B+,A-,B,B
+2026,Carmaya Bowman,Jacksonville,ASun,Junior,B-,C-,A-,B-,B+,C-,C,C+,C+,A+,A,B+,B,B+,B,B,A-,B+,A,B,B,A,A-,D+,A-,B+,B+,C-,A-,B+,A-,B,B
 2026,Comari Mitchell,Jacksonville,ASun,Sophomore,C,D,B,C-,B-,D,D,D+,D,A-,B+,C-,C,C+,C+,C+,B,B-,B,C,C,A-,B-,D-,B,C+,B-,D-,B,C+,B,C,C
 2026,Kimora Hester,Jacksonville,ASun,Freshman,C-,D,D,D+,B-,D,D+,C-,C+,B,B,D+,C-,C,C-,B-,B,C+,D,C,C+,C-,D,D+,D,C-,D-,D,D,B-,B+,D,C+
 2026,Mariah Knight,Jacksonville,ASun,Sophomore,C+,C-,B-,C+,B+,C-,C,C+,B-,B+,B+,C,C+,B-,B-,B,B+,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A-,C-,B
 2026,Mychal White,Jacksonville,ASun,Sophomore,C+,D,B,C+,B,D+,D+,C,D+,A,A-,C,C+,B-,B-,B-,B+,B,B,C+,C+,A-,B,D,B,B-,B-,D,B,B-,A,C+,B-
-2026,Priscilla Williams,Jacksonville,ASun,Sophomore,B,C+,A+,B,A-,C+,C+,B-,B-,A+,A+,A+,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C,A+,A-,A,C,A,B+,B+,B+,B+
+2026,Priscilla Williams,Jacksonville,ASun,Sophomore,B,C+,A+,B+,A-,C+,C+,B-,B-,A+,A+,A+,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C,A+,A-,A,C,A,B+,B+,B+,B+
 2026,Sharmela Reid,Jacksonville,ASun,Junior,C+,C-,C+,C+,B+,D+,C-,C,B-,B+,B+,C-,C+,B-,C+,B,B+,B-,B-,B-,B-,B,C+,C-,C+,C+,C,C-,C+,B,A-,D+,B
 2026,Tatum Brown,Jacksonville,ASun,Freshman,B,C,A+,B,A-,C,C,B-,C+,A+,A+,A+,B+,B+,B,B,A-,A-,A+,B,B,A+,A,C-,A+,B+,A,C,A,B+,A-,B,B+
 2026,Kyera Thornsbury,Jacksonville St.,CUSA,Sophomore,C+,D,B-,C,B-,D,D+,C-,D+,A,A-,C,C+,B-,B-,B-,B,B,B-,C+,C+,B+,C+,D,B-,B-,C+,D,B-,B-,B-,C+,B-
@@ -1039,7 +1039,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Meghan Murray,Kent St.,MAC,Sophomore,C-,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C,B-,B,C+,D+,C+,C+,C+,D,D+,D+,C,D,D+,D+,B,B+,D,B-
 2026,Mya Babbitt,Kent St.,MAC,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B+,B-,B,B-,B-,B,B,A-,C+,B-,A,B+,D,A-,B,B+,D+,A-,B,A,B-,B-
 2026,Riley Rismiller,Kent St.,MAC,Junior,C,D,B,C-,B-,D,D,D+,D,A-,B+,B,C,B-,C+,C+,B,B-,B+,C,C+,A-,B,D-,B,C+,B,D-,B,C+,B,C,C
-2026,Rylee Kalocay,Kent St.,MAC,Freshman,B-,C,B+,B-,A-,C+,C+,B-,B,A-,A-,C,B-,B,B,B+,A-,B,A-,B,B,A,B+,C+,B+,B,B+,C+,B+,B+,A,C,B+
+2026,Rylee Kalocay,Kent St.,MAC,Freshman,B-,C,B+,B-,A-,C+,C+,C+,B,A-,A-,C,B-,B,B,B+,A-,B,A-,B,B,A,B+,C+,B+,B,B+,C+,B+,B+,A,C,B+
 2026,Asia Boone,Kentucky,SEC,Junior,A,B,A+,A+,A+,B,B+,A-,A-,A+,A+,A+,A,A+,A,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A,A+,A
 2026,Clara Strack,Kentucky,SEC,Junior,A+,A+,A+,A+,A+,A,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A+,A+
 2026,Kaelyn Carroll,Kentucky,SEC,Freshman,B+,B-,A+,A-,A,C+,B-,B,B-,A+,A+,A+,A-,A+,B+,B+,A+,A,A+,A-,B+,A+,A+,C+,A+,A-,A+,C+,A+,A-,A+,B+,A-
@@ -1064,7 +1064,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Charity Sawyer,La Salle,A10,Freshman,D,D-,F,D,C,D-,D-,D,C-,C+,C+,D,D,D+,D-,C+,C+,C,F,C-,D+,F,F,D-,F,D+,F,D-,F,C+,B-,D-,C-
 2026,India Webb,La Salle,A10,Freshman,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F,F
 2026,Joan Quinn,La Salle,A10,Sophomore,C+,D,B+,C,B,D,D+,C-,D+,A,A-,B,C+,B,C+,B-,B+,B,A-,C+,C+,A,B+,D,B+,B-,B+,D,B+,B-,B+,C+,B-
-2026,Kiara Williams,La Salle,A10,Sophomore,C+,D,B,C,B,D,D+,C,D+,A,A-,B-,C+,B-,B-,B-,B+,B,B,C+,C+,A-,B,D,B,B-,B-,D,B,B-,B,C+,B-
+2026,Kiara Williams,La Salle,A10,Sophomore,C+,D,B,C,B,D,D+,C-,D+,A,A-,B-,C+,B-,B-,B-,B+,B,B,C+,C+,A-,B,D,B,B-,B-,D,B,B-,B,C+,B-
 2026,Lauren Patnode,La Salle,A10,Sophomore,C-,D-,C+,D+,C+,D-,D-,D,D,B+,B,C,C-,C,C,C+,B,C+,C+,C-,C-,B,C+,D-,C+,C,C,D-,C+,C+,B-,C-,C
 2026,Sania Jenkins,La Salle,A10,Sophomore,C,D+,C-,C-,B,D+,D+,C,B-,B+,B,D+,C+,C+,C-,B,B+,B-,C,C+,C+,B-,C-,D+,C-,C+,C-,D+,C,B,B+,D+,B-
 2026,Yar Manyiel,La Salle,A10,Junior,D+,D,D-,D+,B-,D,D,D+,C,B-,B-,D,D+,C-,C,B-,B-,C+,D-,C,C,D,D-,D,F,C-,F,D,D-,B-,B,D,C
@@ -1106,14 +1106,14 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Valerie Norwood,Lindenwood,OVC,Freshman,D,D-,C-,D,C-,D-,D-,D-,D-,B,C+,D+,D,D+,D+,C-,C-,C,C-,D+,D+,C+,D+,F,C-,D+,D+,F,C-,D+,C,D,D+
 2026,Addison Melton,Lipscomb,ASun,Sophomore,C+,D+,C,C,B,C-,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,C+,B-,B,C,C-,C,C+,C-,C-,C,B,A-,D+,B-
 2026,Elena Bertrand,Lipscomb,ASun,Junior,C-,D-,C,D+,C+,D-,D,D+,D,B+,B,D+,C-,C+,C+,C+,B-,C+,C+,C-,C-,B,C,D-,C,C+,C-,D-,C,C+,C+,C-,C
-2026,Hannah Richardson,Lipscomb,ASun,Sophomore,D+,D-,C-,D,C,D-,D-,D,D-,B,B-,D,D+,B,C-,C,C+,C,C+,D+,D+,B-,C-,D-,C,C-,C-,F,C,C-,C,D+,D+
+2026,Hannah Richardson,Lipscomb,ASun,Sophomore,D+,D-,C-,D,C,D-,D-,D,D-,B,B-,D,D+,B,C-,C,B-,C,C+,D+,D+,B-,C-,D-,C,C-,C-,F,C,C-,C,D+,D+
 2026,Hope Counts,Lipscomb,ASun,Freshman,D,D-,C+,D,C,D-,D-,D-,D-,B,B-,C+,D,C+,C-,C-,C+,C+,B-,D+,D+,B+,C+,F,C+,C-,C+,F,B-,C-,B-,D,D+
-2026,Maris Zurliene,Lipscomb,ASun,Freshman,C-,D-,C,D+,C+,D-,D-,D,D,B+,B,C-,C-,C-,C,C,B,C+,C+,C-,C-,B,C,D-,C+,C,C,F,C+,C+,C+,C-,C-
+2026,Maris Zurliene,Lipscomb,ASun,Freshman,C-,D-,C,D+,C+,D-,D-,D,D,B+,B,C-,C-,C-,C,C,B,C+,C+,C-,C-,B,C,D-,C+,C,C,D-,C+,C+,C+,C-,C-
 2026,McKayla Miller,Lipscomb,ASun,Junior,D+,D-,B+,D+,C+,D-,D-,D,D,B+,B,B,C-,B,C,C,B-,C+,B+,C-,C-,A,B,D-,B+,C,B,F,B+,C+,B+,C-,C-
 2026,Olivia Vinson,Lipscomb,ASun,Freshman,D+,D-,C-,D,C,D-,D-,D,D-,B,B-,D,D+,C-,C-,C,B-,C,C-,D+,D+,C+,D+,D-,C-,C-,D+,F,C-,C-,C-,D+,D+
 2026,Taylor Holt,Lipscomb,ASun,Sophomore,D+,D,D-,D+,B-,D,D,D+,C+,B-,B-,D,C-,C,C,B-,B,C+,D,C,C,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
 2026,Ashley Lester,Little Rock,OVC,Junior,D+,D,D-,D+,B-,D,D,D+,C+,B-,B-,D,C-,C,C+,B-,B,C+,D-,C,C,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
-2026,Blessing Teamer,Little Rock,OVC,Junior,D,F,C-,D-,C-,F,F,D-,D-,B-,C+,D+,D,D+,D+,D+,C,C-,C,D+,D+,B-,C-,F,C-,D+,D+,F,C-,D+,C,D,D
+2026,Blessing Teamer,Little Rock,OVC,Junior,D,D-,C-,D-,C-,F,F,D-,D-,B-,C+,D+,D,D+,D+,D+,C,C-,C,D+,D+,B-,C-,F,C-,D+,D+,F,C-,D+,C,D,D
 2026,Brenna Burk,Little Rock,OVC,Sophomore,C-,D-,C+,D+,C+,D,D,D+,D,B+,B,C,C,C,C+,C+,C+,C+,B-,C,C,B,C+,D-,C+,C+,C+,D-,C+,C+,B-,C-,C
 2026,Destinee Salgado,Little Rock,OVC,Sophomore,D-,F,D+,D-,D+,F,F,D-,D-,B-,C+,D,D,D,C-,D+,C-,C-,C-,D,D,C+,D+,F,D+,D,D+,F,D+,D,C-,D,D
 2026,Jarahle Daniels,Little Rock,OVC,Junior,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,C+,B,B+,B,B-,B-,B-,B+,C+,C-,C+,C+,C+,C-,B-,B,A-,C-,B
@@ -1131,7 +1131,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Christy Reynoso,Long Beach St.,BW,Sophomore,D-,F,D+,D-,D+,F,F,D-,D-,C+,C,D,D-,D,D+,D+,D+,C-,D+,D+,D,C,D,F,D+,D,D,F,D+,D,C-,D-,D
 2026,Haley Wright,Long Beach St.,BW,Sophomore,D+,D-,D-,D,C+,D,D,D+,C,B-,B-,D,D+,C-,C-,C+,B-,C,D-,C,C-,D,F,D,F,D+,F,D,D-,C+,B,D,C
 2026,JaQuoia Jones-Brown,Long Beach St.,BW,Sophomore,C,D,B+,C-,B-,D,D,C-,D+,A-,B+,B+,C+,B,C+,C+,B+,B-,A-,C,C+,A,B+,D-,B+,B-,B+,D-,A-,C+,B+,C,C+
-2026,Judit Oliva Fernandez,Long Beach St.,BW,Sophomore,D-,F,C-,F,D-,F,F,F,F,C-,D+,D+,D-,C-,D,D,C-,D,C-,D-,D-,C+,D+,F,C-,D-,D+,F,C-,D-,C-,D-,D-
+2026,Judit Oliva Fernandez,Long Beach St.,BW,Sophomore,D-,F,C-,F,D-,F,F,F,F,C-,D+,D+,D-,D+,D,D,C-,D,C-,D-,D-,C+,D+,F,C-,D-,D+,F,C-,D-,C-,D-,D-
 2026,Kennan Ka,Long Beach St.,BW,Junior,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,C+,D,D+,C,C-,C,D,D,B-,C-,F,C-,D,C-,F,C-,D,C,D-,D
 2026,Lauren Cummings,Long Beach St.,BW,Sophomore,D+,D,D,D+,B-,D,D+,C-,C+,B,B,D,C-,C,C,B-,B,C+,D,C+,C+,C-,D,D+,D,C-,D,D,D,B-,B+,D,C+
 2026,Morgan Mack,Long Beach St.,BW,Freshman,D-,F,D,D-,D+,F,F,D-,D-,C+,C,D-,D-,D-,C-,D+,D,C-,D,D,D,C-,D,F,D,D,D,F,D,D,D,D-,D
@@ -1141,7 +1141,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Frances Ulysse,Longwood,BSth,Junior,C,D,C+,C-,B-,D,D,D+,D,A-,B+,C+,C+,C,C+,C+,B-,B-,B-,C,C+,B+,C+,D-,C+,C+,C+,D-,B-,C+,B-,C,C+
 2026,Jesstynie Scott,Longwood,BSth,Freshman,C+,D,B+,C,B,D,D+,C-,D+,A,A-,B+,C+,B,C+,B-,B+,B,A-,C+,C+,A,B+,D,A-,B-,B+,D,A-,B-,A-,C+,B-
 2026,Kayla Washington,Longwood,BSth,Freshman,C,D+,C,C,B,D+,C-,C,B-,B+,B,D+,C+,C+,C+,B,B+,B-,C+,C+,B-,B-,C-,C-,C,C+,C-,D+,C,B,B+,D+,B-
-2026,Lili Booker,Longwood,BSth,Sophomore,C,D+,D+,C-,B+,D+,D+,C,C+,B,B,D+,C,C+,C,B-,B+,C+,C-,C+,C+,C+,D+,D+,D+,C,D+,D+,D+,B,B+,D,B-
+2026,Lili Booker,Longwood,BSth,Sophomore,C,D+,D+,C-,B+,D+,D+,C-,C+,B,B,D+,C,C+,C,B-,B+,C+,C-,C+,C+,C+,D+,D+,D+,C,D+,D+,D+,B,B+,D,B-
 2026,Otaifo Esenabhalu,Longwood,BSth,Junior,C+,D,B-,C,B,D,D+,C-,D+,A,A-,C+,C+,C+,B-,B-,B,B,B-,C+,C+,B+,C+,D,B-,B-,C+,D,B-,B-,B-,C+,C+
 2026,Amijah Price,Louisiana,SB,Freshman,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,D+,D+,D+,C-,D+,C,D,D,B-,C-,F,C-,D,D+,F,C-,D,C,D-,D
 2026,Bianca Silva,Louisiana,SB,Junior,D-,F,D,D-,D,F,F,D-,D-,C,C-,D,D-,D-,D,D,D+,D+,D+,D-,D-,C,D,F,D,D-,D,F,D+,D,D+,D-,D-
@@ -1174,7 +1174,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Grace Mbugua,Louisville,ACC,Freshman,B-,C+,A,B,A,C+,C+,B-,B+,A-,A,C+,B,B,B+,B+,A,B+,A,B,B,A+,A,C+,A,B+,A-,C+,A,A-,A,C+,B+
 2026,Imari Berry,Louisville,ACC,Sophomore,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A+,A+
 2026,Mackenly Randolph,Louisville,ACC,Sophomore,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,A-,A+,A+,A+,A+,A+
-2026,Reagan Bender,Louisville,ACC,Sophomore,B,B-,A+,B+,A,B-,B-,B,A-,A,A,B-,B+,B+,B+,A-,A,A-,A+,B+,B+,A+,A+,B-,A+,A-,A+,B-,A+,A-,A+,B-,A-
+2026,Reagan Bender,Louisville,ACC,Sophomore,B,B-,A+,B+,A,B-,B-,B,A-,A,A,B-,B+,B+,B+,A-,A,A-,A+,A-,B+,A+,A+,B-,A+,A-,A+,B-,A+,A-,A+,B-,A-
 2026,Skylar Jones,Louisville,ACC,Junior,A+,A-,A+,A+,A+,A-,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Tajianna Roberts,Louisville,ACC,Sophomore,A,B+,A+,A+,A+,B+,A-,A-,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B,A+,A+,A+,A+,A
 2026,Yevheniia Putra,Louisville,ACC,Freshman,C+,C,B,C+,A-,C,C,C+,B,B+,A-,C,B-,B-,B,B,A-,B,B,B-,B-,B+,B-,C,B-,B,B-,C,B,B+,A,C-,B
@@ -1228,7 +1228,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Justine Henry,Marist,MAAC,Freshman,D+,D-,B,D+,C+,D-,D-,D,D,B+,B,D+,C-,B-,C,C+,B,C+,B,C-,C-,A-,B,D-,B,C,B-,D-,B,C+,B,C-,C-
 2026,Karly Fischer,Marist,MAAC,Junior,D-,F,D,D-,D+,F,F,D-,D-,B-,C+,D-,D,D-,D+,D+,D,C,D,D,D,C-,D,F,D,D,D,F,D,D,D,D,D
 2026,Kasey Bretones,Marist,MAAC,Sophomore,D-,F,D,D-,D+,F,F,D-,D-,C+,C,D-,D-,D-,D+,D+,D,D+,D,D,D,C-,D-,F,D,D,D,F,D,D,D,D-,D
-2026,Charia Smith,Marquette,BE,Junior,C+,C-,B-,C+,A-,C-,C,C+,B-,B+,B+,C,B-,B-,B-,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A-,C-,B
+2026,Charia Smith,Marquette,BE,Junior,C+,C-,B-,C+,A-,C-,C,C+,B-,B+,B+,C,B-,B-,B-,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A,C-,B
 2026,Halle Vice,Marquette,BE,Junior,B+,B-,A+,A-,A,C+,B-,B,B,A+,A+,A+,A-,A,B+,B+,A+,A,A+,A-,B+,A+,A+,C+,A+,A,A+,C+,A+,A-,A+,A-,A-
 2026,Jada Bediako,Marquette,BE,Junior,C+,C,B,C+,A-,C,C,C+,B,B+,A-,C,B-,B-,B,B+,A-,B,B+,B,B-,A-,B,C+,B,B,B,C,B,B+,A,C-,B
 2026,Jordan Meulemans,Marquette,BE,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,B,B,B+,C+,B-,A,B,D,B+,B,B,D,B+,B,B+,B-,B-
@@ -1269,7 +1269,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Jordan Hunter,Memphis,Amer,Sophomore,C+,D,B,C,B-,D,D,C-,D+,A-,B+,C,C+,B-,C+,C+,B+,B-,B,C+,C+,B+,B-,D-,B,B-,B-,D,B,B-,B,C,C+
 2026,Kennedi Alexander,Memphis,Amer,Sophomore,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,D+,C-,C+,C,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Paris Gaines,Memphis,Amer,Junior,C+,D,B,C,B-,D,D+,C-,D+,A-,A-,B-,C+,B-,B-,B-,B,B-,B,C+,C+,A-,B,D,B,B-,B-,D,B,B-,B,C+,C+
-2026,Tamya Smith,Memphis,Amer,Sophomore,C,D,B,C-,B-,D,D,D+,D,A-,B+,C-,C+,C+,C+,C+,B,B-,B+,C,C+,A-,B,D-,B,C+,B,D-,B,C+,B,C,C+
+2026,Tamya Smith,Memphis,Amer,Sophomore,C,D,B,C-,B-,D,D,D+,D,A-,B+,C-,C+,C+,C+,C+,B,B-,B+,C,C,A-,B,D-,B,C+,B,D-,B,C+,B,C,C+
 2026,Abigail Holtman,Mercer,SC,Junior,C+,D,B+,C+,B,D+,D+,C,C-,A,A-,B+,C+,B,B-,B-,B+,B,A-,C+,C+,A,B+,D,B+,B-,B+,D,B+,B-,B+,C+,B-
 2026,Elena Cabello,Mercer,SC,Junior,D,D-,C+,D,C-,D-,D-,D-,D-,B,C+,C,D,B-,C-,C-,C+,C,B-,D+,D+,B,C+,F,C+,D+,C,F,C+,C-,B-,D,D+
 2026,Khadidja Toure,Mercer,SC,Junior,D+,D,D-,D+,B-,D,D+,D+,C+,B-,B-,D,C-,C,D+,B-,B,C+,D,C,C,D+,D-,D,D-,D+,D-,D,D,B-,B+,D,C+
@@ -1284,7 +1284,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Ella Cupka,Mercyhurst,NEC,Sophomore,D+,D,D-,D,B-,D,D,D+,C,B-,B-,D,D+,C-,D+,C+,B-,C+,D-,C,C-,D-,F,D,F,D+,F,D,D-,C+,B,D,C
 2026,Erica Hall,Mercyhurst,NEC,Sophomore,D-,F,D+,D-,D+,F,F,D-,D-,B-,C+,D,D,D,D+,D+,D+,D+,D+,D,D,C,D,F,D+,D,D,F,D+,D+,D+,D,D
 2026,Gabby Sweeney,Mercyhurst,NEC,Freshman,D,D-,D-,D,C+,D,D,D+,C,B-,C+,D,D+,C-,C-,C+,B-,C,D-,C-,C-,D-,F,D,F,D+,F,D,D-,C+,B,D-,C
-2026,Imani Frazier,Mercyhurst,NEC,Freshman,D,D-,F,D,C+,D-,D-,D,D+,C,C+,D-,D,D+,D+,C+,C+,C-,F,D+,D+,F,F,D-,F,D,F,D-,F,C+,B-,D-,C-
+2026,Imani Frazier,Mercyhurst,NEC,Freshman,D,D-,F,D,C+,D-,D-,D,D+,C+,C+,D-,D,D+,D+,C+,C+,C-,F,D+,D+,F,F,D-,F,D,F,D-,F,C+,B-,D-,C-
 2026,Julia Lewis,Mercyhurst,NEC,Freshman,D,D-,F,D,C+,D-,D,D,C-,C+,C+,D,D,D+,C,C+,C+,C,F,C-,C-,F,F,D-,F,D+,F,D-,F,C+,B,D-,C-
 2026,Lena Walz,Mercyhurst,NEC,Sophomore,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,D+,D+,D+,C-,D+,C,D,D,B-,C-,F,C-,D,C-,F,C-,D,C,D-,D
 2026,Quinn Borroni,Mercyhurst,NEC,Sophomore,D+,D,D,D+,B-,D,D+,C-,C+,B,B-,D,C-,C,C-,B-,B,C+,D,C,C+,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
@@ -1304,7 +1304,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Gal Raviv,Miami FL,ACC,Freshman,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A-,B+,B+,B+,B+,B+,A-,A,B+,B,A+,A-,C,A,A-,A-,C,A,B+,A+,B+,B+
 2026,Meredith Tippner,Miami FL,ACC,Freshman,C+,C,B+,B-,A-,C,C,C+,B,A-,A-,C,B-,B-,B-,B+,A-,B,A-,B,B,A,B+,C+,B+,B-,B,C,B+,B+,A,C,B+
 2026,Natalie Wetzel,Miami FL,ACC,Freshman,B,C+,A+,B+,A-,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A+,A-,A,C+,A,A-,A,B+,B+
-2026,Soma Okolo,Miami FL,ACC,Freshman,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A-,B+,B+,B+,B,A-,A-,A,B+,B,A+,A-,C,A,B+,A-,C,A-,B+,A,B,B+
+2026,Soma Okolo,Miami FL,ACC,Freshman,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A-,B+,B+,B+,B+,A-,A-,A,B+,B,A+,A-,C,A,B+,A-,C,A-,B+,A,B,B+
 2026,Vittoria Blasigh,Miami FL,ACC,Sophomore,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A,B+,B+,B,B+,A,A-,A+,B+,B,A+,A,C,A,B+,A,C,A,B+,A,B+,B+
 2026,Amber Tretter,Miami OH,MAC,Junior,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A+,A-,A+,B+,A-,A,A,A+,A-,A-,A+,A+,C+,A+,A,A+,C+,A+,A-,A,A-,A-
 2026,Clara Gonzalez Planella,Miami OH,MAC,Junior,B-,D+,B+,C+,B+,C-,C-,C+,C,A+,A,B,B-,B,B-,B-,B+,B+,A-,B-,B-,A,B+,D+,B+,B,B+,D+,B+,B,A,B-,B
@@ -1313,7 +1313,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Macie Taylor,Miami OH,MAC,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,B,C+,B-,B-,B-,A,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,B-
 2026,Mio Sakano,Miami OH,MAC,Freshman,C,D+,C,C,B,D+,C-,C,B-,B+,B,D+,C+,C+,C+,B,B+,B-,C+,C+,C+,B-,C-,C-,C,C+,C-,D+,C,B,B+,D+,B-
 2026,Nuria Jurjo,Miami OH,MAC,Junior,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A,B+,A-,B,B+,B+,A-,A+,B+,B,A+,A,C,A,B+,A,C,A,B+,A,B+,B+
-2026,Tamar Singer,Miami OH,MAC,Sophomore,B,C+,A,B+,A-,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A,B+,A-
+2026,Tamar Singer,Miami OH,MAC,Sophomore,B,C+,A,B+,A-,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A,B+,B+
 2026,Aaiyanna Dunbar,Michigan,B10,Sophomore,C+,C-,B-,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B,B,B+,B,B-,B-,B-,B+,C+,C-,C+,C+,C+,C-,B-,B,A-,C-,B
 2026,Ashley Sofilkanich,Michigan,B10,Junior,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Kendall Dudley,Michigan,B10,Sophomore,A,B+,A+,A+,A+,B,B+,A-,A-,A+,A+,A+,A,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
@@ -1360,7 +1360,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Sira Thienou,Mississippi,SEC,Sophomore,A+,A-,A+,A+,A+,A-,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Tianna Thompson,Mississippi,SEC,Sophomore,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A+,A-,A-,A,A+,A+,A,A,A+,A+,B-,A+,A,A+,B-,A+,A,A+,A,A
 2026,Awa Fane,Mississippi St.,SEC,Junior,B-,C,B+,B-,A-,C,C+,B-,B,A-,A-,C+,B-,B,B-,B+,A-,B,A-,B,B,A,B+,C+,B+,B,B+,C,B+,B+,A,C,B+
-2026,Favour Nwaedozi,Mississippi St.,SEC,Junior,A+,A-,A+,A+,A+,A-,A,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
+2026,Favour Nwaedozi,Mississippi St.,SEC,Junior,A+,A-,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Jaylah Lampley,Mississippi St.,SEC,Freshman,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A+,A-,A,A-,A-,A,A,A+,A-,A-,A+,A+,C+,A+,A,A+,C+,A+,A-,A+,A-,A-
 2026,Madison Francis,Mississippi St.,SEC,Freshman,A,B+,A+,A+,A+,B+,B+,A-,A,A+,A+,A+,A+,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A+,A+,A+,A
 2026,Saniyah King,Mississippi St.,SEC,Sophomore,C-,D-,B-,D+,C+,D-,D,D,D,B+,B,C+,C-,B-,C+,C+,B,B-,B,C,C-,B+,B-,D-,B-,C,C+,D-,B-,C+,B,C-,C
@@ -1372,13 +1372,13 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Sydnei Marshall,Mississippi Valley St.,SWAC,Junior,D-,F,C-,F,D,F,F,F,D-,C-,C-,D+,D-,D+,D,D,C-,D,C,D-,D-,C+,D+,F,C-,D-,D+,F,C-,D-,C,D-,D-
 2026,Sydney Thompson,Mississippi Valley St.,SWAC,Freshman,C-,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C,B-,B,C+,C-,C+,C+,C+,D+,D+,D+,C,D+,D+,D+,B,B+,D,B-
 2026,Taylor Crawford,Mississippi Valley St.,SWAC,Freshman,D,D-,D-,D,C+,D,D,D,C,B-,C+,D,D+,C-,C-,C+,C+,C,F,C-,C-,D-,F,D,F,D+,F,D-,F,C+,B,D-,C
-2026,Abbey Schreacke,Missouri,SEC,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A,A-,B,B,B,B,B+,B+,A,B,B,A+,A,C-,A,B+,A-,C-,A,B+,A+,B,B
+2026,Abbey Schreacke,Missouri,SEC,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A+,A-,B,B,B,B,B+,B+,A,B,B,A+,A,C-,A,B+,A-,C-,A,B+,A+,B,B
 2026,Chloe Sotell,Missouri,SEC,Sophomore,B,C,A,B,A-,C,C,B-,C+,A+,A+,A,B+,B+,B,B,A-,A-,A+,B,B,A+,A,C-,A,B+,A,C,A,B+,A+,B,B+
 2026,Grace Slaughter,Missouri,SEC,Junior,A-,B-,A,A,A,B-,B,B+,B+,A+,A+,A,A-,A-,A-,A-,A+,A+,A+,A,A-,A+,A,B-,A,A,A,B-,A,A,A-,A,A-
-2026,Lisa Thompson,Missouri,SEC,Junior,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,A-,B,B-,B-,B-,B,C+,C-,C+,B-,C+,C-,B-,B,A-,D+,B
+2026,Lisa Thompson,Missouri,SEC,Junior,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,B+,B,B-,B-,B-,B,C+,C-,C+,B-,C+,C-,B-,B,A-,C-,B
 2026,Ma'Riya Vincent,Missouri,SEC,Freshman,C+,C,B+,B-,A-,C,C,C+,B,A-,A-,C+,B-,B-,B-,B+,A-,B,A-,B,B,A,B+,C+,B+,B-,B,C,B+,B+,A,C,B+
 2026,Reka Toman,Missouri,SEC,Freshman,B-,C+,A-,B-,A-,C+,C+,B-,B+,A-,A,C+,B,B,B,B+,A,B+,A,B,B,A,A-,C+,A-,B,B+,C+,A-,B+,A,C,B+
-2026,Shannon Dowell,Missouri,SEC,Junior,B,C+,A,B,A-,C+,C+,B-,B-,A+,A+,A-,B+,B+,B+,B+,A-,A-,A,B+,B+,A+,A-,C,A,A-,A-,C,A,B+,A+,B+,B+
+2026,Shannon Dowell,Missouri,SEC,Junior,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A-,B+,B+,B+,B+,A-,A-,A,B+,B+,A+,A-,C,A,A-,A-,C,A,B+,A+,B+,B+
 2026,Audrey Hopkins,Missouri St.,CUSA,Freshman,B-,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,A-,B,A-,B-,B-,A,B+,D,B+,B,B,D+,B+,B,B+,B-,B-
 2026,JaNyla Bush,Missouri St.,CUSA,Sophomore,D+,D-,C,D,C,D-,D-,D,D-,B+,B-,D+,D+,C+,C-,C,B,C+,C+,C-,D+,B-,C,D-,C,C-,C-,F,C,C,C+,D+,C-
 2026,Kaemyn Bekemeier,Missouri St.,CUSA,Junior,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A,B+,B+,B+,B+,A-,A,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A+,B+,B+
@@ -1398,7 +1398,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Kennedy Gillette,Montana,BSky,Junior,D,D-,C+,D,C,D-,D-,D,D-,B,B-,D+,D,C+,C,C-,B-,C,C+,D+,D+,B,C,F,C+,D+,C,F,C+,C-,C+,D,D+
 2026,Macy Donarski,Montana,BSky,Sophomore,D,D-,C,D-,C-,D-,D-,D-,D-,B-,C+,D+,D,B-,C-,C-,C+,C,C+,D+,D+,B-,C-,F,C,D+,C-,F,C,D+,C+,D,D+
 2026,Rae Ehrman,Montana,BSky,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,A-,B,A-,B-,B-,A,B+,D,B+,B,B,D+,B+,B,B+,B-,B-
-2026,Addison Harris,Montana St.,BSky,Sophomore,B,C+,A,B,A-,C+,C+,B-,B-,A+,A+,A-,B+,B+,B,B+,A,A-,A,B+,B+,A+,A-,C,A,B+,A-,C,A,B+,A,B+,B+
+2026,Addison Harris,Montana St.,BSky,Sophomore,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A-,B+,B+,B,B+,A,A-,A,B+,B+,A+,A-,C,A,A-,A-,C,A,B+,A,B+,B+
 2026,Brianne Bailey,Montana St.,BSky,Freshman,C+,D,B,C,B,D+,D+,C-,D+,A,A-,C,C+,B-,B-,B-,A-,B,B+,C+,C+,A-,B,D,B+,B-,B,D,B,B-,B,C+,B-
 2026,Brooke Fatupaito,Montana St.,BSky,Junior,C+,C-,B-,C+,A-,C-,C,C+,B-,B+,B+,C,B-,B-,B-,B,A-,B,B,B-,B-,B+,B-,C,B-,B,C+,C,B-,B+,A-,C-,B
 2026,Courtney Smith,Montana St.,BSky,Freshman,D+,D,D,D+,B-,D,D+,C-,C+,B,B-,D,C-,C,C,B-,B-,C+,D,C,C+,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
@@ -1444,7 +1444,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Christina Liggio,Navy,Pat,Freshman,C-,D-,C+,D+,C+,D,D,D+,D,B+,B,D+,C,B-,C,C+,B+,C+,B-,C,C,B+,C+,D-,C+,C+,C+,D-,B-,C+,B-,C-,C
 2026,Julianna Almeida,Navy,Pat,Sophomore,B-,C-,B+,B-,B,C-,C-,C+,C,A+,A,B,B,B,B-,B,B+,B+,A-,B-,B-,A,B+,D+,B+,B,B,D+,B+,B,B+,B-,B
 2026,Lizzie Holder,Navy,Pat,Junior,C-,D+,D+,C-,B,D,D+,C-,C+,B,B,D+,C,C+,C+,B-,B,C+,D+,C+,C+,C,D,D+,D+,C,D,D+,D+,B,B+,D,B-
-2026,Mary Gibbons,Navy,Pat,Sophomore,C-,D-,B-,D+,C+,D-,D,D+,D,B+,B,D+,C-,C,C+,C+,B,C+,B-,C-,C,B+,C+,D-,B-,C,C+,D-,B-,C+,B-,C-,C
+2026,Mary Gibbons,Navy,Pat,Sophomore,C-,D-,B-,D+,C+,D-,D,D+,D,B+,B,D+,C-,C,C+,C+,B,C+,B-,C,C,B+,C+,D-,B-,C,C+,D-,B-,C+,B-,C-,C
 2026,Quinn Boettinger,Navy,Pat,Freshman,B,B-,A+,B,A,C+,B-,B,B+,A,A,B-,B,B,B+,A-,A,B+,A+,B+,B+,A+,A,B-,A,A-,A,B-,A,A-,A,C+,A-
 2026,Saran Moschella,Navy,Pat,Junior,C-,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C,B-,B,C+,D+,C+,C+,C+,D,D+,D+,C,D,D+,D+,B,B+,D,B-
 2026,Zanai Barnett-Gay,Navy,Pat,Junior,A-,B,A+,A,A,B-,B,B+,B+,A+,A+,A+,A,A+,A-,A-,A+,A+,A+,A,A-,A+,A+,B-,A+,A,A+,B-,A+,A,A+,A,A-
@@ -1465,7 +1465,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Jessica Petrie,Nebraska,B10,Junior,A-,B,A+,A,A+,B,B+,B+,A-,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A,A+,A
 2026,Kennadi Williams,Nebraska,B10,Sophomore,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A,A-,A,B+,B+,A,A+,A+,A-,B+,A+,A,C+,A+,A,A,C+,A,A-,A,A-,A-
 2026,Logan Nissley,Nebraska,B10,Junior,A,B+,A+,A+,A+,B+,B+,A-,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B,A+,A+,A+,A+,A
-2026,Petra Bozan,Nebraska,B10,Sophomore,B,C,A-,B,A-,C+,C+,B-,C+,A+,A+,B+,B+,B+,B,B+,A+,A-,A,B,B,A,A-,C,A-,B+,B+,C,A-,B+,A-,B,B+
+2026,Petra Bozan,Nebraska,B10,Sophomore,B,C,A-,B,A-,C+,C+,B-,C+,A+,A+,B+,B+,B+,B,B+,A+,A-,A,B,B,A,A-,C,A-,B+,B+,C,A-,B+,A-,B+,B+
 2026,Ali Stephens,Nebraska Omaha,Sum,Junior,F,F,D-,F,D-,F,F,F,F,D+,D,D-,F,D-,D-,D-,D,D-,D,D-,D-,D+,D-,F,D-,F,D-,F,D,D-,D,F,F
 2026,Avril Smith,Nebraska Omaha,Sum,Freshman,D+,D-,B,D+,C+,D-,D-,D,D,B+,B,B-,C-,B-,C,C,B,C+,B+,C-,C-,A-,B,D-,B,C,B,F,B,C+,B,D+,C-
 2026,Cora Olsen,Nebraska Omaha,Sum,Junior,B-,C+,B+,B-,A,C+,C+,B-,B,A-,A-,C,B-,B-,B,B+,A-,B,A-,B,B,A,B,C+,B+,B,B,C+,B+,B+,A,C,B+
@@ -1504,7 +1504,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Renelle Grannum,New Haven,NEC,Sophomore,F,F,D-,F,D-,F,F,F,F,D+,D,F,F,F,D-,D-,D-,D,D-,D-,D-,D-,F,F,F,F,F,F,D-,D-,F,F,F
 2026,Schuyler Coles,New Haven,NEC,Sophomore,F,F,D-,F,D-,F,F,F,F,D,D,F,F,F,D-,D-,D-,D-,D-,F,F,D-,F,F,F,F,F,F,D-,D-,F,F,F
 2026,Teaira Kelley,New Haven,NEC,Freshman,D-,F,D-,F,D-,F,F,F,F,C-,D+,D-,D-,D-,D-,D,D-,D,D-,D-,D-,D+,D-,F,D-,D-,D-,F,D,D-,D-,D-,D-
-2026,Cacia Antonio,New Mexico,MWC,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A,A-,B,B+,B,B,A-,B+,A,B,B,A+,A-,C-,A,B+,A-,C-,A,B+,A-,B,B
+2026,Cacia Antonio,New Mexico,MWC,Junior,B,C-,A,B-,B+,C,C,C+,C+,A+,A,A-,B,B+,B,B,A-,B+,A,B,B,A+,A-,C-,A,B+,A-,C-,A,B+,A-,B,B
 2026,Destinee Hooks,New Mexico,MWC,Junior,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A,B+,B,B,B,B,A,B+,A,B,B,A,B+,C-,A-,B+,B+,C-,A-,B+,A,B,B
 2026,Drew Jordon,New Mexico,MWC,Junior,C+,C,B,C+,A-,C,C,C+,B,B+,A-,C,B-,B-,B-,B,A-,B,B,B-,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
 2026,Emma Najjuma,New Mexico,MWC,Junior,B-,C-,A,B-,B+,C-,C,C+,C+,A+,A,A-,B,B+,B,B,A,B+,A,B,B,A+,A-,D+,A,B,A-,C-,A,B+,A,B,B
@@ -1515,7 +1515,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Nayli Padilla,New Mexico,MWC,Sophomore,B-,C-,A,B-,B+,C-,C-,C+,C,A+,A,B-,B-,B,B,B-,A-,B+,A,B-,B-,A+,A,D+,A,B,A-,D+,A,B,A,B-,B
 2026,Tyler Jones,New Mexico,MWC,Freshman,D+,D,D-,D+,B-,D,D,D+,C,B-,B-,D,C-,C,C-,B-,B-,C+,D-,C,C,D+,D-,D,D-,C-,D-,D,D-,B-,B,D,C+
 2026,DeAvion Wilson,New Mexico St.,CUSA,Freshman,D-,F,D,D-,D+,F,F,D-,D-,C+,C,D,D-,D,D,D+,D+,C-,D+,D,D,C,D,F,D,D,D,F,D+,D,D+,D-,D
-2026,Emma Christiano,New Mexico St.,CUSA,Junior,D,F,D+,D-,C-,F,F,D-,D-,B-,C+,D,D,C+,D+,D+,C,C-,C-,D+,D,C+,D+,F,D+,D+,D+,F,D+,D+,C-,D,D
+2026,Emma Christiano,New Mexico St.,CUSA,Junior,D,F,D+,D-,C-,F,F,D-,D-,B-,C+,D-,D,C+,D+,D+,C,C-,C-,D+,D,C+,D+,F,D+,D+,D+,F,D+,D+,C-,D,D
 2026,Imani Warren,New Mexico St.,CUSA,Junior,C-,D-,B+,D+,C+,D-,D-,D,D,B+,B,B+,C-,B,C+,C+,B+,C+,A-,C-,C-,A,B+,D-,B+,C,B+,D-,B+,C+,B+,C-,C
 2026,Iyana Beh,New Mexico St.,CUSA,Junior,C,D+,C,C,B,D+,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,C+,C+,B,C,C-,C,C+,C-,C-,C,B,A-,D+,B-
 2026,Keira Hudson,New Mexico St.,CUSA,Freshman,D,D-,C+,D,C-,D-,D-,D,D-,B,B-,C,D,C,C-,C-,C+,C,B-,D+,D+,B,C+,F,C+,D+,C,F,C+,C-,B-,D,D+
@@ -1597,9 +1597,9 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Abby Krzewinski,North Dakota St.,Sum,Junior,B,C,A-,B,A-,C+,C+,B-,C+,A+,A+,B+,B+,B,B,B+,A,A-,A-,B,B,A,B+,C,A-,B+,B+,C,A-,B+,A,B+,B+
 2026,Amelia Hobson,North Dakota St.,Sum,Sophomore,C+,D,B+,C,B-,D,D,C-,D+,A-,B+,C+,C+,B,C+,C+,B+,B-,B+,C+,C+,A,B,D-,B+,C+,B,D,B+,B-,B+,C,C+
 2026,Avery Koenen,North Dakota St.,Sum,Junior,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+
-2026,Jocelyn Schiller,North Dakota St.,Sum,Sophomore,B,C,A-,B,A-,C,C+,B-,C+,A+,A+,B+,B+,B+,B,B+,B+,A-,A,B,B,A,B+,C,A-,B+,B+,C,A-,B+,A+,B+,B+
+2026,Jocelyn Schiller,North Dakota St.,Sum,Sophomore,B,C,A-,B,A-,C,C+,B-,C+,A+,A+,B+,B+,B+,B,B+,B+,A-,A,B+,B,A,B+,C,A-,B+,B+,C,A-,B+,A+,B+,B+
 2026,Karrington Asp,North Dakota St.,Sum,Freshman,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A,A-,A,B+,A-,A,A,A+,A-,A-,A+,A,C+,A,A,A,C+,A,A-,A+,A-,A-
-2026,Marisa Frost,North Dakota St.,Sum,Sophomore,A-,B-,A+,A,A,B-,B,B+,B+,A+,A+,A+,A-,A,B+,A-,A+,A+,A+,A,A-,A+,A,B-,A+,A,A,B-,A+,A,A+,A,A-
+2026,Marisa Frost,North Dakota St.,Sum,Sophomore,A-,B-,A+,A,A,B-,B,B+,B+,A+,A+,A+,A-,A,A-,A-,A+,A+,A+,A,A-,A+,A,B-,A+,A,A,B-,A+,A,A+,A,A-
 2026,Miriley Simon,North Dakota St.,Sum,Junior,B-,C+,A,B-,A,C+,C+,B-,B+,A-,A,C+,B,B,B+,B+,A,B+,A,B,B,A+,A-,C+,A,B,A-,C+,A,A-,A,C+,B+
 2026,Molly Lenz,North Dakota St.,Sum,Junior,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A+,B+,B,B,B,B,B+,B+,A,B,B,A,A-,C-,A-,B+,B+,C-,A-,B+,A-,B,B
 2026,Alyssa Staten,Northeastern,CAA,Sophomore,D-,F,D,D-,D+,F,F,D-,D-,C+,C,D-,D-,D-,D+,D+,D,C-,D,D,D,D+,D-,F,D,D,D-,F,D,D,D,D-,D
@@ -1649,7 +1649,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Abby Knauff,North Florida,ASun,Freshman,D,D-,D+,D,C-,D-,D-,D-,D-,B-,C+,D,D,C,C-,C-,C-,C,C-,D+,D+,C+,D+,F,D+,D+,D+,F,D+,D+,C-,D,D+
 2026,Alexa Washington,North Florida,ASun,Sophomore,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,C+,D,D+,C,D+,C,D,D,B-,C-,F,C-,D,C-,F,C-,D,C,D-,D
 2026,Alonya Waldon,North Florida,ASun,Junior,C-,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C-,C+,B-,C+,B-,C-,C-,B+,C+,D-,B-,C,C+,D-,B-,C+,B-,C-,C
-2026,Dezuray McGill,North Florida,ASun,Freshman,D+,D-,C+,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,C+,C+,B-,C-,C-,B+,C+,D-,C+,C-,C+,F,B-,C+,B-,D+,C-
+2026,Dezuray McGill,North Florida,ASun,Freshman,D+,D-,C+,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,C+,C+,B-,C-,C-,B+,C+,D-,C+,C,C+,F,B-,C+,B-,D+,C-
 2026,Elle Blatchford,North Florida,ASun,Junior,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,B-,C+,B,C-,C-,B+,B-,D-,B-,C,C+,F,B-,C,B-,D+,C-
 2026,Georgi Buzzetti,North Florida,ASun,Junior,D+,D-,C+,D,C,D-,D-,D,D,B+,B-,C,D+,C,C-,C,C+,C+,B-,C-,D+,B,C+,D-,C+,C-,C,F,C+,C,C+,D+,C-
 2026,Jamison Cardwell,North Florida,ASun,Freshman,C-,D+,D+,C-,B,D+,D+,C,C+,B,B,D+,C,C+,C+,B-,B,C+,C-,C+,C+,C+,D+,D+,D+,C+,D+,D+,D+,B,B+,D,B-
@@ -1707,7 +1707,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Emma Tolan,Oklahoma,SEC,Freshman,B-,C+,A,B-,A-,C+,C+,B-,B+,A-,A,C+,B,B,B,B+,A,B+,A,B,B,A+,A-,C+,A,B,A-,C+,A,B+,A,C+,B+
 2026,Keziah Lofton,Oklahoma,SEC,Freshman,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A,B+,A-,B+,B+,A,A-,A,B+,B+,A+,A,C+,A,A-,A,C+,A,B+,A,B+,B+
 2026,Sahara Williams,Oklahoma,SEC,Junior,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B+,A+,A+,A+,A+,A+
-2026,Zya Vann,Oklahoma,SEC,Sophomore,A,B+,A+,A+,A+,B+,B+,A-,A-,A+,A+,A+,A+,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A+,A,A+,A
+2026,Zya Vann,Oklahoma,SEC,Sophomore,A,B+,A+,A+,A+,B+,B+,A-,A,A+,A+,A+,A+,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A+,A,A+,A
 2026,Achol Akot,Oklahoma St.,B12,Sophomore,A+,A-,A+,A+,A+,A-,A,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Amari Whiting,Oklahoma St.,B12,Junior,A-,B,A+,A,A+,B,B,B+,B+,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
 2026,Jadyn Wooten,Oklahoma St.,B12,Sophomore,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B+,A+,A+,A+,A+,A+
@@ -1723,7 +1723,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Riley Stack,Old Dominion,SB,Junior,B,C,A,B,A-,C,C,B-,C+,A+,A+,A,B+,B+,B,B,A-,A-,A+,B,B,A+,A,C-,A,B+,A,C,A,B+,A+,B,B+
 2026,A'Maya Holton,Oral Roberts,Sum,Freshman,D+,D-,C-,D,C,D-,D-,D,D-,B,B-,D+,D+,C+,C,C,C-,C,C-,D+,D+,C+,D+,D-,C-,D+,D+,F,C-,C-,C-,D,D+
 2026,Alana Shetlar,Oral Roberts,Sum,Freshman,C+,D+,C+,C+,B+,D+,C-,C+,B-,B+,B+,C-,C+,B-,C+,B,B+,B-,C+,C+,B-,B,C+,C-,C+,B-,C,C-,C+,B,A-,D+,B
-2026,Anna Trusty,Oral Roberts,Sum,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,B,B-,B-,B-,B-,A-,B,B+,C+,B-,A-,B,D,B,B,B,D+,B,B,B,B-,B-
+2026,Anna Trusty,Oral Roberts,Sum,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,B,B-,B-,B-,B-,A-,B,B+,C+,B-,A-,B,D,B,B,B,D,B,B,B,B-,B-
 2026,Ari Gordon,Oral Roberts,Sum,Junior,C+,D+,A-,C+,B,D+,D+,C,C-,A,A-,B+,B-,B-,B-,B-,B,B,A,C+,C+,A,B+,D,A-,B,B+,D,A-,B-,A-,C+,B-
 2026,Azailah Funches,Oral Roberts,Sum,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,B,B-,B-,B-,B-,A-,B,B+,C+,B-,A-,B,D,B+,B,B,D,B,B,B+,B-,B-
 2026,Bella Edwards,Oral Roberts,Sum,Freshman,B,C+,A,B,A,C+,C+,B-,B+,A,A,C+,B,B,B,B+,A,B+,A+,B+,B,A+,A,C+,A,B,A,C+,A,A-,A,C+,B+
@@ -1746,13 +1746,13 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Keira Lindemans,Oregon St.,WCC,Freshman,C+,C-,B,C+,B+,C-,C,C+,B,B+,A-,C,B-,B-,B-,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,B-,C,B,B+,A,C-,B
 2026,Kennedie Shuler,Oregon St.,WCC,Junior,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B-,A+,A+,A+,B,A+,A,A+,A,A
 2026,Lara Alonso,Oregon St.,WCC,Freshman,B-,C-,B+,B-,B+,C-,C-,C+,C,A+,A,B+,B,B,B,B,B,B+,A-,B-,B,A,B+,D+,A-,B,B+,C-,A-,B,A,B,B
-2026,Tiara Bolden,Oregon St.,WCC,Junior,B,C+,A,B+,A,C+,C+,B,B-,A+,A+,A-,B+,B+,B+,B+,A,A,A,B+,B+,A+,A,C+,A,A-,A-,C+,A,A-,B+,B+,B+
+2026,Tiara Bolden,Oregon St.,WCC,Junior,B+,C+,A,B+,A,C+,C+,B,B-,A+,A+,A-,B+,B+,B+,B+,A,A,A,B+,B+,A+,A,C+,A,A-,A-,C+,A,A-,B+,B+,B+
 2026,Daria Nestorov,Pacific,WCC,Sophomore,C,D,B,C-,B-,D,D,C-,D+,A-,B+,B,C+,B-,C+,C+,B,B-,B+,C,C+,A-,B,D-,B+,B-,B,D-,B,C+,B+,C,C+
 2026,Lamiracle Lebon,Pacific,WCC,Freshman,C,D+,C,C,B,D+,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,C+,B-,B,C,C-,C,C+,C-,C-,C+,B,A-,D+,B-
 2026,Liv Yergensen,Pacific,WCC,Freshman,D-,F,C-,D-,D+,F,F,D-,D-,B-,C+,D+,D,C-,D+,D+,C-,C,C-,D,D,C+,D+,F,C-,D,D+,F,C-,D,C,D,D
 2026,Marina Radocaj,Pacific,WCC,Junior,D+,D-,B-,D,C,D-,D-,D,D-,B,B-,C+,D+,B,C,C,C+,C+,B,C-,D+,B+,B-,D-,B-,C-,B-,F,B-,C,B,D+,D+
 2026,Nyah Lowery,Pacific,WCC,Junior,D+,D-,C+,D,C,D-,D-,D,D-,B,B-,C-,D,B-,C,C,C+,C,C+,D+,D+,B,C+,D-,C+,C-,C,F,C+,C-,C+,D,D+
-2026,Sophia Mindermann,Pacific,WCC,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,B,B-,B,B-,B-,B,B,A-,C+,B-,A,B+,D,B+,B,B+,D,B+,B,B+,B-,B-
+2026,Sophia Mindermann,Pacific,WCC,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,B,B,A-,C+,B-,A,B+,D,B+,B,B+,D,B+,B,B+,B-,B-
 2026,Stella Szabo,Pacific,WCC,Sophomore,C-,D-,B-,D+,C+,D-,D,D+,D,B+,B,C+,C-,C+,C,C+,B,C+,B,C,C,B+,B-,D-,B-,C,C+,D-,B-,C+,B-,C-,C
 2026,Winner Bartholomew,Pacific,WCC,Sophomore,B-,D+,B,C+,B+,D+,C-,C+,C,A+,A,B-,B-,B,B,B-,B+,B+,B+,B-,B-,A-,B,D+,B,B,B,D+,B,B,A,B-,B
 2026,Abby Sharpe,Penn,Ivy,Junior,C,D+,C,C,B,D+,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,C+,B-,B-,C,C-,C,C+,C-,C-,C,B,A-,D+,B-
@@ -1769,7 +1769,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Rachael Okokoh,Penn St.,B10,Freshman,C+,C-,B-,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,B+,B,B-,B-,B-,B+,C+,C,B-,B-,C+,C-,B-,B+,A-,C-,B
 2026,Shaelyn Steele,Penn St.,B10,Sophomore,C+,D+,A-,C+,B,D+,D+,C,C-,A,A-,C+,B-,B-,B-,B-,B,B,A,C+,B-,A,A-,D,A-,B,B+,D,A-,B-,A-,C+,B-
 2026,Shayla Smith,Penn St.,B10,Freshman,C+,C-,B,C+,A-,C,C,C+,B,B+,A-,C,B-,B-,B-,B,A-,B,B,B,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
-2026,Tea Cleante,Penn St.,B10,Freshman,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A,B+,B,B+,B,B,A-,B+,A,B,B,A,A-,D+,A-,B+,B+,C-,A-,B+,A-,B,B
+2026,Tea Cleante,Penn St.,B10,Freshman,B-,C-,A-,B-,B+,C,C,C+,C+,A+,A,B+,B,B+,B,B,A-,B+,A,B,B,A,A-,C-,A-,B+,B+,C-,A-,B+,A-,B,B
 2026,Viktoria Ranisavljevic,Penn St.,B10,Freshman,C+,D+,B,C+,B,D+,D+,C,D+,A,A-,C,C+,B-,B-,B-,B+,B,B+,C+,C+,A-,B,D,B+,B-,B,D,B+,B-,A,C+,B-
 2026,Elli Guiney,Pepperdine,WCC,Sophomore,B+,C+,A,B+,A,C+,C+,B,B-,A+,A+,A,A-,A-,B+,B+,A+,A,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A,B+,A-
 2026,Lina Falk,Pepperdine,WCC,Junior,B,C,A,B,B+,C,C,B-,C+,A+,A+,A-,B+,B+,B,B,A-,A-,A,B,B,A+,A-,C-,A,B+,A-,C,A,B+,A,B,B+
@@ -1781,7 +1781,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Carla Viegas,Pittsburgh,ACC,Junior,C+,D,B+,C+,B,D+,D+,C,D+,A,A-,B,C+,B,B-,B-,B+,B,A-,C+,C+,A,B+,D,B+,B-,B+,D,B+,B-,B+,C+,B-
 2026,Fatima Diakhate,Pittsburgh,ACC,Junior,B-,C-,A,B-,B+,C-,C-,C+,C,A+,A,A-,B,B+,B-,B,A-,B+,A,B-,B-,A+,A,D+,A,B,A-,D+,A,B,A,B,B
 2026,Jayda Queeley,Pittsburgh,ACC,Freshman,D-,F,D+,D-,D,F,F,D-,D-,C,C-,D,D-,D,D,D,D+,D+,D+,D-,D-,C+,D+,F,D+,D-,D,F,D+,D-,C-,D-,D-
-2026,Lauren Rust,Pittsburgh,ACC,Junior,D,D-,C+,D,C-,D-,D-,D,D-,B,B-,C-,D,B-,C-,C-,C+,C+,C+,D+,D+,B,C,F,C+,C-,C,F,C+,C-,C+,D,D+
+2026,Lauren Rust,Pittsburgh,ACC,Junior,D,D-,C+,D,C-,D-,D-,D-,D-,B,B-,C-,D,B-,C-,C-,C+,C+,C+,D+,D+,B,C,F,C+,C-,C,F,C+,C-,C+,D,D+
 2026,Megan Hollingsworth,Pittsburgh,ACC,Freshman,D+,D-,C,D,C,D-,D-,D,D,B+,B-,C-,D+,C-,C,C,C+,C+,C+,D+,C-,B,C,D-,C+,C-,C,F,C+,C,C+,D+,C-
 2026,Mikayla Johnson,Pittsburgh,ACC,Junior,D,D-,C-,D,C-,D-,D-,D-,D-,B-,C+,D+,D,B-,C-,C-,C-,C,C,D+,D+,B-,C-,F,C-,D+,D+,F,C-,D+,C,D,D+
 2026,Theresa Hagans,Pittsburgh,ACC,Freshman,C+,D,B+,C,B,D,D+,C-,D+,A-,A-,B,C+,B,C+,B-,B+,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
@@ -1824,21 +1824,21 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Emily Eadie,Princeton,Ivy,Sophomore,C+,C-,B,C+,A-,C-,C,C+,B,B+,A-,C,B-,B-,B-,B,A-,B,B,B,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
 2026,Fadima Tall,Princeton,Ivy,Junior,A+,A,A+,A+,A+,A,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A-,A+,A+,A+,A+,A+
 2026,Grace O'Sullivan,Princeton,Ivy,Freshman,C+,C,B+,B-,A-,C,C,C+,B,A-,A-,C,B-,B-,B-,B+,A-,B,A-,B,B,A,B+,C+,B+,B-,B,C,B+,B+,A,C,B
-2026,Olivia Hutcherson,Princeton,Ivy,Junior,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A,A-,A-,A+,A+,A+,A,A,A+,A,B-,A+,A,A+,B-,A+,A,A+,A,A-
+2026,Olivia Hutcherson,Princeton,Ivy,Junior,A-,B,A+,A,A,B-,B,B+,B+,A+,A+,A+,A,A,A-,A-,A+,A+,A+,A,A,A+,A,B-,A+,A,A+,B-,A+,A,A+,A,A-
 2026,Skye Belker,Princeton,Ivy,Junior,A-,B,A,A,A,B,B,B+,B+,A+,A+,A,A,A-,A-,A,A,A+,A+,A,A,A+,A,B-,A,A,A,B-,A,A,A,A,A
 2026,Toby Nweke,Princeton,Ivy,Sophomore,B,C+,A+,B+,A-,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A+,A-,A,C+,A,A-,A+,B+,B+
 2026,Ashley Dinges,Providence,BE,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B+,B-,B,B-,B-,A-,B,A-,C+,B-,A,B+,D,B+,B,B,D+,B+,B,B+,B-,B-
 2026,Audrey Shields,Providence,BE,Sophomore,C,D+,C+,C,B,D+,C-,C,B-,B+,B+,C-,C+,B-,C+,B,B+,B-,C+,B-,B-,B,C+,C-,C+,C+,C,C-,C+,B,A-,D+,B
 2026,Orlagh Gormley,Providence,BE,Sophomore,B+,C+,A+,B+,A,C+,C+,B,B-,A+,A+,A+,A-,A,B+,B+,A,A,A+,A-,B+,A+,A,C+,A+,A-,A+,C+,A+,A-,A,B+,A-
-2026,Payton Dunbar,Providence,BE,Sophomore,C,D,B,C-,B-,D,D,D+,D,B+,B,C-,C,C+,C+,C+,B,B-,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C
+2026,Payton Dunbar,Providence,BE,Sophomore,C,D,B,C-,C+,D,D,D+,D,B+,B,C-,C,C+,C+,C+,B,B-,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C
 2026,Princess Moody,Providence,BE,Freshman,D+,D-,C,D,C-,D-,D-,D,D-,B,B-,C-,D,C+,C-,C-,C+,C,C+,D+,D+,B,C,F,C+,D+,C,F,C+,C-,C+,D,D+
 2026,Riley Hamburger,Providence,BE,Freshman,C,D+,C,C,B,D+,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,C+,C+,B,C,C-,C,C+,C-,D+,C,B,A-,D+,B-
 2026,Sami Mancini,Providence,BE,Freshman,C,D+,C-,C,B,D+,D+,C,B-,B+,B,D+,C+,C+,C+,B,B+,B-,C,C+,C+,B-,C-,D+,C-,C,D+,D+,C-,B,B+,D+,B-
-2026,Sophi Hall,Providence,BE,Junior,C+,D,B+,C,B-,D,D+,C-,D+,A-,A-,C,C+,B-,C+,B-,B+,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
+2026,Sophi Hall,Providence,BE,Junior,C+,D,B+,C,B-,D,D+,C-,D+,A-,B+,C,C+,B-,C+,B-,B+,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
 2026,Avery Gordon,Purdue,B10,Freshman,B,B-,A+,B+,A,B-,B-,B,B+,A,A,B-,B+,B,A-,A-,A,A-,A+,B+,B+,A+,A+,B-,A+,A-,A+,B-,A+,A-,A+,C+,A-
 2026,Carley Barrett,Purdue,B10,Freshman,A+,A,A+,A+,A+,A,A,A,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A,A+
 2026,Hila Karsh,Purdue,B10,Freshman,B-,D+,B,C+,B,D+,C-,C+,C,A+,A,C+,B-,B,B-,B-,B+,B+,B+,B-,B-,A-,B,D+,B+,B,B,D+,B+,B,A,B-,B
-2026,Kendall Puryear,Purdue,B10,Sophomore,B,C,B,B,A-,C,C,B-,C+,A+,A+,B,B,B-,B,B,B+,B+,B+,B,B,A-,B,C-,B,B+,B,C-,B,B+,A+,B,B+
+2026,Kendall Puryear,Purdue,B10,Sophomore,B,C,B,B,A-,C,C,B-,C+,A+,A+,B,B,B-,B,B,B+,B+,B+,B,B,A-,B,C-,B,B+,B,C,B,B+,A+,B,B+
 2026,Kiki Smith,Purdue,B10,Junior,B,C+,A,B,A-,C+,C+,B-,B-,A+,A+,A,B+,B+,B+,B+,A,A-,A+,B+,B,A+,A,C,A,A-,A,C,A,B+,A+,B+,B+
 2026,Lana McCarthy,Purdue,B10,Sophomore,B-,C-,B+,B-,B+,C,C,C+,C+,A+,A+,B+,B,B,B,B,A-,B+,A-,B,B,A,B+,C-,B+,B+,B+,C-,B+,B+,B+,B,B
 2026,McKenna Layden,Purdue,B10,Junior,B-,D+,A-,B-,B,C-,C-,C+,C,A+,A,B+,B-,B,B-,B-,B+,B+,A,B-,B-,A,A-,D+,A-,B,B+,D+,A-,B,A-,B-,B
@@ -1879,10 +1879,10 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Sophia Vital,Rhode Island,A10,Junior,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A+,A-,A,B+,A-,A,A+,A+,A-,A-,A+,A+,C+,A+,A,A+,B-,A+,A-,A+,A-,A-
 2026,Vanessa Harris,Rhode Island,A10,Freshman,B,C,B+,B,B+,C,C,C+,C+,A+,A+,B+,B,B,B,B,B+,B+,A-,B,B,A,B+,C-,B+,B+,B+,C-,B+,B+,A+,B,B
 2026,Aniah Alexis,Rice,Amer,Sophomore,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A,B+,B+,B,B+,A-,A-,A+,B+,B,A+,A,C,A,B+,A,C,A,B+,A+,B+,B+
-2026,Jordin Blackmon,Rice,Amer,Freshman,C,D,C+,C-,B-,D,D,D+,D,B+,B+,C,C,C+,C+,C+,A-,B-,B-,C,C,B,C+,D-,C+,C+,C+,D-,C+,C+,B-,C,C
+2026,Jordin Blackmon,Rice,Amer,Freshman,C,D,C+,C-,B-,D,D,D+,D,B+,B,C,C,C+,C+,C+,A-,B-,B-,C,C,B,C+,D-,C+,C+,C+,D-,C+,C+,B-,C,C
 2026,Louann Battiston,Rice,Amer,Junior,B-,D+,B,C+,B,C-,C-,C+,C,A+,A,B-,B-,B,B-,B-,B,B+,B,B-,B-,A-,B,D+,B,B,B-,D+,B,B,A,B-,B
 2026,Myah Hazelton,Rice,Amer,Sophomore,C,D+,C,C,B+,D+,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,C+,B,C,C-,C+,C,C,C-,C+,B,A-,D+,B-
-2026,Victoria Flores,Rice,Amer,Junior,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A-,B+,B+,B+,B+,A,A,A,B+,B+,A+,A-,C+,A,A-,A-,C+,A,B+,A,B+,B+
+2026,Victoria Flores,Rice,Amer,Junior,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A-,B+,B+,B+,B+,A,A,A,B+,B+,A+,A-,C,A,A-,A-,C+,A,B+,A,B+,B+
 2026,Alicia Newell,Richmond,A10,Sophomore,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A+,A-,A+,B+,A-,A+,A+,A+,A-,A-,A+,A+,C+,A+,A,A+,B-,A+,A-,A-,A-,A-
 2026,Ally Sweeney,Richmond,A10,Junior,A-,B,A,A,A,B,B,B+,B+,A+,A+,A,A,A,A-,A,A,A+,A+,A,A,A+,A,B-,A,A+,A,B,A,A,A+,A,A
 2026,Aneisha Scott,Richmond,A10,Freshman,C,D+,C-,C,B+,D+,C-,C,C+,B+,B,D+,C+,C+,C+,B-,B+,B-,C,C+,C+,C+,C-,D+,C-,C+,D+,D+,C-,B,B+,D+,B-
@@ -1890,7 +1890,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Payton Richard,Richmond,A10,Sophomore,C-,D,D,D+,B-,D,D+,C-,C+,B,B,D+,C,C,C+,B-,B,C+,D+,C+,C+,C,D,D+,D,C,D,D,D,B-,B+,D,C+
 2026,Rayne Wright,Richmond,A10,Freshman,B-,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B-,B-,B-,A,B,A-,B-,B-,A,B+,D,B+,B,B+,D+,B+,B,B+,B-,B-
 2026,Aina Perez Mesquida,Rider,MAAC,Freshman,D,D-,C-,D,C,D-,D-,D-,D-,B,B-,D+,D,D+,D+,C-,C-,C+,C-,D+,D+,C+,D+,F,C-,D+,D+,F,C-,C-,C-,D,D+
-2026,Alena Cofield,Rider,MAAC,Freshman,D,F,D+,D-,D+,F,F,D-,D-,B-,C+,D,D,C+,D+,D+,C-,C,C-,D,D,C+,D+,F,D+,D,D+,F,C-,D+,C-,D,D
+2026,Alena Cofield,Rider,MAAC,Freshman,D-,F,D+,D-,D+,F,F,D-,D-,B-,C+,D,D,C+,D+,D+,C-,C,C-,D,D,C+,D+,F,D+,D,D+,F,C-,D+,C-,D,D
 2026,Aliya McIver,Rider,MAAC,Junior,D,D-,B-,D,C-,D-,D-,D-,D-,B,C+,C+,D,C+,C-,C-,B-,C,B,D+,D+,B+,B-,F,B-,D+,C+,F,B-,D+,B-,D,D+
 2026,Amany Lopez,Rider,MAAC,Sophomore,F,F,D-,F,D-,F,F,F,F,D,D,D-,F,D-,D-,D-,D-,D-,D-,D-,D-,D+,D-,F,D-,F,D-,F,D,D-,D,F,F
 2026,Daniya Brown,Rider,MAAC,Freshman,D,D,D-,D,B-,D,D,D+,C,B-,B-,D,D+,C-,C-,C+,B-,C,D-,C-,C-,D-,F,D,F,D+,F,D,D-,C+,B,D,C
@@ -2008,7 +2008,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Mecca Alexander,San Jose St.,MWC,Sophomore,D+,D,D-,D+,B-,D,D,D+,C+,B-,B-,D,C-,C,D+,B-,B,C+,D-,C,C,D+,D-,D,D-,C-,D-,D,D,B-,B,D,C+
 2026,Rylei Waugh,San Jose St.,MWC,Junior,B-,C,B,C+,A-,C,C+,C+,B,B+,A-,C,B-,B-,B,B+,A-,B,B+,B,B,A-,B,C+,B,B,B,C+,B,B+,A,C-,B+
 2026,Stella Sgro,San Jose St.,MWC,Sophomore,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D+,D-,D+,D+,D+,C-,C-,C,D,D,B-,C-,F,C-,D,D+,F,C-,D,C,D-,D
-2026,Aniya Hooker,Santa Clara,WCC,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,C+,B-,B-,B-,B-,B+,B,B+,C+,B-,A-,B,D,B,B,B,D,B,B,A,B-,B-
+2026,Aniya Hooker,Santa Clara,WCC,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,C+,B-,B-,B-,B-,A-,B,B+,C+,B-,A-,B,D,B,B,B,D,B,B,A,B-,B-
 2026,Ava Schmidt,Santa Clara,WCC,Junior,B+,B-,A+,A-,A,B-,B-,B,B,A+,A+,A+,A-,A+,B+,A-,A,A,A+,A-,A-,A+,A+,C+,A+,A,A+,C+,A+,A-,A+,A-,A-
 2026,Delainey Miller,Santa Clara,WCC,Freshman,C+,D+,B,C+,B,D+,D+,C,C-,A,A-,C+,B-,B-,B-,B-,B+,B,B,C+,B-,A-,B,D,B,B,B-,D,B,B,A,C+,B-
 2026,Kate Schat,Santa Clara,WCC,Freshman,C+,C-,B-,C+,B+,C-,C,C+,B-,B+,B+,C-,C+,B-,C+,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,C+,C-,B-,B+,A-,C-,B
@@ -2016,7 +2016,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Maia Jones,Santa Clara,WCC,Junior,A-,B-,A+,A-,A,B-,B-,B+,B,A+,A+,A+,A-,A+,A-,A-,A+,A+,A+,A,A-,A+,A+,B-,A+,A,A+,B-,A+,A-,A-,A-,A-
 2026,Tyler Gildersleeve-Stiles,Santa Clara,WCC,Freshman,C,D,C+,C-,C+,D,D,D+,D,B+,B,C,C,C+,C+,C+,C+,C+,B-,C,C,B,C+,D-,C+,C+,C+,D-,C+,C+,B-,C,C
 2026,Chloe Emanga,Seattle,WCC,Freshman,D-,F,D,F,D,F,F,F,F,C-,C-,D-,D-,D-,D,D,D,D,D,D-,D-,C-,D,F,D,D-,D,F,D,D-,D,D-,D-
-2026,Dylan Mogel,Seattle,WCC,Freshman,D-,F,D,F,D,F,F,F,D-,C-,C-,D-,D-,D-,D,D,D,D,D,D-,D-,D+,D-,F,D,D-,D-,F,D,D-,D,D-,D-
+2026,Dylan Mogel,Seattle,WCC,Freshman,D-,F,D,F,D,F,F,F,D-,C-,C-,D-,D-,D-,D,D,D,D+,D,D-,D-,D+,D-,F,D,D-,D-,F,D,D-,D,D-,D-
 2026,Fia Proctor,Seattle,WCC,Sophomore,C,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C+,B-,B,C+,D+,C+,C+,C+,D+,D+,D+,C,D,D+,D+,B,B+,D,B-
 2026,Jana Vesic,Seattle,WCC,Freshman,D-,F,D,F,D-,F,F,F,F,C-,D+,D-,D-,D-,D-,D-,D,D,D,D-,D-,C-,D-,F,D,D-,D,F,D,D-,D,D-,D-
 2026,Lucija Milkovic,Seattle,WCC,Junior,D-,F,D+,D-,D+,F,F,D-,D-,C+,C,D,D-,D,D+,D+,D+,D+,D+,D,D,C,D,F,D+,D-,D,F,D+,D,D+,D-,D
@@ -2039,7 +2039,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Genevive Wedemeyer,Siena,MAAC,Junior,D+,D-,C,D,C+,D-,D-,D,D,B+,B-,C-,D+,C-,C,C,B-,C+,C+,C-,C-,B,C,D-,C+,C-,C,F,C+,C,C+,D+,C-
 2026,Kaiya Rain Tucker,Siena,MAAC,Freshman,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,A-,B,B+,C+,B-,A,B,D,B+,B,B,D+,B+,B,B+,B-,B-
 2026,Nicole Melious,Siena,MAAC,Junior,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C-,C-,B-,C+,C,B,C+,B,C-,C-,B+,B-,D-,B-,C-,B-,F,B-,C,B,D+,C-
-2026,Olivia Watkins,Siena,MAAC,Freshman,C,C-,C,C,B+,C-,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C,C-,C+,C+,C,C-,C+,B,A-,D+,B
+2026,Olivia Watkins,Siena,MAAC,Freshman,C,C-,C,C,B+,C-,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C,C-,C+,B-,C,C-,C+,B,A-,D+,B
 2026,Adriana Blazquez,SIU Edwardsville,OVC,Sophomore,D-,F,C-,D-,D,F,F,D-,D-,C,C-,D+,D-,D+,D+,D,C-,D+,C-,D,D,C+,D+,F,C-,D-,D+,F,C-,D,C-,D-,D-
 2026,Ava Gugliuzza,SIU Edwardsville,OVC,Junior,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Emiyah Cobb,SIU Edwardsville,OVC,Sophomore,D,D-,F,D,C+,D-,D,D,C-,C+,C+,D,D,D+,D,C+,C+,C,F,C-,D+,F,F,D-,F,D+,F,D-,F,C+,B,D-,C-
@@ -2059,11 +2059,11 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Diawna Carter-Hartley,South Alabama,SB,Junior,C+,D+,A-,C+,B,D+,D+,C,C-,A,A-,C+,B-,B-,B-,B-,B+,B,A,C+,C+,A,A-,D,A-,B,A-,D,A-,B,A,C+,B-
 2026,Tamara Ortiz,South Alabama,SB,Sophomore,C,D,B-,C-,B-,D,D,D+,D,A-,B+,C-,C+,C+,C+,C+,B-,B-,B-,C,C+,B+,C+,D-,B-,C+,C+,D-,B-,C+,B-,C,C+
 2026,Adhel Tac,South Carolina,SEC,Sophomore,B,B-,A+,B+,A,B-,B-,B,A-,A,A+,B,B+,B+,B+,A-,A,A-,A+,A-,B+,A+,A+,B-,A+,A-,A+,B-,A+,A-,A+,B-,A-
-2026,Agot Makeer,South Carolina,SEC,Freshman,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
+2026,Agot Makeer,South Carolina,SEC,Freshman,A+,A,A+,A+,A+,A-,A,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Alicia Tournebize,South Carolina,SEC,Freshman,B,B-,A+,B,A,C+,B-,B,B+,A,A,B-,B,B,B+,A-,A,B+,A+,B+,B+,A+,A,B-,A+,B+,A,B-,A,A-,A+,C+,A-
 2026,Ayla McDowell,South Carolina,SEC,Freshman,A,B,A+,A,A+,B,B+,B+,B+,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
 2026,Joyce Edwards,South Carolina,SEC,Sophomore,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+
-2026,Maddy McDaniel,South Carolina,SEC,Sophomore,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
+2026,Maddy McDaniel,South Carolina,SEC,Sophomore,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Tessa Johnson,South Carolina,SEC,Junior,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+
 2026,Ariana Simmons,South Carolina St.,MEAC,Junior,D+,D,D-,D+,C+,D,D,D+,C,B-,B-,D,D+,C-,C-,B-,B,C+,D-,C,C,D,D-,D,D-,C-,D-,D,D-,B-,B,D,C+
 2026,DaH'Neisha Blige,South Carolina St.,MEAC,Junior,C,D+,C+,C,B+,C-,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,B-,B-,B,C+,C-,C+,C+,C,C-,C+,B,A-,D+,B
@@ -2088,7 +2088,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Hadley Thul,South Dakota St.,Sum,Freshman,B,C,A,B,A-,C,C,B-,C+,A+,A+,A,B+,B+,B,B,A-,A-,A+,B,B,A+,A,C-,A,B+,A,C,A,B+,A+,B,B+
 2026,Hilary Behrens,South Dakota St.,Sum,Sophomore,B,C,A,B,A-,C+,C+,B-,C+,A+,A+,A,B+,B+,B,B+,A-,A-,A,B+,B,A+,A,C,A,B+,A,C,A,B+,A+,B+,B+
 2026,Katie Vasecka,South Dakota St.,Sum,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,C+,B-,B,B-,B-,B+,B,B,C+,B-,A-,B,D,B,B,B-,D+,B,B,A,B-,B-
-2026,Maggie Hartwig,South Dakota St.,Sum,Junior,B-,D+,B+,B-,B+,C-,C-,C+,C,A+,A,B+,B-,B,B,B-,A-,B+,A-,B-,B-,A,B+,D+,B+,B,B+,D+,B+,B,B+,B-,B
+2026,Maggie Hartwig,South Dakota St.,Sum,Junior,B-,D+,B+,C+,B+,C-,C-,C+,C,A+,A,B+,B-,B,B,B-,A-,B+,A-,B-,B-,A,B+,D+,B+,B,B+,D+,B+,B,B+,B-,B
 2026,Mahli Abdouch,South Dakota St.,Sum,Freshman,B,C,A,B,A-,C,C,B-,C+,A+,A+,A-,B+,B+,B,B,A-,A-,A,B,B,A+,A,C-,A,B+,A,C,A,B+,A+,B,B+
 2026,Aisha Marten-Coney,Southeastern Louisiana,Slnd,Junior,D-,F,D-,D-,D+,F,F,D-,D-,C+,C,D-,D-,D-,C-,D+,D,C-,D,D,D,D+,D-,F,D-,D,D-,F,D,D,D,D-,D
 2026,Aliyah Collins,Southeastern Louisiana,Slnd,Junior,D+,D-,B+,D,C,D-,D-,D,D-,B+,B-,D+,D+,C+,C+,C,B+,C,A-,D+,D+,A,B+,D-,B+,C-,B+,F,B+,C,B+,D+,C-
@@ -2100,7 +2100,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Natalie Huff,Southeastern Louisiana,Slnd,Freshman,D-,F,D,F,D-,F,F,F,F,D+,D+,D-,D-,D-,D-,D-,D,D,D,D-,D-,C-,D,F,D,D-,D,F,D,D-,D,D-,D-
 2026,Taylor Ross,Southeastern Louisiana,Slnd,Junior,C-,D+,D,C-,B,D,D+,C-,C+,B,B,D+,C,C,C+,B-,B,C+,D+,C+,C+,C,D,D+,D,C+,D,D+,D+,B,B+,D,B-
 2026,Aa'Mya Stacker,Southeast Missouri St.,OVC,Junior,C+,C-,C,C,B+,C-,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C,C-,C+,C+,C,C-,C+,B,A-,D+,B
-2026,Ainaya Williams,Southeast Missouri St.,OVC,Sophomore,B-,C-,B+,B,B+,C,C,C+,C+,A+,A+,B,B,B,B,B,A,B+,B+,B,B,A,B,C-,B+,B+,B,C-,B+,B+,B+,B,B
+2026,Ainaya Williams,Southeast Missouri St.,OVC,Sophomore,B-,C,B+,B,B+,C,C,C+,C+,A+,A+,B,B,B,B,B,A,B+,B+,B,B,A,B,C-,B+,B+,B,C-,B+,B+,B+,B,B
 2026,Kearra Jones,Southeast Missouri St.,OVC,Freshman,C+,D+,B,C+,B,D+,D+,C,C-,A,A-,B,B-,B-,B-,B-,B+,B,B+,C+,C+,A-,B,D,B+,B,B,D,B+,B-,A,C+,B-
 2026,Madison Ayers,Southeast Missouri St.,OVC,Junior,C-,D-,C+,D+,C+,D-,D,D+,D,B+,B,C,C-,C,C+,C+,C+,C+,C+,C,C-,B,C+,D-,C+,C,C,D-,C+,C+,B-,C-,C
 2026,Zoey Rixter,Southeast Missouri St.,OVC,Freshman,C,D,B-,C-,B-,D,D,C-,D+,A-,B+,C+,C+,C+,C+,C+,B+,B-,B,C+,C+,B+,B-,D-,B-,C+,B-,D,B-,C+,B,C,C+
@@ -2108,7 +2108,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Demya Porter,Southern,SWAC,Sophomore,B-,C-,B+,B-,B+,C-,C-,C+,C,A+,A,B+,B,B,B,B,A-,B+,A-,B-,B-,A,B+,D+,A-,B,B+,C-,A-,B,A-,B,B
 2026,Jestiny Dixon,Southern,SWAC,Junior,C+,D+,A-,C+,B,D+,D+,C,C-,A,A-,C+,C+,B-,B-,B-,B,B,A,C+,C+,A,A-,D,A-,B-,B+,D,A-,B-,A,C+,B-
 2026,Jocelyn Tate,Southern,SWAC,Sophomore,B-,C-,A,B-,B+,C-,C-,C+,C,A+,A,A-,B,B+,B,B,A-,B+,A,B-,B-,A+,A,D+,A,B,A,D+,A,B,A,B,B
-2026,Mykayla Cunningham,Southern,SWAC,Junior,C,D,B,C-,B-,D,D,D+,D,A-,B+,C+,C+,B-,C+,C+,B,B-,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C+
+2026,Mykayla Cunningham,Southern,SWAC,Junior,C,D,B,C-,B-,D,D,D+,D,A-,B+,C+,C+,B-,C+,C+,B,B-,B,C,C+,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C+
 2026,Zaria Hurston,Southern,SWAC,Junior,D+,D-,B-,D,C,D-,D-,D,D-,B,B-,C+,D+,B,C,C,C+,C,B-,D+,D+,B+,C+,D-,B-,C-,C+,F,B-,C,B-,D+,D+
 2026,Alayna Kraus,Southern Illinois,MVC,Sophomore,C,D-,B,D+,B-,D,D,D+,D,B+,B,C+,C,B-,C+,C+,B,C+,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C
 2026,Carmen Morales Romero,Southern Illinois,MVC,Sophomore,C,D+,C-,C,B+,D+,D+,C,B-,B+,B,D+,C+,C+,C+,B,B+,B-,C,C+,C+,B-,C-,D+,C-,C+,D+,D+,C-,B,B+,D+,B-
@@ -2119,7 +2119,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Tkiyah Nelson,Southern Illinois,MVC,Junior,D,F,C,D-,C-,F,F,D-,D-,B-,C+,D+,D,C-,D+,D+,C,C,C+,D,D,B-,C-,F,C,D+,C-,F,C,D+,C+,D,D
 2026,Amiyah Buchanan,Southern Indiana,OVC,Junior,C,D,B,C-,B-,D,D,C-,D+,A-,B+,C-,C+,C+,C+,C+,B+,B-,B,C,C+,A-,B-,D-,B,C+,B-,D,B,C+,B,C,C+
 2026,Channah Gannon,Southern Indiana,OVC,Freshman,B,C,B+,B,A-,C,C,B-,C+,A+,A+,B+,B,B,B,B,A,B+,A-,B,B,A,B+,C-,A-,B+,B+,C,A-,B+,A-,B,B+
-2026,Chloe Gannon,Southern Indiana,OVC,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A,A-,B,B,B,B,B+,B+,A,B,B,A+,A-,C-,A,B+,A-,C-,A,B+,A+,B,B
+2026,Chloe Gannon,Southern Indiana,OVC,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A+,A-,B,B,B,B,B+,B+,A,B,B,A+,A-,C-,A,B+,A-,C-,A,B+,A+,B,B
 2026,Kylee Dennis,Southern Indiana,OVC,Sophomore,B-,C+,A,B-,A-,C+,C+,B-,B+,A-,A,C+,B,B,B,B+,A,B+,A,B,B,A+,A-,C+,A,B,A-,C+,A,B+,A,C,B+
 2026,Lexi Sepulveda,Southern Indiana,OVC,Sophomore,D,D-,C-,D,C-,D-,D-,D-,D-,B-,C+,D+,D,D+,C-,C-,C-,C,C-,D+,D+,C+,D+,F,C-,D+,D+,F,C-,D+,C,D,D+
 2026,Lily Graves,Southern Indiana,OVC,Freshman,C+,C-,B-,C+,B+,C-,C,C+,B-,B+,B+,C,C+,B-,B-,B,B+,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A-,C-,B
@@ -2235,7 +2235,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Ariana Meriedy,Temple,Amer,Freshman,C+,C-,B-,C+,A-,C-,C,C+,B,B+,A-,C,B-,B-,B,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,B-,C,B-,B+,A,C-,B
 2026,Brianna Mead,Temple,Amer,Sophomore,C-,D-,C+,D+,C+,D-,D-,D,D,B+,B,D+,C-,B-,C,C,B,C+,C+,C,C-,B,C+,D-,C+,C,C,D-,C+,C+,C+,C-,C
 2026,Drew Alexander,Temple,Amer,Sophomore,C+,D,B+,C,B-,D,D+,C-,D+,A-,A-,C,C+,C+,C+,B-,B+,B-,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
-2026,Felicia Jacobs,Temple,Amer,Sophomore,C-,D-,C+,D+,C+,D-,D-,D,D,B+,B,C-,C-,B-,C,C,B+,C+,B-,C-,C-,B,C+,D-,C+,C,C,D-,C+,C,B-,D+,C-
+2026,Felicia Jacobs,Temple,Amer,Sophomore,C-,D-,C+,D+,C+,D-,D-,D,D,B+,B,C-,C-,B-,C,C,B+,C+,B-,C-,C-,B,C+,D-,C+,C,C,F,C+,C,B-,D+,C-
 2026,Jaleesa Molina,Temple,Amer,Junior,C+,D+,A-,C+,B,D+,D+,C,C-,A,A,B+,B-,B+,B-,B-,B+,B,A,C+,B-,A,A-,D,A-,B,B+,D+,A-,B,A-,B-,B-
 2026,Kaylah Turner,Temple,Amer,Junior,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A,B+,A,B,B+,A,A-,A+,B+,B+,A+,A,C,A,A-,A,C,A,B+,A,B+,B+
 2026,Kelian Cedano,Temple,Amer,Sophomore,C-,D,C+,D+,C+,D,D,D+,D,B+,B,C,C,C,C+,C+,C+,C+,B-,C,C,B,C+,D-,C+,C+,C+,D-,B-,C+,B-,C-,C
@@ -2252,7 +2252,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Mya Pauldo,Tennessee,SEC,Freshman,B-,C+,A,B-,A-,C+,C+,B-,B+,A-,A,C+,B,B,B,B+,A,B+,A,B,B,A+,A-,C+,A,B,A-,C+,A,B+,A,C,B+
 2026,Talaysia Cooper,Tennessee,SEC,Junior,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A+,A+
 2026,Brittani Wells,Tennessee Martin,OVC,Junior,C-,D-,B,D+,C+,D-,D-,D,D,B+,B,B-,C-,B-,C,C+,B,C+,B,C-,C-,A-,B,D-,B,C+,B-,D-,B,C+,B,C-,C
-2026,Cam Ward,Tennessee Martin,OVC,Freshman,D+,D-,C,D,C,D-,D-,D,D-,B+,B-,C-,D+,C+,C+,C,C,C+,C+,D+,C-,B-,C,D-,C,C-,C-,F,C,C,C+,D+,C-
+2026,Cam Ward,Tennessee Martin,OVC,Freshman,D+,D-,C,D,C,D-,D-,D,D,B+,B-,C-,D+,C+,C+,C,C,C+,C+,D+,C-,B-,C,D-,C,C-,C-,F,C,C,C+,D+,C-
 2026,Grace Billington,Tennessee Martin,OVC,Sophomore,D+,D-,B-,D+,C+,D-,D-,D,D,B+,B,C+,C-,C+,C+,C,B-,C+,B-,C-,C-,B+,C+,D-,B-,C-,C+,F,B-,C,B-,D+,C-
 2026,Haylee Jarred,Tennessee Martin,OVC,Freshman,B,C+,A,B,A-,C+,C+,B-,B+,A,A,B-,B,B,B-,B+,A,B+,A+,B+,B,A+,A,C+,A,B,A,C+,A,A-,A,C+,B+
 2026,Kenley McCarn,Tennessee Martin,OVC,Junior,C+,D,B+,C,B,D,D+,C-,D+,A,A-,B,C+,B,B-,B-,B+,B,A-,C+,C+,A,B+,D,B+,B-,B,D,B+,B-,B+,C+,B-
@@ -2262,8 +2262,8 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Yar Tong,Tennessee Martin,OVC,Freshman,C+,C-,B-,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,B+,B,B-,B-,B-,B+,C+,C,B-,B-,C+,C,B-,B+,A-,C-,B
 2026,Zy Thompson,Tennessee Martin,OVC,Sophomore,B-,C-,A,B-,B+,C,C,C+,C+,A+,A,A-,B,B+,B,B,A-,B+,A,B,B,A,A-,C-,A-,B+,A-,C-,A-,B+,A,B,B
 2026,Amiyah Ferguson,Tennessee St.,OVC,Junior,D-,F,D-,F,D,F,F,F,D-,C-,C-,D-,D-,D-,D,D,D,D+,D,D-,D-,D+,D-,F,D-,D-,D-,F,D,D-,D,D-,D-
-2026,Erin Martin,Tennessee St.,OVC,Sophomore,C,D,B+,C-,B-,D,D,C-,D+,A-,B+,B,C+,B,B-,C+,B+,B-,A-,C,C+,A,B+,D-,B+,B-,B,D,B+,B-,B+,C,C+
-2026,Genesis Harris,Tennessee St.,OVC,Sophomore,D-,F,D-,F,D-,F,F,F,F,D+,D+,D-,D-,D-,D,D-,D,D,D,D-,D-,D+,D-,F,D-,D-,D-,F,D,D-,D,D-,D-
+2026,Erin Martin,Tennessee St.,OVC,Sophomore,C,D,B+,C-,B-,D,D,C-,D+,A-,B+,B,C+,B,B-,C+,B+,B-,A-,C,C+,A,B+,D-,B+,C+,B,D,B+,B-,B+,C,C+
+2026,Genesis Harris,Tennessee St.,OVC,Sophomore,D-,F,D-,F,D-,F,F,F,F,C-,D+,D-,D-,D-,D,D-,D,D,D,D-,D-,D+,D-,F,D-,D-,D-,F,D,D-,D,D-,D-
 2026,Icesis Thomas,Tennessee St.,OVC,Freshman,D+,D,D,D+,B-,D,D+,C-,C+,B,B-,D,C-,C,C-,B-,B,C+,D,C,C+,D+,D-,D,D,C-,D-,D,D,B-,B+,D,C+
 2026,Laila Lancaster,Tennessee St.,OVC,Sophomore,C-,D+,D,C-,B,D,D+,C-,C+,B,B,D+,C,C,C+,B-,B,C+,D+,C+,C+,C,D,D+,D,C+,D,D+,D+,B,B+,D,B-
 2026,Sadie Sanchez,Tennessee St.,OVC,Freshman,D+,D,D-,D+,B,D,D+,C-,C+,B-,B-,D,C-,C,C+,B-,B,C+,D,C,C+,D+,D-,D,D-,C-,D-,D,D,B-,B,D,C+
@@ -2277,17 +2277,17 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,LaReesha Cawthorn,Tennessee Tech,OVC,Freshman,B-,D+,A,B-,B+,C-,C-,C+,C,A+,A,A-,B,B+,B,B,A-,B+,A,B-,B-,A,A-,D+,A-,B,A-,D+,A-,B,A,B-,B
 2026,Lyriq Mastin,Tennessee Tech,OVC,Freshman,D-,F,D,D-,D+,F,F,D-,D-,C+,C,D-,D-,C+,D,D+,C-,D+,D,D,D,C-,D-,F,D,D,D-,F,D,D,D,D-,D
 2026,Maddy Newman,Tennessee Tech,OVC,Sophomore,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,B+,B-,B-,B-,B-,B,C+,C-,C+,B-,C,C-,C+,B,A-,D+,B
-2026,Aaliyah Crump,Texas,SEC,Freshman,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B+,A+,A+,A+,A+,A+
+2026,Aaliyah Crump,Texas,SEC,Freshman,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Breya Cunningham,Texas,SEC,Junior,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Bryanna Preston,Texas,SEC,Sophomore,A+,A,A+,A+,A+,A-,A,A,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A-,A+,A+,A+,B+,A+,A+,A+,A+,A+
 2026,Jordan Lee,Texas,SEC,Sophomore,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A+,A+
-2026,Justice Carlton,Texas,SEC,Sophomore,A+,A+,A+,A+,A+,A,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A-,A+,A+,A+,A+,A+
+2026,Justice Carlton,Texas,SEC,Sophomore,A+,A+,A+,A+,A+,A,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A+,A+
 2026,Madison Booker,Texas,SEC,Junior,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+
 2026,Anita Franchini,Texas A&M,SEC,Freshman,C+,C,A-,B-,A-,C,C+,B-,B,A-,A,C+,B-,B,B-,B+,A-,B+,A,B,B,A,B+,C+,A-,B,B+,C+,A-,B+,A,C,B+
 2026,Chaney Spencer,Texas A&M,SEC,Freshman,C-,D,D-,D+,B-,D,D+,C-,C+,B,B-,D,C-,C,C+,B-,B-,C+,D,C,C+,D+,D-,D,D-,C-,D-,D,D,B-,B+,D,C+
 2026,Emerald Parker,Texas A&M,SEC,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,B-,B-,B-,B-,B-,A,B,B+,C+,B-,A,B,D,B+,B-,B,D,B+,B-,B+,C+,B-
 2026,Fatmata Janneh,Texas A&M,SEC,Junior,A-,B,A+,A,A+,B,B,B+,B+,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B-,A+,A+,A+,B,A+,A,A+,A,A
-2026,Janae Kent,Texas A&M,SEC,Junior,B,C,A-,B,A-,C+,C+,B-,C+,A+,A+,A-,B+,B+,B,B,A-,A-,A,B,B,A,A-,C,A-,B+,A-,C,A-,B+,A,B,B+
+2026,Janae Kent,Texas A&M,SEC,Junior,B,C,A-,B,A-,C+,C+,B-,C+,A+,A+,A-,B+,B+,B,B,A-,A-,A,B+,B,A,A-,C,A-,B+,A-,C,A-,B+,A,B,B+
 2026,Pien Steenbergen,Texas A&M,SEC,Junior,C+,C-,B,C+,B+,C-,C,C+,B,B+,A-,C,B-,B-,B-,B,B+,B,B,B-,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
 2026,Salese Blow,Texas A&M,SEC,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B-,B-,B-,B-,B-,A,B,B+,C+,B-,A,B,D,B+,B,B,D+,B+,B,B+,B-,B-
 2026,Vanessa Saidu,Texas A&M,SEC,Junior,C,D+,C,C,B,D+,C-,C,B-,B+,B+,C-,C+,C+,C+,B,B+,B-,C+,B-,C+,B,C,C-,C,C+,C-,C-,C,B,A-,D+,B-
@@ -2298,7 +2298,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Alisa Blalock,Texas Southern,SWAC,Junior,D+,D,D-,D+,B-,D,D,D+,C,B-,B-,D,D+,C-,C-,B-,B,C+,D-,C,C,D,D-,D,D-,C-,F,D,D-,B-,B,D,C+
 2026,Ayanna Jackson,Texas Southern,SWAC,Junior,D,F,D,D-,D+,F,F,D-,D-,B-,C+,D,D,D,C-,D+,D+,C,D+,D,D,C,D,F,D,D,D,F,D+,D,D+,D,D
 2026,Fenishka Bertho,Texas Southern,SWAC,Junior,D+,D,D-,D+,B-,D,D,D+,C,B-,B-,D,C-,C-,C,B-,B-,C+,D-,C,C,D,D-,D,D-,C-,D-,D,D-,B-,B,D,C+
-2026,Maci Quiller,Texas Southern,SWAC,Junior,D-,F,D+,D-,D,F,F,D-,D-,C,C-,D,D-,D,D,D,C-,D+,C-,D,D-,C+,D+,F,D+,D-,D+,F,C-,D-,C-,D-,D-
+2026,Maci Quiller,Texas Southern,SWAC,Junior,D-,F,D+,D-,D,F,F,D-,D-,C,C-,D,D-,D,D-,D,C-,D+,C-,D,D-,C+,D+,F,D+,D-,D+,F,C-,D-,C-,D-,D-
 2026,Malaya LeSueur,Texas Southern,SWAC,Junior,D-,F,D,F,D-,F,F,F,F,C-,D+,D-,D-,D+,C,D,D,D,D,D-,D-,D+,D-,F,D,D-,D-,F,D,D-,D,D-,D-
 2026,Taliyah Logwood,Texas Southern,SWAC,Sophomore,C,D,B+,C-,B-,D,D,D+,D,A-,B+,B+,C,B,C+,C+,B,B-,A-,C,C,A,B+,D-,A-,C+,B+,D-,A-,C+,B+,C,C+
 2026,Angela Carroll,Texas St.,SB,Freshman,D,F,C,D-,D+,F,F,D-,D-,B-,C+,C-,D,C+,D+,D+,C,C-,C+,D,D+,B-,C,F,C,D+,C-,F,C,D+,C+,D,D
@@ -2381,7 +2381,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Summah Hanson,UC Irvine,BW,Junior,B-,C-,A,B-,B+,C,C,C+,C+,A+,A+,A-,B,B,B,B,B+,B+,A,B,B,A+,A-,C-,A,B+,A-,C-,A,B+,A+,B,B
 2026,Amanda Muse,UCLA,B10,Junior,B,B-,A+,B+,A,B-,B-,B,A-,A+,A+,B,B+,B+,B+,A-,A,A-,A+,A-,B+,A+,A+,B-,A+,B+,A+,B-,A+,A-,A+,B-,A-
 2026,Lena Bilic,UCLA,B10,Freshman,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A+,A-,A-,A+,A+,A+,A,A,A+,A+,B-,A+,A,A+,B-,A+,A,A+,A,A-
-2026,Sienna Betts,UCLA,B10,Freshman,A,B+,A+,A+,A+,B+,B+,A-,A-,A+,A+,A+,A+,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A+,A+,A+,A
+2026,Sienna Betts,UCLA,B10,Freshman,A,B+,A+,A+,A+,B+,B+,A-,A,A+,A+,A+,A+,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A+,A+,A+,A
 2026,Allie Ziebell,Connecticut,BE,Sophomore,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A,A+,A+,A+,A+,A+
 2026,Ashlynn Shade,Connecticut,BE,Junior,A+,A,A+,A+,A+,A,A,A,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A+,A,A+,A+,A+,A-,A+,A+,A+,A+,A+
 2026,Ayanna Patterson,Connecticut,BE,Junior,B-,C+,A,B,A,C+,C+,B-,B+,A,A,C+,B,B,B+,B+,A,B+,A+,B+,B,A+,A,C+,A,B+,A,C+,A,A-,A,C+,B+
@@ -2454,7 +2454,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Paige Smith,UNC Wilmington,CAA,Junior,D-,F,D,F,D,F,F,F,F,C-,C-,D-,D-,D-,D-,D,D,D,D,D-,D-,D+,D-,F,D-,D-,D-,F,D,D-,D,D-,D-
 2026,Meadow Roland,UNLV,MWC,Sophomore,B+,C+,A+,B+,A,C+,C+,B,B-,A+,A+,A+,A-,A-,B+,B+,A-,A,A+,B+,B+,A+,A,C+,A+,A-,A,C+,A+,A-,A+,B+,A-
 2026,Sydni Summers,UNLV,MWC,Junior,C+,C-,B,C+,B+,C,C,C+,B,B+,A-,C,B-,B-,B-,B,A-,B,B,B-,B-,A-,B,C,B,B-,B-,C,B,B+,A,C-,B
-2026,Teagan Colvin,UNLV,MWC,Sophomore,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,C+,B-,B,B-,B-,A-,B,B+,C+,B-,A,B,D,B+,B-,B,D,B+,B-,B+,C+,B-
+2026,Teagan Colvin,UNLV,MWC,Sophomore,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,C+,B-,B,B-,B-,A-,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,B-
 2026,Trystan James,UNLV,MWC,Freshman,C+,C-,B-,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,B+,B,B-,B-,B-,B+,C+,C,B-,B-,C+,C-,B-,B+,A-,C-,B
 2026,Dayana Mendes,USC,B10,Sophomore,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A,B+,B+,B+,B+,A-,A-,A,B+,B+,A+,A,C,A,B+,A,C+,A,B+,A+,B+,B+
 2026,Gerda Raulusaityte,USC,B10,Freshman,B,C+,A,B+,A-,C+,C+,B-,B-,A+,A+,A,B+,A-,B+,B+,A-,A-,A,B+,B+,A+,A,C+,A,A-,A,C+,A,B+,A+,B+,B+
@@ -2560,10 +2560,10 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Savanna Creal,Vermont,AE,Sophomore,C+,C-,C,C,B+,D+,C-,C,B-,B+,B+,C-,C+,C+,B-,B,B+,B-,C+,C+,B-,B,C,C-,C+,B-,C,C-,C+,B,A-,D+,B
 2026,Brooke Bender,Villanova,BE,Freshman,A-,B-,A+,A-,A,B-,B-,B+,B,A+,A+,A+,A-,A+,B+,A-,A,A+,A+,A,A-,A+,A+,B-,A+,A,A+,B-,A+,A-,A+,A-,A-
 2026,Brynn McCurry,Villanova,BE,Junior,A+,A-,A+,A+,A+,B+,A-,A,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B+,A+,A+,A+,A+,A+
-2026,Dani Ceseretti,Villanova,BE,Sophomore,B,C-,A-,B-,B+,C,C,C+,C+,A+,A+,B,B,B,B,B,A,B+,A,B,B,A,B+,C-,A-,B+,B+,C-,A-,B+,A+,B,B
+2026,Dani Ceseretti,Villanova,BE,Sophomore,B,C-,A-,B-,B+,C,C,C+,C+,A+,A+,B,B,B,B,B,A-,B+,A,B,B,A,B+,C-,A-,B+,B+,C-,A-,B+,A+,B,B
 2026,Jasmine Bascoe,Villanova,BE,Sophomore,A+,B+,A+,A+,A+,B+,A-,A-,A,A+,A+,A+,A+,A+,A,A+,A+,A+,A+,A+,A+,A+,A+,B+,A+,A+,A+,B,A+,A+,A+,A+,A
 2026,Kelsey Joens,Villanova,BE,Junior,B+,C+,A+,B+,A-,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A+,B+,B+
-2026,Kennedy Henry,Villanova,BE,Freshman,A,B+,A+,A+,A+,B,B+,A-,A-,A+,A+,A+,A,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
+2026,Kennedy Henry,Villanova,BE,Freshman,A,B,A+,A+,A+,B,B+,A-,A-,A+,A+,A+,A,A+,A,A,A+,A+,A+,A+,A,A+,A+,B,A+,A+,A+,B,A+,A,A+,A+,A
 2026,MD Ntambue,Villanova,BE,Freshman,C+,C,B+,C+,A-,C,C,C+,B,A-,A-,C,B-,B-,B-,B+,A-,B,B+,B,B,A,B,C+,B+,B-,B,C,B+,B+,A,C,B+
 2026,Rachel Wirts,Villanova,BE,Sophomore,C-,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C,B-,B+,C+,C-,C+,C+,C+,D+,D+,D+,C,D+,D+,D+,B,B+,D,B-
 2026,Adeang Ring,Virginia,ACC,Sophomore,B-,C+,B+,B-,A-,C+,C+,B-,B,A-,A-,C+,B-,B,B,B+,A-,B+,A-,B,B,A,B+,C+,A-,B,B+,C+,A-,B+,A,C,B+
@@ -2619,9 +2619,9 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Paris Lauro,Weber St.,BSky,Junior,C-,D-,C+,D+,C+,D-,D,D,D,B+,B,C,C-,C,C,C+,B-,C+,B-,C-,C-,B,C+,D-,C+,C,C+,D-,C+,C+,B-,C-,C
 2026,Sydney White,Weber St.,BSky,Junior,D-,F,D+,D-,D,F,F,D-,D-,C+,C,D,D-,C,D+,D,C-,D+,C-,D,D,C+,D+,F,D+,D-,D+,F,C-,D,C-,D-,D
 2026,Ally Hollifield,Western Carolina,SC,Sophomore,D,D-,C+,D-,C-,F,D-,D-,D-,B-,C+,C,D,C,D,C-,C+,C,B-,D+,D+,B,C+,F,C+,D+,C+,F,B-,D+,B-,D,D+
-2026,Betsey Burnett,Western Carolina,SC,Sophomore,D-,F,D,D-,D,F,F,D-,D-,C,C-,D,D-,D-,D+,D,D+,D+,D+,D,D-,C-,D,F,D,D-,D,F,D+,D,D+,D-,D-
+2026,Betsey Burnett,Western Carolina,SC,Sophomore,D-,F,D,D-,D,F,F,D-,D-,C,C-,D,D-,D-,D+,D,D+,D+,D+,D,D-,C-,D,F,D,D-,D,F,D,D,D+,D-,D-
 2026,Christina Bowers,Western Carolina,SC,Freshman,D-,F,C-,D-,D,F,F,D-,D-,C+,C,D,D-,C,D,D+,C-,D+,C-,D,D,C+,D+,F,C-,D,D+,F,C-,D,C,D-,D
-2026,Grace Pack,Western Carolina,SC,Junior,D-,F,D+,D-,D+,F,F,D-,D-,C+,C,D,D-,D,D,D+,D+,C-,D+,D,D,C,D,F,D+,D,D,F,D+,D,D+,D-,D
+2026,Grace Pack,Western Carolina,SC,Junior,D-,F,D+,D-,D+,F,F,D-,D-,B-,C,D,D-,D,D,D+,D+,C-,D+,D,D,C,D,F,D+,D,D,F,D+,D,D+,D,D
 2026,Joyce Mulumba,Western Carolina,SC,Junior,C-,D,D,D+,B-,D,D+,C-,C+,B,B,D+,C,C,C-,B-,B,C+,D,C+,C+,C-,D,D+,D,C,D,D,D,B-,B+,D,C+
 2026,Justice Zimmerman,Western Carolina,SC,Freshman,D-,F,D-,D-,D,F,F,D-,D-,C+,C,D-,D-,F,D+,D,D-,C-,D-,D,D,D,D-,F,D-,D-,D-,F,D-,D,D-,D-,D-
 2026,Kennedy Hilsenroth,Western Carolina,SC,Sophomore,D-,F,F,F,D+,F,F,D-,D,D+,D+,D-,D-,D-,F,D+,C-,D,F,D,D,F,F,F,F,D-,F,F,F,D+,C,F,D
@@ -2632,7 +2632,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Mallory Shetley,Western Illinois,OVC,--,C+,D+,B,C+,B,D+,D+,C,C-,A,A,B-,B-,B-,B-,B-,B+,B,B,C+,B-,A-,B,D,B,B,B-,D,B,B,B,B-,B-
 2026,Raegan McCowan,Western Illinois,OVC,Junior,B-,C+,B+,B-,A,C+,C+,B-,B,A-,A-,C+,B-,B,B+,B+,A-,B,A-,B,B,A,B+,C+,B+,B+,B,C+,B+,B+,A,C,B+
 2026,Enni Ahervuo,Western Kentucky,CUSA,Freshman,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,C+,B,B+,B-,B-,B-,B-,B,C+,C-,C+,C+,C,C-,C+,B,A-,D+,B
-2026,Lola Bond,Western Kentucky,CUSA,Freshman,D+,D,D,D+,B-,D,D+,C-,C+,B,B,D+,C-,C,C,B-,B,C+,D,C,C+,C-,D-,D,D,C-,D-,D,D,B-,B+,D,C+
+2026,Lola Bond,Western Kentucky,CUSA,Freshman,D+,D,D,D+,B-,D,D+,C-,C+,B,B,D,C-,C,C,B-,B,C+,D,C,C+,C-,D-,D,D,C-,D-,D,D,B-,B+,D,C+
 2026,Salma Khedr,Western Kentucky,CUSA,Sophomore,C-,D-,B,D+,C+,D-,D,D,D,B+,B,B,C-,B-,C+,C+,B,C+,B+,C-,C-,A-,B,D-,B,C+,B,D-,B,C+,B,C-,C
 2026,Tatum Boettjer,Western Kentucky,CUSA,Junior,D-,F,C-,D-,D+,F,F,D-,D-,C+,C,D,D-,D,D+,D+,C-,C-,C-,D,D,C+,D+,F,D+,D,D+,F,C-,D,C-,D-,D
 2026,Torri James,Western Kentucky,CUSA,Sophomore,C-,D-,C+,D+,C+,D-,D,D,D,B+,B,C,C-,C,C,C+,C+,C+,B-,C-,C-,B,C+,D-,C+,C,C+,D-,B-,C+,B-,C-,C
@@ -2646,7 +2646,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Anya McKenzie,West Georgia,ASun,Junior,C+,C,B,C+,A-,C,C,C+,B,B+,A-,C,B-,B-,B,B,A-,B,B,B-,B-,A-,B,C,B,B,B-,C,B,B+,A,C-,B
 2026,Asia Donald,West Georgia,ASun,Sophomore,C-,D-,C+,D+,C+,D-,D-,D,D,B+,B,D+,C-,B-,C+,C,B,C+,B-,C-,C-,B+,C+,D-,C+,C,C+,D-,B-,C+,B-,C-,C-
 2026,Destiny Jones,West Georgia,ASun,Sophomore,C+,D+,B,C+,B,D+,D+,C,C-,A,A,B,B-,B-,B-,B-,A-,B,B+,C+,B-,A-,B,D,B,B,B,D,B,B,B+,B-,B-
-2026,Gal-la Font,West Georgia,ASun,Junior,D,F,C-,D-,C-,F,D-,D-,D-,B-,C+,D+,D,B-,D+,D+,C-,C-,C,D,D+,C+,D+,F,C-,D+,D+,F,C-,D+,C,D,D
+2026,Gal-la Font,West Georgia,ASun,Junior,D,D-,C-,D-,C-,F,D-,D-,D-,B-,C+,D+,D,B-,D+,D+,C,C-,C,D,D+,C+,D+,F,C-,D+,D+,F,C-,D+,C,D,D
 2026,Grace O'Gara,West Georgia,ASun,Junior,C-,D-,B,D+,C+,D-,D,D+,D,B+,B,C+,C,B-,C,C+,B,C+,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C-,C
 2026,Sydne Tolbert,West Georgia,ASun,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A,B,B-,B,B-,B-,B+,B,A-,C+,B-,A,B+,D,B+,B,B+,D,B+,B,B+,B-,B-
 2026,Carter McCray,West Virginia,B12,Junior,A-,B,A+,A,A,B,B,B+,B+,A+,A+,A+,A,A+,A-,A,A+,A+,A+,A,A,A+,A+,B-,A+,A,A+,B,A+,A,A+,A,A
@@ -2686,7 +2686,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Courtney Swider,Wofford,SC,Junior,C,D+,C-,C,B,D+,D+,C,C+,B+,B,D+,C+,C+,C,B-,B,B-,C,C+,C+,B-,C-,D+,C-,C+,D+,D+,C-,B,B+,D+,B-
 2026,Elli Porter,Wofford,SC,Freshman,D,F,C-,D-,D+,F,F,D-,D-,B-,C+,D+,D,C-,D+,D+,C-,C-,C,D+,D,B-,C-,F,C-,D+,D+,F,C-,D+,C,D,D
 2026,Gabby Mundy,Wofford,SC,Freshman,B-,D+,A,B-,B+,C-,C-,C+,C,A+,A,A-,B-,B+,B-,B-,A-,B+,A,B-,B-,A+,A-,D+,A,B,A-,D+,A-,B,A,B-,B
-2026,Maddie Heiss,Wofford,SC,Junior,C+,D,B,C,B-,D,D,C-,D+,A-,B+,B-,C+,B-,C+,C+,B+,B-,B,C+,C+,A-,B-,D-,B,B-,B-,D,B,B-,B,C+,C+
+2026,Maddie Heiss,Wofford,SC,Junior,C+,D,B,C,B-,D,D,C-,D+,A-,B+,B-,C+,B-,C+,C+,B+,B-,B,C+,C+,A-,B-,D,B,B-,B-,D,B,B-,B,C+,C+
 2026,Madi Hawk,Wofford,SC,Sophomore,C-,D+,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C+,B-,B,B-,C-,C+,C+,C+,D+,D+,D+,C+,D+,D+,C-,B,B+,D+,B-
 2026,Molly Masingale,Wofford,SC,Sophomore,C+,D,B+,C,B-,D,D+,C-,D+,A-,A-,B,C+,B,C+,B-,B+,B,B+,C+,C+,A,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
 2026,Queen Ikhiuwu,Wofford,SC,Junior,C+,D,B,C-,B-,D,D,C-,D+,A-,B+,B-,C+,B-,B-,C+,B,B-,B+,C,C+,A-,B,D-,B,C+,B,D,B,B-,B,C,C+
@@ -2708,7 +2708,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Peyton Wohlford,Wyoming,MWC,Freshman,C-,D,D+,C-,B,D+,D+,C-,C+,B,B,D+,C,C+,C+,B-,B,C+,D+,C+,C+,C,D,D+,D,C,D,D,D+,B,B+,D,C+
 2026,Audia Young,Xavier,BE,Junior,D,D-,C-,D-,C-,D-,D-,D-,D-,B-,C+,D+,D,C,D+,C-,C-,C,C,D+,D+,B-,C-,F,C-,D+,D+,F,C-,D+,C,D,D+
 2026,Lucía Martínez López,Xavier,BE,Sophomore,C+,C-,B-,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,C+,B,A-,B,B,B-,B-,B+,B-,C,B-,B-,C+,C,B-,B+,A-,C-,B
-2026,MacKenzie Givens,Xavier,BE,Sophomore,B,C+,A,B+,A,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A,B+,B+
+2026,MacKenzie Givens,Xavier,BE,Sophomore,B,C+,A,B+,A,C+,C+,B,B-,A+,A+,A,B+,A,B+,B+,A,A-,A+,B+,B+,A+,A,C+,A,A-,A,C+,A,A-,A,B+,B+
 2026,Mariyah Noel,Xavier,BE,Junior,C+,D+,B+,C+,B,D+,D+,C,C-,A,A-,B,B-,B,B-,B-,B+,B,B+,C+,C+,A,B,D,B+,B,B,D,B+,B-,B+,C+,B-
 2026,Meri Kanerva,Xavier,BE,Sophomore,C,D,B,C-,B-,D,D,D+,D+,A-,B+,C+,C+,B-,C,C+,B,B-,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C+
 2026,Petra Oborilova,Xavier,BE,Junior,C+,D,B,C,B,D,D+,C-,D+,A-,A-,B,C+,B-,C+,B-,B+,B,B+,C+,C+,A-,B,D,B+,B-,B,D,B+,B-,B+,C+,C+
@@ -2716,7 +2716,7 @@ season,player,team,source_conference,class,A10,ACC,AE,AMER,ASUN,B10,B12,BE,BSKY,
 2026,Ana Guillen,Yale,Ivy,Junior,C+,C-,C+,C+,B+,C-,C-,C+,B-,B+,B+,C-,C+,B-,B-,B,A-,B,B-,B-,B-,B+,C+,C-,C+,B-,C+,C-,B-,B+,A-,C-,B
 2026,Ciniya Moore,Yale,Ivy,Sophomore,C-,D-,C+,D+,C+,D-,D-,D,D,B+,B,C,C-,C,C,C,C+,C+,B-,C-,C-,B,C+,D-,C+,C,C+,F,C+,C+,B-,C-,C
 2026,Dorka Kastl,Yale,Ivy,Freshman,C-,D-,B,D+,C+,D-,D,D+,D,B+,B,B,C,B-,C+,C+,B,B-,B+,C-,C,A-,B,D-,B+,C+,B,D-,B,C+,B+,C-,C
-2026,Ke'iara Odume,Yale,Ivy,Sophomore,D-,F,D-,D-,D,F,F,D-,D-,C,C-,D-,D-,D-,D,D,D-,D+,D-,D,D,D+,D-,F,D-,D-,D-,F,D-,D-,D-,D-,D-
+2026,Ke'iara Odume,Yale,Ivy,Sophomore,D-,F,D-,D-,D,F,F,D-,D-,C,C-,D-,D-,D-,D,D,D-,D+,D-,D,D-,D+,D-,F,D-,D-,D-,F,D-,D-,D-,D-,D-
 2026,Luisa Vydrova,Yale,Ivy,Junior,C,D,B,D+,B-,D,D,D+,D,A-,B+,B-,C,B-,C+,C+,B,B-,B,C,C,B+,B-,D-,B-,C+,B-,D-,B,C+,B,C,C
 2026,Magdalena Schmidt,Yale,Ivy,Sophomore,C-,D+,D+,C-,B-,D+,D+,C,C+,B,B,D+,C,C+,C,B-,B,B-,C-,C+,C+,C+,D+,D+,D+,C,D+,D+,C-,B,B+,D+,B-
 2026,Marisa Chapman,Yale,Ivy,Sophomore,D,D-,C,D,C-,D-,D-,D-,D-,B,C+,C-,D,B-,C-,C-,C+,C,C+,D+,D+,B,C,F,C+,D+,C,F,C+,C-,C+,D,D+
