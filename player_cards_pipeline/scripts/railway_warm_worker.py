@@ -7,6 +7,9 @@ import shutil
 import subprocess
 import sys
 import time
+import gzip
+import base64
+import hashlib
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -70,6 +73,13 @@ def normalize_sync_endpoint(endpoint: str) -> str:
     if normalized.startswith("https://dbcjason.com/"):
         suffix = normalized[len("https://dbcjason.com") :]
         return f"https://www.dbcjason.com{suffix}"
+    return normalized
+
+
+def derive_phase_backup_endpoint(sync_endpoint: str) -> str:
+    normalized = normalize_sync_endpoint(sync_endpoint)
+    if normalized.endswith("/api/internal/payload-sync"):
+        return normalized[: -len("/api/internal/payload-sync")] + "/api/internal/payload-phase-backup"
     return normalized
 
 
@@ -364,6 +374,95 @@ def post_sync_batch(endpoint: str, token: str, rows: list[dict[str, Any]], timeo
     raise RuntimeError(f"sync failed: too many redirects starting from {endpoint}")
 
 
+def iter_payload_json_files(year_dir: Path) -> list[Path]:
+    paths: list[Path] = []
+    for path in sorted(year_dir.glob("*.json")):
+        name = path.name
+        if name in {"index.json", "manifest.json", "errors.json"}:
+            continue
+        if name.startswith(("index.", "manifest.", "errors.", SYNC_STATE_PREFIX)):
+            continue
+        paths.append(path)
+    return paths
+
+
+def shard_index_for_cache_key(cache_key: str, chunk_count: int) -> int:
+    digest = hashlib.sha256(cache_key.encode("utf-8")).hexdigest()
+    return int(digest[:16], 16) % chunk_count
+
+
+def build_phase_backup_rows(default_gender: str, phase_name: str, chunk_count: int) -> list[dict[str, Any]]:
+    out_dir = output_dir_path()
+    years = parse_years(os.getenv("YEARS", os.getenv("WARM_SEASON", "2026")).strip() or "2026")
+    gender = os.getenv("PAYLOAD_SYNC_GENDER", default_gender).strip().lower() or default_gender
+    backup_rows: list[dict[str, Any]] = []
+
+    for year in years:
+        year_dir = out_dir / year
+        chunk_rows: dict[int, list[dict[str, Any]]] = {chunk_index: [] for chunk_index in range(chunk_count)}
+        for payload_path in iter_payload_json_files(year_dir):
+            try:
+                payload = json.loads(payload_path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            if not isinstance(payload, dict):
+                continue
+            player = str(payload.get("player", "")).strip()
+            team = str(payload.get("team", "")).strip()
+            season = str(payload.get("season", year)).strip() or year
+            if not player or not team:
+                continue
+            cache_key = bpc.card_cache_key(player, team, season)
+            chunk_index = shard_index_for_cache_key(cache_key, chunk_count)
+            chunk_rows.setdefault(chunk_index, []).append(
+                {
+                    "cache_key": cache_key,
+                    "player": player,
+                    "team": team,
+                    "season": season,
+                    "path": payload_path.name,
+                    "payload_json": payload,
+                }
+            )
+
+        for chunk_index in range(chunk_count):
+            rows = chunk_rows.get(chunk_index, [])
+            raw = json.dumps({"rows": rows}, ensure_ascii=True, separators=(",", ":")).encode("utf-8")
+            encoded = base64.b64encode(gzip.compress(raw)).decode("ascii")
+            backup_rows.append(
+                {
+                    "gender": gender,
+                    "season": int(year),
+                    "phase": phase_name,
+                    "chunk_index": chunk_index,
+                    "chunk_count": chunk_count,
+                    "row_count": len(rows),
+                    "payload_gzip_base64": encoded,
+                    "metadata_json": {
+                        "format": "gzip+base64+json",
+                        "row_count": len(rows),
+                    },
+                }
+            )
+    return backup_rows
+
+
+def backup_phase_outputs_to_endpoint(default_gender: str, phase_name: str, chunk_count: int) -> None:
+    if not env_flag("ENABLE_PHASE_BACKUPS", True):
+        return
+    sync_endpoint = os.getenv("PAYLOAD_SYNC_ENDPOINT", "")
+    endpoint = derive_phase_backup_endpoint(os.getenv("PAYLOAD_PHASE_BACKUP_ENDPOINT", "") or sync_endpoint)
+    token = os.getenv("PAYLOAD_SYNC_TOKEN", "").strip()
+    if not endpoint or not token:
+        print("[railway-worker] phase backup skipped: endpoint or token missing")
+        return
+    timeout_seconds = max(5, env_int("PAYLOAD_SYNC_TIMEOUT_SECONDS", 120))
+    rows = build_phase_backup_rows(default_gender, phase_name, chunk_count)
+    print(f"[railway-worker] phase backup start endpoint={endpoint} phase={phase_name} chunks={len(rows)}")
+    post_sync_batch(endpoint, token, rows, timeout_seconds)
+    print(f"[railway-worker] phase backup finished phase={phase_name} chunks={len(rows)}")
+
+
 def run_phase_wave(chunk_count: int, max_parallel: int, phases: list[str]) -> None:
     pending = list(range(chunk_count))
     running: list[tuple[int, subprocess.Popen[str]]] = []
@@ -440,9 +539,12 @@ def run_bootstrap_worker() -> None:
 
     if section_major:
         run_phase_wave(chunk_count, max_parallel, ["base_metadata"])
+        backup_phase_outputs_to_endpoint(DEFAULT_GENDER, "base_metadata", chunk_count)
         for section_name in SECTION_PHASES:
             run_phase_wave(chunk_count, max_parallel, [section_name])
+            backup_phase_outputs_to_endpoint(DEFAULT_GENDER, section_name, chunk_count)
         run_phase_wave(chunk_count, max_parallel, ["finalize"])
+        backup_phase_outputs_to_endpoint(DEFAULT_GENDER, "finalize", chunk_count)
     else:
         run_phase_wave(chunk_count, max_parallel, [])
 
