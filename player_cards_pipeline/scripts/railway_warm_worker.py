@@ -150,7 +150,9 @@ def pending_sync_years(out_dir: Path, years: list[str], gender: str) -> list[str
     pending: list[str] = []
     for year in existing_merged_years(out_dir, years):
         year_state = years_state.get(str(year), {}) if isinstance(years_state, dict) else {}
-        if not isinstance(year_state, dict) or year_state.get("status") != "synced":
+        if not isinstance(year_state, dict):
+            continue
+        if year_state.get("status") in {"merged", "syncing"}:
             pending.append(year)
     return pending
 
@@ -164,6 +166,17 @@ def synced_merged_years(out_dir: Path, years: list[str], gender: str) -> list[st
         if isinstance(year_state, dict) and year_state.get("status") == "synced":
             synced.append(year)
     return synced
+
+
+def stale_merged_years(out_dir: Path, years: list[str], gender: str) -> list[str]:
+    state = parse_sync_state(out_dir, gender)
+    years_state = state.get("years", {}) if isinstance(state, dict) else {}
+    stale: list[str] = []
+    for year in existing_merged_years(out_dir, years):
+        year_state = years_state.get(str(year), {}) if isinstance(years_state, dict) else {}
+        if not isinstance(year_state, dict) or not year_state.get("status"):
+            stale.append(year)
+    return stale
 
 
 def build_shard_command(chunk_index: int, chunk_count: int, phases: list[str] | None = None) -> list[str]:
@@ -536,6 +549,11 @@ def run_bootstrap_worker() -> None:
         if env_flag("IDLE_AFTER_BOOTSTRAP", True):
             idle_forever("bootstrap already synced")
         return
+
+    stale_years = stale_merged_years(out_dir, parsed_years, gender)
+    if stale_years:
+        print(f"[railway-worker] removing stale merged outputs years={','.join(stale_years)}")
+        cleanup_output_years(out_dir, stale_years)
 
     if section_major:
         run_phase_wave(chunk_count, max_parallel, ["base_metadata"])
