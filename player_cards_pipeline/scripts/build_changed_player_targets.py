@@ -46,6 +46,8 @@ def alias_variants(name: str) -> list[str]:
     out = {name.strip(), name.strip().replace(".", "")}
     s = name.strip()
     rules = [
+        ("UConn", "Connecticut"),
+        ("Connecticut", "UConn"),
         (" St.", " State"),
         ("Cal St.", "Cal State"),
         ("FIU", "Florida International"),
@@ -264,36 +266,30 @@ def map_played_teams(raw_team_names: set[str], local_teams: list[str]) -> tuple[
 
 def load_played_teams_from_local_plays(project_root: Path, season: str, start_date: str, end_date: str) -> list[str]:
     settings = load_settings(project_root)
-    plays_map = settings.get("plays_csv_by_year", {}) or {}
-    plays_rel = plays_map.get(str(season).strip())
-    if not plays_rel:
+    adv_map = settings.get("advgames_csv_by_year", {}) or {}
+    adv_rel = adv_map.get(str(season).strip())
+    if not adv_rel:
         return []
-    plays_path = rel_to_pipeline(project_root, plays_rel)
-    if not plays_path.exists():
-        log(f"[targets] local plays file missing: {plays_path}")
+    adv_path = rel_to_pipeline(project_root, adv_rel)
+    if not adv_path.exists():
+        log(f"[targets] local advgames file missing: {adv_path}")
         return []
 
-    start = date.fromisoformat(start_date)
-    end = date.fromisoformat(end_date)
+    start_num = start_date.replace("-", "")
+    end_num = end_date.replace("-", "")
     names: set[str] = set()
-    with plays_path.open(newline="", encoding="utf-8", errors="replace") as handle:
+    with adv_path.open(newline="", encoding="utf-8", errors="replace") as handle:
         reader = csv.DictReader(handle)
         for row in reader:
-            raw_dt = (row.get("gameStartDate") or "").strip()
-            if not raw_dt:
+            raw_dt = (row.get("numdate") or "").strip()
+            if not raw_dt or raw_dt < start_num or raw_dt > end_num:
                 continue
-            try:
-                game_date = datetime.fromisoformat(raw_dt.replace("Z", "+00:00")).date()
-            except Exception:
-                continue
-            if game_date < start or game_date > end:
-                continue
-            for key in ("__team_name", "team", "opponent"):
+            for key in ("tt", "opponent"):
                 value = (row.get(key) or "").strip()
                 if value:
                     names.add(value)
     sport_label = "women"
-    log(f"[targets] local {sport_label} plays matched raw teams={len(names)} from {plays_path}")
+    log(f"[targets] local {sport_label} advgames matched raw teams={len(names)} from {adv_path}")
     return sorted(names)
 
 
