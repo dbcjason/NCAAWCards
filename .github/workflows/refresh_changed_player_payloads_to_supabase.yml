@@ -1,0 +1,334 @@
+name: Refresh Changed Women Payloads To Supabase
+
+on:
+  workflow_dispatch:
+    inputs:
+      season:
+        description: "Season to refresh"
+        required: true
+        default: "2026"
+      start_date:
+        description: "Optional YYYY-MM-DD start date. Blank defaults to most recent Wednesday for manual runs."
+        required: false
+        default: ""
+      end_date:
+        description: "Optional YYYY-MM-DD end date. Blank defaults to yesterday."
+        required: false
+        default: ""
+      chunk_count:
+        description: "Parallel shard count"
+        required: true
+        default: "10"
+      min_games:
+        description: "Min games threshold"
+        required: true
+        default: "5"
+  workflow_run:
+    workflows: ["Refresh 2026 NCAAW Bart + Enriched (Daily 4AM ET)"]
+    types: [completed]
+
+concurrency:
+  group: women-changed-payload-refresh-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  DEFAULT_PHASES: "base_metadata,per_game_percentiles,grade_boxes_html,bt_percentiles_html,self_creation_html,playstyles_html,team_impact_html,shot_diet_html,player_comparisons_html,draft_projection_html"
+
+jobs:
+  generate-targets:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      season: ${{ steps.window.outputs.season }}
+      start_date: ${{ steps.window.outputs.start_date }}
+      end_date: ${{ steps.window.outputs.end_date }}
+      chunk_count: ${{ steps.window.outputs.chunk_count }}
+      min_games: ${{ steps.window.outputs.min_games }}
+      target_count: ${{ steps.count.outputs.target_count }}
+    steps:
+      - name: Checkout (sparse)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            cbb_player_cards_v1
+            player_cards_pipeline
+            cbbd_seasons
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas
+
+      - name: Resolve target window
+        id: window
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from datetime import date, timedelta
+          import os
+
+          event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+          today = date.today()
+          yesterday = today - timedelta(days=1)
+          season = os.environ.get("INPUT_SEASON") or "2026"
+          chunk_count = os.environ.get("INPUT_CHUNK_COUNT") or "10"
+          min_games = os.environ.get("INPUT_MIN_GAMES") or "5"
+          start_date = (os.environ.get("INPUT_START_DATE") or "").strip()
+          end_date = (os.environ.get("INPUT_END_DATE") or "").strip()
+          if not end_date:
+              end_date = yesterday.isoformat()
+          if not start_date:
+              if event_name == "workflow_dispatch":
+                  cursor = yesterday
+                  while cursor.weekday() != 2:
+                      cursor -= timedelta(days=1)
+                  start_date = cursor.isoformat()
+              else:
+                  start_date = yesterday.isoformat()
+          print(f"season={season}")
+          print(f"chunk_count={chunk_count}")
+          print(f"min_games={min_games}")
+          print(f"start_date={start_date}")
+          print(f"end_date={end_date}")
+          PY
+        env:
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          INPUT_SEASON: ${{ github.event.inputs.season }}
+          INPUT_START_DATE: ${{ github.event.inputs.start_date }}
+          INPUT_END_DATE: ${{ github.event.inputs.end_date }}
+          INPUT_CHUNK_COUNT: ${{ github.event.inputs.chunk_count }}
+          INPUT_MIN_GAMES: ${{ github.event.inputs.min_games }}
+
+      - name: Build changed-player targets
+        run: |
+          mkdir -p .tmp
+          python3 player_cards_pipeline/scripts/build_changed_player_targets.py \
+            --project-root "." \
+            --season "${{ steps.window.outputs.season }}" \
+            --start-date "${{ steps.window.outputs.start_date }}" \
+            --end-date "${{ steps.window.outputs.end_date }}" \
+            --output-file ".tmp/changed_targets.json" \
+            --summary-file ".tmp/changed_targets_summary.json"
+        env:
+          CBBD_API_KEY: ${{ secrets.CBBD_API_KEY }}
+
+      - name: Count targets
+        id: count
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          path = Path('.tmp/changed_targets.json')
+          payload = json.loads(path.read_text(encoding='utf-8')) if path.exists() else []
+          print(f"target_count={len(payload) if isinstance(payload, list) else 0}")
+          PY
+
+      - name: Upload target artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: women-changed-targets
+          path: |
+            .tmp/changed_targets.json
+            .tmp/changed_targets_summary.json
+            .tmp/changed_targets_summary.csv
+          if-no-files-found: error
+
+  base-metadata:
+    needs: generate-targets
+    if: ${{ needs.generate-targets.outputs.target_count != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - name: Skip inactive shard
+        if: ${{ matrix.shard >= fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: echo "Skipping shard ${{ matrix.shard }}"
+
+      - name: Checkout (sparse)
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            cbb_player_cards_v1
+            player_cards_pipeline
+            cbbd_seasons
+
+      - name: Setup Python
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas psycopg[binary]
+
+      - name: Download targets
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/download-artifact@v4
+        with:
+          name: women-changed-targets
+          path: .tmp
+
+      - name: Refresh base metadata
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: |
+          python3 player_cards_pipeline/scripts/apply_targeted_payload_phases_to_supabase.py \
+            --project-root "." \
+            --gender women \
+            --season "${{ needs.generate-targets.outputs.season }}" \
+            --targets-file ".tmp/changed_targets.json" \
+            --phases "base_metadata" \
+            --chunk-count "${{ needs.generate-targets.outputs.chunk_count }}" \
+            --chunk-index "${{ matrix.shard }}" \
+            --min-games "${{ needs.generate-targets.outputs.min_games }}"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+  per-game-percentiles:
+    needs: [generate-targets, base-metadata]
+    if: ${{ needs.generate-targets.outputs.target_count != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - name: Skip inactive shard
+        if: ${{ matrix.shard >= fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: echo "Skipping shard ${{ matrix.shard }}"
+
+      - name: Checkout (sparse)
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            cbb_player_cards_v1
+            player_cards_pipeline
+            cbbd_seasons
+
+      - name: Setup Python
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas psycopg[binary]
+
+      - name: Download targets
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/download-artifact@v4
+        with:
+          name: women-changed-targets
+          path: .tmp
+
+      - name: Refresh per-game percentiles
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: |
+          python3 player_cards_pipeline/scripts/apply_targeted_payload_phases_to_supabase.py \
+            --project-root "." \
+            --gender women \
+            --season "${{ needs.generate-targets.outputs.season }}" \
+            --targets-file ".tmp/changed_targets.json" \
+            --phases "per_game_percentiles" \
+            --chunk-count "${{ needs.generate-targets.outputs.chunk_count }}" \
+            --chunk-index "${{ matrix.shard }}" \
+            --min-games "${{ needs.generate-targets.outputs.min_games }}"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+  section-refresh:
+    needs: [generate-targets, per-game-percentiles]
+    if: ${{ needs.generate-targets.outputs.target_count != '0' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        phase: ["grade_boxes_html", "bt_percentiles_html", "self_creation_html", "playstyles_html", "team_impact_html", "shot_diet_html", "player_comparisons_html", "draft_projection_html"]
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    steps:
+      - name: Skip inactive shard
+        if: ${{ matrix.shard >= fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: echo "Skipping shard ${{ matrix.shard }}"
+
+      - name: Checkout (sparse)
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            cbb_player_cards_v1
+            player_cards_pipeline
+            cbbd_seasons
+
+      - name: Setup Python
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install deps
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install pandas psycopg[binary]
+
+      - name: Download targets
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        uses: actions/download-artifact@v4
+        with:
+          name: women-changed-targets
+          path: .tmp
+
+      - name: Refresh section
+        if: ${{ matrix.shard < fromJson(needs.generate-targets.outputs.chunk_count) }}
+        run: |
+          python3 player_cards_pipeline/scripts/apply_targeted_payload_phases_to_supabase.py \
+            --project-root "." \
+            --gender women \
+            --season "${{ needs.generate-targets.outputs.season }}" \
+            --targets-file ".tmp/changed_targets.json" \
+            --phases "${{ matrix.phase }}" \
+            --chunk-count "${{ needs.generate-targets.outputs.chunk_count }}" \
+            --chunk-index "${{ matrix.shard }}" \
+            --min-games "${{ needs.generate-targets.outputs.min_games }}"
+        env:
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+
+  summary:
+    needs: [generate-targets, section-refresh]
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report
+        run: |
+          echo "season=${{ needs.generate-targets.outputs.season }}"
+          echo "start_date=${{ needs.generate-targets.outputs.start_date }}"
+          echo "end_date=${{ needs.generate-targets.outputs.end_date }}"
+          echo "target_count=${{ needs.generate-targets.outputs.target_count }}"
