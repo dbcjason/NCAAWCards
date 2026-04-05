@@ -117,6 +117,10 @@ def chunked(seq: list[Any], size: int) -> list[list[Any]]:
     return [seq[index : index + size] for index in range(0, len(seq), size)]
 
 
+def inline_storage_key(gender: str, season: int, cache_key: str) -> str:
+    return f"supabase-inline/{gender}/{season}/{cache_key}.json"
+
+
 def fetch_existing_payloads(conn: psycopg.Connection[Any], gender: str, season: int, targets: list[dict[str, Any]]) -> dict[tuple[str, str, int], dict[str, Any]]:
     rows_json = json.dumps(
         [{"player": row["player"], "team": row["team"], "season": row["season"]} for row in targets],
@@ -226,12 +230,30 @@ def main() -> None:
         log(f"[supabase-refresh] no targets for gender={args.gender} season={season} shard={args.chunk_index + 1}/{args.chunk_count}")
         return
 
+    team_counts: dict[str, int] = {}
+    for player in season_players:
+        team_counts[player.team] = team_counts.get(player.team, 0) + 1
+    team_items = list(team_counts.items())
+    log(
+        f"[supabase-refresh] start gender={args.gender} season={season} shard={args.chunk_index + 1}/{args.chunk_count} "
+        f"phases={','.join(phases)} teams={len(team_items)} targets={len(season_players)}"
+    )
+
     per_game_percentiles_map: dict[str, dict[str, float | None]] = {}
     if PER_GAME_PHASE in phases:
         per_game_percentiles_map = bsp.build_per_game_percentiles_map(season_players, players_all, args.min_games, bt_rows=bt_rows)
 
     updates: list[dict[str, Any]] = []
+    current_team = ""
+    current_team_index = 0
     for index, target in enumerate(season_players, start=1):
+        if target.team != current_team:
+            current_team = target.team
+            current_team_index += 1
+            log(
+                f"[supabase-refresh] team {current_team_index}/{len(team_items)}: {current_team} "
+                f"players={team_counts.get(current_team, 0)} shard={args.chunk_index + 1}/{args.chunk_count}"
+            )
         cache_key = bsp.cache_key_for_target(target)
         base_top = None
         per_game_base = None
@@ -278,6 +300,7 @@ def main() -> None:
                 "team": target.team,
                 "season": season,
                 "cache_key": cache_key,
+                "storage_key": inline_storage_key(args.gender, season, cache_key),
                 "base_top": base_top,
                 "per_game_base": per_game_base,
                 "per_game_percentiles": per_game_percentiles,
@@ -313,6 +336,7 @@ def main() -> None:
                         update["player"],
                         update["cache_key"],
                         source_hash,
+                        update["storage_key"],
                         json.dumps(merged, ensure_ascii=True),
                     )
                 )
@@ -328,16 +352,18 @@ def main() -> None:
                       cache_key,
                       source_hash,
                       storage_provider,
+                      storage_key,
                       payload_json,
                       updated_at
                     ) values (
-                      %s, %s, %s, %s, %s, %s, 'supabase', %s::jsonb, now()
+                      %s, %s, %s, %s, %s, %s, 'supabase', %s, %s::jsonb, now()
                     )
                     on conflict (gender, season, team, player)
                     do update set
                       cache_key = excluded.cache_key,
                       source_hash = excluded.source_hash,
                       storage_provider = 'supabase',
+                      storage_key = excluded.storage_key,
                       payload_json = excluded.payload_json,
                       updated_at = now()
                     """,

@@ -130,6 +130,52 @@ jobs:
           print(f"target_count={len(payload) if isinstance(payload, list) else 0}")
           PY
 
+      - name: Log selected teams
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          summary_path = Path('.tmp/changed_targets_summary.json')
+          if not summary_path.exists():
+              raise SystemExit('Missing .tmp/changed_targets_summary.json')
+          summary = json.loads(summary_path.read_text(encoding='utf-8'))
+          matched = list(summary.get('matched_teams') or [])
+          unmatched = list(summary.get('unmatched_teams') or [])
+          target_count = int(summary.get('target_count') or 0)
+          start_date = summary.get('start_date') or ''
+          end_date = summary.get('end_date') or ''
+          print(f"[targets] date window: {start_date} -> {end_date}")
+          print(f"[targets] target_count: {target_count}")
+          print(f"[targets] matched teams ({len(matched)}):")
+          for team in matched:
+              print(f" - {team}")
+          if unmatched:
+              print(f"[targets] unmatched teams ({len(unmatched)}):")
+              for team in unmatched:
+                  print(f" - {team}")
+
+          summary_lines = [
+              '# Changed Player Targets',
+              f"Date window: {start_date} -> {end_date}",
+              f"Targets: {target_count}",
+              f"Matched teams: {len(matched)}",
+              '',
+          ]
+          if matched:
+              summary_lines.append('Matched teams:')
+              summary_lines.extend([f"- {team}" for team in matched])
+          else:
+              summary_lines.append('Matched teams: none')
+          if unmatched:
+              summary_lines.append('')
+              summary_lines.append('Unmatched teams:')
+              summary_lines.extend([f"- {team}" for team in unmatched])
+          with open(Path.home() / 'workflow_summary.tmp', 'w', encoding='utf-8') as handle:
+              handle.write('\n'.join(summary_lines) + '\n')
+          PY
+          cat "$HOME/workflow_summary.tmp" >> "$GITHUB_STEP_SUMMARY"
+
       - name: Upload target artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -141,6 +187,7 @@ jobs:
           if-no-files-found: error
 
   base-metadata:
+    name: Base Metadata
     needs: generate-targets
     if: ${{ needs.generate-targets.outputs.target_count != '0' }}
     runs-on: ubuntu-latest
@@ -201,6 +248,7 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
 
   per-game-percentiles:
+    name: Per-Game Percentiles
     needs: [generate-targets, base-metadata]
     if: ${{ needs.generate-targets.outputs.target_count != '0' }}
     runs-on: ubuntu-latest
@@ -260,7 +308,8 @@ jobs:
         env:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
 
-  section-refresh:
+  all-card-sections:
+    name: All Card Sections
     needs: [generate-targets, per-game-percentiles]
     if: ${{ needs.generate-targets.outputs.target_count != '0' }}
     runs-on: ubuntu-latest
@@ -268,7 +317,15 @@ jobs:
       fail-fast: false
       max-parallel: 10
       matrix:
-        phase: ["grade_boxes_html", "bt_percentiles_html", "self_creation_html", "playstyles_html", "team_impact_html", "shot_diet_html", "player_comparisons_html", "draft_projection_html"]
+        phase:
+          - grade_boxes_html
+          - bt_percentiles_html
+          - self_creation_html
+          - playstyles_html
+          - team_impact_html
+          - shot_diet_html
+          - player_comparisons_html
+          - draft_projection_html
         shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     steps:
       - name: Skip inactive shard
@@ -322,7 +379,7 @@ jobs:
           SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
 
   summary:
-    needs: [generate-targets, section-refresh]
+    needs: [generate-targets, all-card-sections]
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:

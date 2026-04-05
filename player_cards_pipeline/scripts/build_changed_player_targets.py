@@ -358,6 +358,12 @@ def main() -> None:
 
     matched_teams, unmatched_teams = map_played_teams(raw_team_names, local_teams)
     matched_set = set(matched_teams)
+    if matched_teams:
+        log(f"[targets] matched teams ({len(matched_teams)}): {', '.join(matched_teams)}")
+    else:
+        log("[targets] matched teams (0): none")
+    if unmatched_teams:
+        log(f"[targets] unmatched teams ({len(unmatched_teams)}): {', '.join(unmatched_teams)}")
 
     targets: list[dict[str, Any]] = []
     seen_cache_keys: set[str] = set()
