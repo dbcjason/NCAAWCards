@@ -152,7 +152,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,67761,Laura Nogues,American,18,17,7,1,13,0,14,38,12,0,0,0
 2026,67762,Gentry Baldwin,Oral Roberts,42,42,6,13,23,2,39,75,31,0,0,0
 2026,67764,Raven Thompson,Clemson,62,42,21,18,29,5,17,37,17,0,0,0
-2026,67765,Aarionna Redman,Marshall,5,4,1,6,16,0,11,32,11,0,0,0
+2026,67765,Aarionna Redman,Marshall,6,5,1,6,16,0,11,33,11,0,0,0
 2026,67772,Sayvia Sellers,Washington,102,52,21,43,57,8,74,135,53,0,0,0
 2026,67773,Amy O'Hara,Bradley,51,25,37,13,21,13,0,5,0,0,0,0
 2026,67775,Chloe Briggs,Washington,6,7,5,3,10,0,5,16,5,0,0,0
@@ -649,7 +649,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,69081,Micah Gray,Oklahoma St.,52,36,22,7,22,1,90,170,85,0,0,0
 2026,69086,Kiley Capstraw,Yale,48,51,23,41,89,16,0,4,0,0,0,0
 2026,69091,Keslyn Secrist,Murray St.,97,58,46,27,30,11,36,66,35,0,0,0
-2026,69092,Addison Martin,Illinois St.,122,70,84,61,112,31,0,7,0,0,0,0
+2026,69092,Addison Martin,Illinois St.,124,71,85,63,116,33,0,7,0,0,0,0
 2026,69093,Hattie Ogden,BYU,1,1,1,1,1,1,12,27,12,0,0,0
 2026,69094,Sofia Alonso,Cal Baptist,12,10,4,1,12,0,6,19,4,0,0,0
 2026,69097,Karson Martin,Quinnipiac,31,23,15,24,56,10,35,60,28,0,0,0
@@ -743,13 +743,13 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,69324,Ashlyn Traylor-Walker,Stephen F. Austin,38,23,7,9,16,2,24,32,21,0,0,0
 2026,69325,Jeniah Thompson,Southern Illinois,47,51,15,48,44,26,12,29,12,0,0,0
 2026,69328,Anaëlle Dutat,Colorado,92,60,47,19,21,10,3,27,3,0,0,0
-2026,69329,Peyton Ilderton,Marshall,20,22,0,5,6,0,76,135,68,0,0,0
+2026,69329,Peyton Ilderton,Marshall,20,22,0,5,7,0,77,140,69,0,0,0
 2026,69331,Madison St. Rose,Princeton,88,53,46,45,51,8,27,70,22,0,0,0
 2026,69332,Faith Stinson,Saint Joseph's,83,62,73,3,6,1,16,51,16,0,0,0
 2026,69333,Vanessa de Jesus,Notre Dame,31,28,11,21,49,7,54,81,43,0,0,0
 2026,69340,Pien Steenbergen,Texas A&M,4,3,1,2,4,1,6,25,6,0,0,0
 2026,69343,Aliyah Collins,Southeastern Louisiana,53,39,15,43,77,5,49,100,40,0,0,0
-2026,69344,Meredith Maier,Marshall,12,19,10,8,16,3,84,156,81,0,0,0
+2026,69344,Meredith Maier,Marshall,12,19,10,8,17,3,86,160,83,0,0,0
 2026,69345,Camryn Tade,Army,89,66,53,29,49,15,38,58,32,0,0,0
 2026,69347,Brooklyn Meyer,South Dakota St.,251,110,139,47,49,31,0,4,0,0,0,0
 2026,69352,Brie Crittendon,Utah Tech,64,39,34,0,10,0,37,91,36,0,0,0
@@ -869,7 +869,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,69654,Crystal Henderson,Georgia St.,77,71,14,46,92,6,31,91,20,0,0,0
 2026,69656,Ayanna Jackson,Texas Southern,29,31,11,7,36,2,6,25,3,0,0,0
 2026,69660,Lili Krasovec,Purdue Fort Wayne,128,73,45,30,36,19,1,11,1,0,0,0
-2026,69661,Timberlynn Yeast,Marshall,58,56,23,8,19,1,12,38,12,0,0,0
+2026,69661,Timberlynn Yeast,Marshall,60,57,25,8,19,1,12,40,12,0,0,0
 2026,69662,Kaitlyn Adams,Delaware St.,17,11,8,6,13,4,1,2,1,0,0,0
 2026,69663,Eghosa Obasuyi,Georgia St.,4,11,2,2,8,1,31,68,27,0,0,0
 2026,69665,Sydney Bolden,IU Indy,24,35,10,4,16,0,21,77,18,0,0,0
@@ -1280,7 +1280,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,70626,Anabel Latorre Ciria,UMass Lowell,26,28,17,2,4,2,0,0,0,0,0,0
 2026,70629,Ta'Mia Scott,Alabama,49,51,7,27,30,8,52,87,45,0,0,0
 2026,70630,Caroline Ducharme,Connecticut,8,7,6,1,10,1,4,19,4,0,0,0
-2026,70633,Bella Finnegan,Illinois St.,4,7,1,26,35,15,50,96,49,0,0,0
+2026,70633,Bella Finnegan,Illinois St.,4,7,1,29,37,16,50,98,49,0,0,0
 2026,70636,Ally Sweeney,Richmond,58,51,6,21,23,4,55,83,39,0,0,0
 2026,70637,Melissa Mwanza,Stony Brook,29,32,20,2,12,2,0,0,0,0,0,0
 2026,70639,Malaya Cowles,Notre Dame,89,69,65,29,40,22,0,0,0,0,0,0
@@ -1354,14 +1354,14 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,70833,Clara Strack,Kentucky,102,44,59,113,139,77,25,75,25,0,0,0
 2026,70836,Colbi Maples,Cleveland St.,68,70,18,41,75,4,66,146,32,0,0,0
 2026,70837,Zsófia Telegdy,Western Kentucky,41,22,24,12,21,8,33,110,32,0,0,0
-2026,70839,Timaya Lewis-Eutsey,Marshall,180,107,37,48,78,2,17,65,14,0,0,0
+2026,70839,Timaya Lewis-Eutsey,Marshall,188,109,38,49,81,2,20,65,17,0,0,0
 2026,70841,Allie Palmieri,Massachusetts,40,34,21,38,60,18,55,121,52,0,0,0
 2026,70843,Torin Rogers,UNC Wilmington,24,17,11,10,38,6,30,49,29,0,0,0
 2026,70844,Mary-Anna Asare,VCU,21,21,3,6,10,1,14,33,9,0,0,0
 2026,70845,Lalani Ellis,Eastern Illinois,7,2,2,4,7,0,1,2,0,0,0,0
 2026,70848,Ashlon Jackson,Duke,25,27,5,35,63,7,73,164,54,0,0,0
 2026,70849,Mimi McCollister,Arkansas St.,32,38,8,15,36,1,35,77,33,0,0,0
-2026,70852,De'Shawnti Thomas,Illinois St.,3,7,2,2,12,0,2,6,2,0,0,0
+2026,70852,De'Shawnti Thomas,Illinois St.,3,7,2,2,13,0,2,6,2,0,0,0
 2026,70854,Ande'a Cherisier,Delaware,118,111,54,32,64,14,0,1,0,0,0,0
 2026,70856,Laine McGurk,Drexel,43,16,23,59,98,34,48,99,41,0,0,0
 2026,70857,Shay Bollin,Wisconsin,15,12,8,9,10,6,18,46,16,0,0,0
@@ -1957,7 +1957,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,72340,Bella Fontleroy,Baylor,30,34,8,33,53,25,41,117,41,0,0,0
 2026,72341,JaNiah Newell,Austin Peay,6,13,1,19,39,2,35,84,29,0,0,0
 2026,72342,Michelle Ugwah,San Francisco,29,31,20,9,20,4,0,0,0,0,0,0
-2026,72343,Blessing King,Marshall,37,43,13,3,8,0,1,1,1,0,0,0
+2026,72343,Blessing King,Marshall,40,44,15,3,8,0,1,1,1,0,0,0
 2026,72345,Zya Nugent,Saint Louis,60,79,25,29,99,10,27,92,23,0,0,0
 2026,72346,Alyssa Berry,Purdue Fort Wayne,0,0,0,0,0,0,0,1,0,0,0,0
 2026,72347,Kate Novik,DePaul,123,106,54,14,39,7,15,53,14,0,0,0
@@ -2208,7 +2208,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,78508,Sophia Zufelt,UT Rio Grande Valley,2,0,0,0,0,0,1,11,1,0,0,0
 2026,78509,Elizabeth Romer,UT Rio Grande Valley,3,0,3,0,0,0,6,8,6,0,0,0
 2026,78511,Sarah Baker,Youngstown St.,79,38,51,96,121,61,0,1,0,0,0,0
-2026,78512,Grace Nelson,Illinois St.,14,17,4,5,13,3,42,71,40,0,0,0
+2026,78512,Grace Nelson,Illinois St.,14,18,4,5,14,3,44,74,42,0,0,0
 2026,78514,Ciniya Moore,Yale,56,64,17,55,121,31,42,74,41,0,0,0
 2026,78515,Amiyah Donaldson,Maine,5,4,1,5,13,1,1,17,1,0,0,0
 2026,78516,Aminata Tal,Presbyterian,61,85,13,17,35,2,6,45,3,0,0,0
@@ -2301,7 +2301,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,78627,Lily Zeinstra,Butler,51,30,29,8,24,4,34,54,31,0,0,0
 2026,78628,Lily Carmody,Boston College,109,86,56,11,28,1,17,39,15,0,0,0
 2026,78630,Jocelyn Land,Montana,57,30,19,8,21,6,51,119,51,0,0,0
-2026,78631,TreShondra Williams,Marshall,11,13,6,3,12,0,11,26,9,0,0,0
+2026,78631,TreShondra Williams,Marshall,12,14,6,3,12,0,11,28,9,0,0,0
 2026,78633,Alayna West,DePaul,52,73,20,13,56,4,15,59,12,0,0,0
 2026,78634,Jordan Zubich,North Carolina,1,1,0,0,1,0,10,21,10,0,0,0
 2026,78635,Blanca Thomas,North Carolina,13,15,11,2,4,2,1,0,1,1,0,1
@@ -2840,8 +2840,8 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,79326,Jovana Spasovski,Wisconsin,17,8,11,6,7,5,1,19,1,0,0,0
 2026,79327,Isimenme Ozzy-Momodu,Maryland,93,62,64,16,19,10,0,0,0,0,0,0
 2026,79328,Jayda Angel,Elon,2,2,0,3,9,0,1,4,0,0,0,0
-2026,79329,Leyocha Marigney,Marshall,35,20,24,2,5,0,3,12,3,0,0,0
-2026,79331,Kassie Ingram,Marshall,26,24,12,6,8,3,27,58,26,0,0,0
+2026,79329,Leyocha Marigney,Marshall,37,20,26,2,5,0,3,12,3,0,0,0
+2026,79331,Kassie Ingram,Marshall,28,26,14,6,8,3,27,59,26,0,0,0
 2026,79333,Danni Scully,Ohio,38,42,23,3,3,1,6,22,6,0,0,0
 2026,79336,Isabella Casey,Bucknell,41,38,18,11,33,4,24,48,23,0,0,0
 2026,79339,Kimora Smith,South Carolina St.,21,15,10,4,15,2,0,2,0,0,0,0
@@ -2974,7 +2974,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,79507,Fui Niumeitolu,Weber St.,22,38,11,5,13,3,8,17,8,0,0,0
 2026,79508,Diaka Berete,Stony Brook,41,36,12,11,22,6,55,110,49,0,0,0
 2026,79509,Toni Warren,Wofford,20,10,6,38,71,18,13,35,13,0,0,0
-2026,79510,Doneelah Washington,Illinois St.,196,105,145,9,42,7,38,86,38,0,0,0
+2026,79510,Doneelah Washington,Illinois St.,196,106,145,9,45,7,38,89,38,0,0,0
 2026,79513,Lauren Thompson,UMBC,1,0,1,1,2,0,5,12,5,0,0,0
 2026,79515,Olivia Pawlicki,Colorado St.,0,0,0,1,0,0,3,6,3,0,0,0
 2026,79516,Tasia Johnson,UNC Greensboro,5,21,1,5,17,0,35,62,34,0,0,0
@@ -3013,7 +3013,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,79556,Sydney Piekny,North Dakota,5,4,5,1,1,1,34,74,32,0,0,0
 2026,79557,Jaime Gallatly,Cal St. Bakersfield,0,1,0,2,2,0,4,7,4,0,0,0
 2026,79558,Micah Cooper,Bradley,12,14,6,9,16,0,7,14,4,0,0,0
-2026,79560,Trista Fayta,Illinois St.,91,88,16,16,30,3,30,67,25,0,0,0
+2026,79560,Trista Fayta,Illinois St.,92,89,16,16,31,3,31,69,26,0,0,0
 2026,79561,Rhian Stokes,Saint Joseph's,29,45,9,18,42,2,28,43,26,0,0,0
 2026,79562,Lauren Greer,Saint Joseph's,1,0,1,0,0,0,0,1,0,0,0,0
 2026,79563,Janiya Jones,Mississippi Valley St.,12,16,5,10,35,5,52,151,42,0,0,0
@@ -3354,7 +3354,7 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,80282,Dylan Mogel,Seattle,14,19,3,0,6,0,1,2,0,0,0,0
 2026,80283,Lala Woods,Maine,26,25,14,3,15,1,34,78,32,0,0,0
 2026,80284,Hannah Chicken,Portland St.,83,53,46,31,61,16,19,26,17,0,0,0
-2026,80285,Ni'Kiah Chesterfield,Marshall,54,27,39,8,14,5,13,25,13,0,0,0
+2026,80285,Ni'Kiah Chesterfield,Marshall,56,27,40,8,14,5,13,26,13,0,0,0
 2026,80286,Anisa Jeffries,Grand Canyon,68,45,34,14,27,7,11,39,11,0,0,0
 2026,80287,Robynn Thompson,Queens,1,2,0,1,1,1,1,4,0,0,0,0
 2026,80288,Mari Dangerfield,Southeastern Louisiana,0,0,0,3,3,1,7,11,6,0,0,0
@@ -4413,14 +4413,14 @@ year,pid,player,team,rim_made,rim_miss,rim_assisted,mid_made,mid_miss,mid_assist
 2026,81498,Addison Tarr,Southeast Missouri St.,1,0,1,0,1,0,0,2,0,0,0,0
 2026,81499,London Walker-George,Illinois Chicago,3,9,1,1,5,0,0,0,0,0,0,0
 2026,81500,Alexis Cox,Central Arkansas,0,0,0,0,1,0,1,4,1,0,0,0
-2026,81501,Madison Austin,Illinois St.,26,13,20,5,8,4,9,17,9,0,0,0
-2026,81502,Kya Hurt,Illinois St.,44,32,20,41,77,14,23,40,20,0,0,0
-2026,81503,Jordan Fenske,Illinois St.,1,1,0,1,2,1,2,16,2,0,0,0
+2026,81501,Madison Austin,Illinois St.,26,15,20,5,8,4,9,18,9,0,0,0
+2026,81502,Kya Hurt,Illinois St.,44,32,20,43,79,14,23,40,20,0,0,0
+2026,81503,Jordan Fenske,Illinois St.,1,1,0,1,2,1,2,17,2,0,0,0
 2026,81504,Emma Christiano,New Mexico St.,9,6,5,18,30,7,5,9,4,0,0,0
 2026,81505,Zanyra Adams,Illinois St.,8,4,4,5,7,2,0,9,0,0,0,0
 2026,81506,Jocelyn Medina,Denver,34,17,12,9,13,2,12,41,8,0,0,0
 2026,81507,Senoj Jones,New Mexico St.,34,20,23,17,25,10,0,0,0,0,0,0
-2026,81508,Jaeden Pratt,Illinois St.,35,29,22,7,11,4,19,45,19,0,0,0
+2026,81508,Jaeden Pratt,Illinois St.,36,29,22,7,11,4,19,47,19,0,0,0
 2026,81509,Morane Dossou,New Mexico St.,39,38,32,14,25,11,0,2,0,0,0,0
 2026,81510,DeAvion Wilson,New Mexico St.,18,16,6,1,11,0,0,5,0,0,0,0
 2026,81511,Leekaya Burke Perryman,Nebraska Omaha,34,82,5,12,45,1,11,44,9,0,0,0
