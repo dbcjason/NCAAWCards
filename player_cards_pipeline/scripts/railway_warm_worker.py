@@ -616,7 +616,7 @@ def main() -> None:
     worker_mode = os.getenv("WORKER_MODE", "warm").strip().lower()
     if worker_mode == "transfer_api":
         cmd = [sys.executable, "player_cards_pipeline/scripts/transfer_projection_api.py"]
-        print(f"[railway-worker] transfer api mode: {' '.join(cmd)}")
+        print(f"[railway-transfer-api] launch mode: {' '.join(cmd)}")
         subprocess.run(cmd, cwd=PROJECT_ROOT, text=True, check=True)
         return
     if worker_mode == "bootstrap":
