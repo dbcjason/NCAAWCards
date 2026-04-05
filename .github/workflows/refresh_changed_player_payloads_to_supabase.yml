@@ -83,7 +83,7 @@ jobs:
           start_date = (os.environ.get("INPUT_START_DATE") or "").strip()
           end_date = (os.environ.get("INPUT_END_DATE") or "").strip()
           if not end_date:
-              end_date = yesterday.isoformat()
+              end_date = today.isoformat() if event_name == "workflow_dispatch" else yesterday.isoformat()
           if not start_date:
               if event_name == "workflow_dispatch":
                   cursor = yesterday

@@ -262,6 +262,41 @@ def map_played_teams(raw_team_names: set[str], local_teams: list[str]) -> tuple[
     return deduped, unmatched
 
 
+def load_played_teams_from_local_plays(project_root: Path, season: str, start_date: str, end_date: str) -> list[str]:
+    settings = load_settings(project_root)
+    plays_map = settings.get("plays_csv_by_year", {}) or {}
+    plays_rel = plays_map.get(str(season).strip())
+    if not plays_rel:
+        return []
+    plays_path = rel_to_pipeline(project_root, plays_rel)
+    if not plays_path.exists():
+        log(f"[targets] local plays file missing: {plays_path}")
+        return []
+
+    start = date.fromisoformat(start_date)
+    end = date.fromisoformat(end_date)
+    names: set[str] = set()
+    with plays_path.open(newline="", encoding="utf-8", errors="replace") as handle:
+        reader = csv.DictReader(handle)
+        for row in reader:
+            raw_dt = (row.get("gameStartDate") or "").strip()
+            if not raw_dt:
+                continue
+            try:
+                game_date = datetime.fromisoformat(raw_dt.replace("Z", "+00:00")).date()
+            except Exception:
+                continue
+            if game_date < start or game_date > end:
+                continue
+            for key in ("__team_name", "team", "opponent"):
+                value = (row.get(key) or "").strip()
+                if value:
+                    names.add(value)
+    sport_label = "women"
+    log(f"[targets] local {sport_label} plays matched raw teams={len(names)} from {plays_path}")
+    return sorted(names)
+
+
 def fetch_games(client: Client, season: str, start_date: str, end_date: str) -> list[dict[str, Any]]:
     params = {
         "season": season,
@@ -315,7 +350,7 @@ def parse_args() -> argparse.Namespace:
     today = date.today()
     yesterday = today - timedelta(days=1)
     default_start = yesterday.isoformat()
-    default_end = yesterday.isoformat()
+    default_end = today.isoformat()
 
     ap = argparse.ArgumentParser(description="Build changed-player targets from CBBD games")
     ap.add_argument("--project-root", default=".")
@@ -356,14 +391,25 @@ def main() -> None:
     for game in games:
         raw_team_names.update(extract_team_names(game))
 
-    matched_teams, unmatched_teams = map_played_teams(raw_team_names, local_teams)
+    api_matched_teams, unmatched_teams = map_played_teams(raw_team_names, local_teams)
+    local_played_raw = load_played_teams_from_local_plays(project_root, season, args.start_date, args.end_date)
+    local_matched_teams, local_unmatched_teams = map_played_teams(set(local_played_raw), local_teams)
+    matched_teams = local_matched_teams or api_matched_teams
     matched_set = set(matched_teams)
-    if matched_teams:
-        log(f"[targets] matched teams ({len(matched_teams)}): {', '.join(matched_teams)}")
+    if api_matched_teams:
+        log(f"[targets] api matched teams ({len(api_matched_teams)}): {', '.join(api_matched_teams)}")
     else:
-        log("[targets] matched teams (0): none")
+        log("[targets] api matched teams (0): none")
+    if local_matched_teams:
+        log(f"[targets] local sport-filtered teams ({len(local_matched_teams)}): {', '.join(local_matched_teams)}")
+    if matched_teams:
+        log(f"[targets] final matched teams ({len(matched_teams)}): {', '.join(matched_teams)}")
+    else:
+        log("[targets] final matched teams (0): none")
     if unmatched_teams:
-        log(f"[targets] unmatched teams ({len(unmatched_teams)}): {', '.join(unmatched_teams)}")
+        log(f"[targets] api unmatched teams ({len(unmatched_teams)}): {', '.join(unmatched_teams)}")
+    if local_unmatched_teams:
+        log(f"[targets] local unmatched teams ({len(local_unmatched_teams)}): {', '.join(local_unmatched_teams)}")
 
     targets: list[dict[str, Any]] = []
     seen_cache_keys: set[str] = set()
@@ -395,8 +441,11 @@ def main() -> None:
             "requests": client.request_count,
             "games": len(games),
             "raw_team_names": sorted(raw_team_names),
+            "api_matched_teams": api_matched_teams,
             "matched_teams": matched_teams,
             "unmatched_teams": unmatched_teams,
+            "local_played_raw": local_played_raw,
+            "local_unmatched_teams": local_unmatched_teams,
             "target_count": len(targets),
             "generated_at_utc": utc_now(),
         }
