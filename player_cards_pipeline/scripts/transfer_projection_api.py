@@ -14,10 +14,14 @@ if str(PROJECT_ROOT) not in sys.path:
 
 import cbb_player_cards_v1.build_player_card as bpc
 
+API_VERSION = "2026-04-05b"
+
 
 def load_settings(project_root: Path) -> dict[str, Any]:
+    import json as _json
+
     p = project_root / "player_cards_pipeline" / "config" / "settings.json"
-    return json.loads(p.read_text(encoding="utf-8"))
+    return _json.loads(p.read_text(encoding="utf-8"))
 
 
 def rel_to_pipeline(project_root: Path, rel: str) -> Path:
@@ -57,7 +61,9 @@ class TransferProjectionHandler(BaseHTTPRequestHandler):
     token: str = ""
 
     def _send_json(self, status: int, payload: dict[str, Any]) -> None:
-        raw = json.dumps(payload).encode("utf-8")
+        import json as _json
+
+        raw = _json.dumps(payload).encode("utf-8")
         self.send_response(status)
         self.send_header("Content-Type", "application/json")
         self.send_header("Content-Length", str(len(raw)))
@@ -71,7 +77,7 @@ class TransferProjectionHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         if self.path.rstrip("/") == "/health":
-            self._send_json(200, {"ok": True, "rows": len(self.bt_rows)})
+            self._send_json(200, {"ok": True, "rows": len(self.bt_rows), "version": API_VERSION})
             return
         self._send_json(404, {"ok": False, "error": "Not found"})
 
@@ -84,8 +90,10 @@ class TransferProjectionHandler(BaseHTTPRequestHandler):
             return
 
         try:
+            import json as _json
+
             length = int(self.headers.get("Content-Length", "0") or "0")
-            body = json.loads(self.rfile.read(length).decode("utf-8") if length > 0 else "{}")
+            body = _json.loads(self.rfile.read(length).decode("utf-8") if length > 0 else "{}")
             player = StringOrEmpty(body.get("player"))
             team = StringOrEmpty(body.get("team"))
             season = StringOrEmpty(body.get("season"))
@@ -126,7 +134,7 @@ def main() -> None:
     host = os.getenv("HOST", "0.0.0.0").strip() or "0.0.0.0"
     port = int(os.getenv("PORT", "8080"))
     server = ThreadingHTTPServer((host, port), TransferProjectionHandler)
-    print(f"[transfer-api] listening on http://{host}:{port} rows={len(bt_rows)}", flush=True)
+    print(f"[transfer-api] listening on http://{host}:{port} rows={len(bt_rows)} version={API_VERSION}", flush=True)
     server.serve_forever()
 
 
