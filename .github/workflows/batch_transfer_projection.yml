@@ -9,6 +9,14 @@ on:
         description: "Script season (e.g. 2026)"
         required: true
         default: "2026"
+      start_date:
+        description: "Optional YYYY-MM-DD start date. Blank uses the daily target window."
+        required: false
+        default: ""
+      end_date:
+        description: "Optional YYYY-MM-DD end date. Blank uses the daily target window."
+        required: false
+        default: ""
       min_games:
         description: "Minimum GP filter"
         required: true
@@ -29,42 +37,187 @@ on:
         description: "Optional comma-separated destination conferences (blank = all)"
         required: false
         default: ""
+      chunk_count:
+        description: "Parallel shard count"
+        required: true
+        default: "10"
+      bootstrap_all:
+        description: "Run every player instead of only the daily changed-team target set"
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: write
 
 jobs:
-  run-batch-transfer:
+  generate-targets:
+    if: ${{ github.event.inputs.bootstrap_all != 'true' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 60
+    outputs:
+      season: ${{ steps.window.outputs.season }}
+      start_date: ${{ steps.window.outputs.start_date }}
+      end_date: ${{ steps.window.outputs.end_date }}
+      target_count: ${{ steps.count.outputs.target_count }}
     steps:
-      - name: Checkout
+      - name: Checkout (sparse)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            cbb_player_cards_v1
+            player_cards_pipeline
+            cbbd_seasons
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Run batch transfer projection
+      - name: Resolve target window
+        id: window
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from datetime import date, timedelta
+          import os
+
+          event_name = os.environ.get("GITHUB_EVENT_NAME", "")
+          today = date.today()
+          yesterday = today - timedelta(days=1)
+          season = os.environ.get("INPUT_SEASON") or "2026"
+          start_date = (os.environ.get("INPUT_START_DATE") or "").strip()
+          end_date = (os.environ.get("INPUT_END_DATE") or "").strip()
+          if not end_date:
+              end_date = today.isoformat() if event_name == "workflow_dispatch" else yesterday.isoformat()
+          if not start_date:
+              start_date = yesterday.isoformat()
+          print(f"season={season}")
+          print(f"start_date={start_date}")
+          print(f"end_date={end_date}")
+          PY
         env:
-          INPUT_SEASON: ${{ inputs.season || '2026' }}
-          INPUT_MIN_GAMES: ${{ inputs.min_games || '5' }}
-          INPUT_TEAM: ${{ inputs.team || '' }}
-          INPUT_LIMIT: ${{ inputs.limit || '0' }}
-          INPUT_MIN_PCT: ${{ inputs.min_pct || '5' }}
-          INPUT_CONFERENCES: ${{ inputs.conferences || '' }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          INPUT_SEASON: ${{ github.event.inputs.season }}
+          INPUT_START_DATE: ${{ github.event.inputs.start_date }}
+          INPUT_END_DATE: ${{ github.event.inputs.end_date }}
+
+      - name: Build changed-player targets
+        run: |
+          mkdir -p .tmp/transfer_targets
+          python3 player_cards_pipeline/scripts/build_changed_player_targets.py \
+            --project-root "." \
+            --season "${{ steps.window.outputs.season }}" \
+            --start-date "${{ steps.window.outputs.start_date }}" \
+            --end-date "${{ steps.window.outputs.end_date }}" \
+            --output-file ".tmp/transfer_targets/changed_targets.json" \
+            --summary-file ".tmp/transfer_targets/changed_targets_summary.json"
+        env:
+          CBBD_API_KEY: ${{ secrets.CBBD_API_KEY }}
+
+      - name: Count targets
+        id: count
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          path = Path('.tmp/transfer_targets/changed_targets.json')
+          payload = json.loads(path.read_text(encoding='utf-8')) if path.exists() else []
+          print(f"target_count={len(payload) if isinstance(payload, list) else 0}")
+          PY
+
+      - name: Log target window
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          summary_path = Path('.tmp/transfer_targets/changed_targets_summary.json')
+          summary = json.loads(summary_path.read_text(encoding='utf-8'))
+          matched = list(summary.get('matched_teams') or [])
+          print(f"[targets] window: {summary.get('start_date')} -> {summary.get('end_date')}")
+          print(f"[targets] matched teams: {len(matched)}")
+          for team in matched:
+              print(f" - {team}")
+          PY
+
+      - name: Upload target artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: transfer-targets-${{ steps.window.outputs.season }}
+          path: |
+            .tmp/transfer_targets/changed_targets.json
+            .tmp/transfer_targets/changed_targets_summary.json
+            .tmp/transfer_targets/changed_targets_summary.csv
+          if-no-files-found: error
+
+  run-batch-transfer:
+    needs: [generate-targets]
+    if: ${{ always() && (github.event.inputs.bootstrap_all == 'true' || needs.generate-targets.result == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    steps:
+      - name: Skip inactive shard
+        if: ${{ matrix.shard >= fromJson(github.event.inputs.chunk_count || '10') }}
+        run: echo "Skipping shard ${{ matrix.shard }} because chunk_count=${{ github.event.inputs.chunk_count || '10' }}"
+
+      - name: Checkout
+        if: ${{ matrix.shard < fromJson(github.event.inputs.chunk_count || '10') }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        if: ${{ matrix.shard < fromJson(github.event.inputs.chunk_count || '10') }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download targets
+        if: ${{ matrix.shard < fromJson(github.event.inputs.chunk_count || '10') && github.event.inputs.bootstrap_all != 'true' }}
+        uses: actions/download-artifact@v4
+        with:
+          name: transfer-targets-${{ github.event.inputs.season || '2026' }}
+          path: .tmp/transfer_targets
+
+      - name: Run batch transfer projection shard
+        if: ${{ matrix.shard < fromJson(github.event.inputs.chunk_count || '10') }}
+        env:
+          INPUT_SEASON: ${{ github.event.inputs.season || '2026' }}
+          INPUT_MIN_GAMES: ${{ github.event.inputs.min_games || '5' }}
+          INPUT_TEAM: ${{ github.event.inputs.team || '' }}
+          INPUT_LIMIT: ${{ github.event.inputs.limit || '0' }}
+          INPUT_MIN_PCT: ${{ github.event.inputs.min_pct || '5' }}
+          INPUT_CONFERENCES: ${{ github.event.inputs.conferences || '' }}
+          INPUT_CHUNK_COUNT: ${{ github.event.inputs.chunk_count || '10' }}
+          INPUT_CHUNK_INDEX: ${{ matrix.shard }}
+          INPUT_TARGETS_FILE: ${{ github.event.inputs.bootstrap_all == 'true' && '' || '.tmp/transfer_targets/changed_targets.json' }}
         run: |
           mkdir -p player_cards_pipeline/output
+          OUT_CSV="player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_shard_${INPUT_CHUNK_INDEX}.csv"
+          OUT_JSON="player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_shard_${INPUT_CHUNK_INDEX}.json"
           TEAM_ARG=""
           CONF_ARG=""
+          TARGET_ARG=""
           if [ -n "${INPUT_TEAM}" ]; then
             TEAM_ARG="--team \"${INPUT_TEAM}\""
           fi
           if [ -n "${INPUT_CONFERENCES}" ]; then
             CONF_ARG="--conferences \"${INPUT_CONFERENCES}\""
           fi
+          if [ -n "${INPUT_TARGETS_FILE}" ]; then
+            TARGET_ARG="--targets-file \"${INPUT_TARGETS_FILE}\""
+          fi
 
+          echo "[batch-transfer] season=${INPUT_SEASON} shard=${INPUT_CHUNK_INDEX}/${INPUT_CHUNK_COUNT} targets=${INPUT_TARGETS_FILE:-bootstrap-all}"
           # shellcheck disable=SC2086
           eval "python3 player_cards_pipeline/scripts/batch_transfer_projection.py \
             --project-root . \
@@ -72,38 +225,125 @@ jobs:
             --min-games \"${INPUT_MIN_GAMES}\" \
             --min-pct \"${INPUT_MIN_PCT}\" \
             --limit \"${INPUT_LIMIT}\" \
+            --chunk-count \"${INPUT_CHUNK_COUNT}\" \
+            --chunk-index \"${INPUT_CHUNK_INDEX}\" \
+            ${TARGET_ARG} \
             ${TEAM_ARG} \
             ${CONF_ARG} \
-            --out-csv \"player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv\""
+            --out-csv \"${OUT_CSV}\" \
+            --out-json \"${OUT_JSON}\""
 
-      - name: Upload CSV artifact
+      - name: Upload shard artifacts
+        if: ${{ matrix.shard < fromJson(github.event.inputs.chunk_count || '10') }}
         uses: actions/upload-artifact@v4
         with:
-          name: transfer-projection-${{ inputs.season || '2026' }}-all-conferences
-          path: player_cards_pipeline/output/transfer_projection_${{ inputs.season || '2026' }}_all_conferences.csv
+          name: transfer-projection-shard-${{ github.event.inputs.season || '2026' }}-${{ matrix.shard }}
+          path: |
+            player_cards_pipeline/output/transfer_projection_${{ github.event.inputs.season || '2026' }}_shard_${{ matrix.shard }}.csv
+            player_cards_pipeline/output/transfer_projection_${{ github.event.inputs.season || '2026' }}_shard_${{ matrix.shard }}.json
           if-no-files-found: error
 
-      - name: Commit and push CSV
+  merge-transfer-projections:
+    needs: run-batch-transfer
+    if: ${{ always() && needs.run-batch-transfer.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download shard artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: .tmp/transfer_projection_shards
+          pattern: transfer-projection-shard-${{ github.event.inputs.season || '2026' }}-*
+          merge-multiple: true
+
+      - name: Merge shards into final JSON
         env:
-          INPUT_SEASON: ${{ inputs.season || '2026' }}
+          INPUT_SEASON: ${{ github.event.inputs.season || '2026' }}
+          INPUT_CHUNK_COUNT: ${{ github.event.inputs.chunk_count || '10' }}
+        run: |
+          python3 - <<'PY'
+          import csv
+          import json
+          import re
+          import os
+          import time
+          from pathlib import Path
+
+          season = str(os.environ["INPUT_SEASON"])
+          chunk_count = int(os.environ["INPUT_CHUNK_COUNT"] or "10")
+          root = Path(".tmp/transfer_projection_shards")
+          shard_files = sorted(root.glob(f"transfer_projection_{season}_shard_*.json"))
+          if not shard_files:
+              raise SystemExit("No shard JSON files were downloaded.")
+
+          rows = []
+          source_files = []
+          for path in shard_files:
+              match = re.search(r"_shard_(\d+)\.json$", path.name)
+              shard_idx = int(match.group(1)) if match else -1
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              shard_rows = payload.get("rows") if isinstance(payload, dict) else []
+              print(f"[merge] shard={shard_idx} rows={len(shard_rows) if isinstance(shard_rows, list) else 0} file={path}")
+              if isinstance(shard_rows, list):
+                  rows.extend(shard_rows)
+              source_files.append(path.name)
+
+          rows.sort(key=lambda row: (str(row.get("team", "")), str(row.get("player", ""))))
+          out_dir = Path("player_cards_pipeline/data/cache/transfer_projection")
+          out_dir.mkdir(parents=True, exist_ok=True)
+          out_json = out_dir / f"{season}.json"
+          out_csv = Path("player_cards_pipeline/output") / f"transfer_projection_{season}_all_conferences.csv"
+          out_csv.parent.mkdir(parents=True, exist_ok=True)
+
+          merged = {
+              "season": season,
+              "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+              "section": "transfer_projection",
+              "chunk_count": chunk_count,
+              "chunk_files": source_files,
+              "row_count": len(rows),
+              "rows": rows,
+          }
+          out_json.write_text(json.dumps(merged, ensure_ascii=True, indent=2), encoding="utf-8")
+          headers = ["season", "player", "team", "source_conference", "class"]
+          if rows:
+              projection_keys = sorted(
+                  {
+                      key
+                      for row in rows
+                      for key in row.keys()
+                      if key not in {"season", "player", "team", "source_conference", "class", "projections"}
+                  }
+              )
+              headers.extend(projection_keys)
+          with out_csv.open("w", encoding="utf-8", newline="") as handle:
+              writer = csv.DictWriter(handle, fieldnames=headers)
+              writer.writeheader()
+              for row in rows:
+                  flat = {k: v for k, v in row.items() if k != "projections"}
+                  writer.writerow(flat)
+          print(f"[merge] wrote {out_json}")
+          print(f"[merge] wrote {out_csv}")
+          print(f"[merge] total_rows={len(rows)} from {len(shard_files)} shards")
+          PY
+
+      - name: Commit merged JSON
+        env:
+          INPUT_SEASON: ${{ github.event.inputs.season || '2026' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          FILE="player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv"
-          test -f "$FILE" || (echo "Missing expected output: $FILE" && exit 1)
-          git add -f "$FILE" || true
+          git pull --rebase origin main || true
+          git add player_cards_pipeline/data/cache/transfer_projection/ || true
+          git add player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv || true
           if git diff --cached --quiet; then
-            echo "No transfer projection CSV changes to commit."
+            echo "No merged transfer projection changes to commit"
             exit 0
           fi
-          git commit -m "Refresh transfer projection matrix (${INPUT_SEASON})"
-          for i in 1 2 3; do
-            if git push origin main; then
-              echo "Push succeeded."
-              exit 0
-            fi
-            echo "Push rejected; rebasing attempt ${i}..."
-            git pull --rebase origin main || true
-          done
-          echo "Failed to push after retries."
-          exit 1
+          git commit -m "Refresh transfer projection cache (${INPUT_SEASON})"
+          git push origin main

@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import importlib.util
+import json
 import sys
 import re
 from pathlib import Path
@@ -102,6 +103,52 @@ def build_target_row_index(bpc: Any, bt_rows: list[dict[str, str]]) -> dict[tupl
         if cur_gp > prev_gp:
             idx[key] = r
     return idx
+
+
+def load_target_keys(bpc: Any, project_root: Path, targets_file: str) -> set[str] | None:
+    if not targets_file.strip():
+        return None
+    path = Path(targets_file)
+    if not path.is_absolute():
+        path = project_root / path
+    if not path.exists():
+        raise FileNotFoundError(f"targets file not found: {path}")
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if isinstance(payload, list):
+        keys = {
+            str(item.get("cache_key") or "").strip()
+            for item in payload
+            if isinstance(item, dict) and str(item.get("cache_key") or "").strip()
+        }
+        if keys:
+            return keys
+        team_keys = {
+            f"{bpc.norm_player_name(item.get('player', ''))}|{bpc.norm_team(item.get('team', ''))}|{bpc.norm_season(item.get('season', ''))}"
+            for item in payload
+            if isinstance(item, dict)
+            and str(item.get("player") or "").strip()
+            and str(item.get("team") or "").strip()
+            and str(item.get("season") or "").strip()
+        }
+        return team_keys or None
+    if isinstance(payload, dict):
+        matched_teams = payload.get("matched_teams")
+        if isinstance(matched_teams, list):
+            teams = {bpc.norm_team(item) for item in matched_teams if str(item).strip()}
+            return {f"::team::{team}" for team in teams if team}
+    return None
+
+
+def select_shard_rows(
+    rows: list[tuple[Any, dict[str, str]]],
+    chunk_count: int,
+    chunk_index: int,
+) -> list[tuple[Any, dict[str, str]]]:
+    if chunk_count <= 1:
+        return rows
+    if chunk_index < 0 or chunk_index >= chunk_count:
+        raise ValueError(f"chunk-index {chunk_index} out of range for chunk-count {chunk_count}")
+    return [row for idx, row in enumerate(rows) if idx % chunk_count == chunk_index]
 
 
 def project_transfer_bundle(
@@ -345,6 +392,9 @@ def main() -> int:
         default="",
         help="Optional comma-separated destination conferences (e.g. SEC,ACC,Big 12). Blank = all.",
     )
+    ap.add_argument("--targets-file", default="", help="Optional JSON file of player/team targets to include.")
+    ap.add_argument("--chunk-count", type=int, default=1, help="Number of shard chunks to split the run into.")
+    ap.add_argument("--chunk-index", type=int, default=0, help="Shard index to process for this run.")
     args = ap.parse_args()
 
     project_root = Path(args.project_root).resolve()
@@ -368,6 +418,7 @@ def main() -> int:
         out_json = project_root / out_json
     out_json.parent.mkdir(parents=True, exist_ok=True)
     team_norm = bpc.norm_team(args.team) if args.team else ""
+    target_keys = load_target_keys(bpc, project_root, args.targets_file)
 
     filtered: list[tuple[Any, dict[str, str]]] = []
     seen_player_keys: set[tuple[str, str, str]] = set()
@@ -376,6 +427,11 @@ def main() -> int:
             continue
         if team_norm and bpc.norm_team(p.team) != team_norm:
             continue
+        if target_keys is not None:
+            cache_key = bpc.card_cache_key(p.player, p.team, p.season)
+            team_key = f"::team::{bpc.norm_team(p.team)}"
+            if cache_key not in target_keys and team_key not in target_keys:
+                continue
         key = (
             bpc.norm_player_name(p.player),
             bpc.norm_team(p.team),
@@ -414,7 +470,11 @@ def main() -> int:
     filtered.sort(key=lambda x: (bpc.norm_team(x[0].team), bpc.norm_player_name(x[0].player)))
     if args.limit and args.limit > 0:
         filtered = filtered[: args.limit]
-    print(f"[batch-transfer] eligible players: {len(filtered)}", flush=True)
+    shard_rows = select_shard_rows(filtered, max(1, int(args.chunk_count)), int(args.chunk_index))
+    print(
+        f"[batch-transfer] eligible players: {len(filtered)} | shard {int(args.chunk_index) + 1}/{max(1, int(args.chunk_count))}: {len(shard_rows)}",
+        flush=True,
+    )
 
     examples = build_transfer_examples(bpc, bt_rows)
     if len(examples) < 200:
@@ -467,8 +527,8 @@ def main() -> int:
     with out_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=headers)
         w.writeheader()
-        total = len(filtered)
-        for idx, (p, row) in enumerate(filtered, start=1):
+        total = len(shard_rows)
+        for idx, (p, row) in enumerate(shard_rows, start=1):
             source = bpc._row_transfer_metrics(row)
             source_conf = bpc._conference_key(bpc.bt_get(row, ["conf", "conference"]))
             rec: dict[str, Any] = {
@@ -499,13 +559,20 @@ def main() -> int:
             w.writerow(rec)
             json_rows.append({**rec, "projections": projection_by_conf})
             if idx == 1 or idx % 100 == 0 or idx == total:
-                print(f"[batch-transfer] {idx}/{total} written")
+                print(
+                    f"[batch-transfer] shard {int(args.chunk_index) + 1}/{max(1, int(args.chunk_count))} {idx}/{total} written",
+                    flush=True,
+                )
 
     out_json.write_text(
         json.dumps(
             {
                 "season": season_norm,
                 "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "section": "transfer_projection",
+                "chunk_index": int(args.chunk_index),
+                "chunk_count": max(1, int(args.chunk_count)),
+                "row_count": len(json_rows),
                 "rows": json_rows,
             },
             ensure_ascii=True,
@@ -513,7 +580,7 @@ def main() -> int:
         ),
         encoding="utf-8",
     )
-    print(f"[batch-transfer] done: rows={len(filtered)} out={out_csv}")
+    print(f"[batch-transfer] done: rows={len(shard_rows)} out={out_csv}")
     print(f"[batch-transfer] json written: {out_json}")
     return 0
 
