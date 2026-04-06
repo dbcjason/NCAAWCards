@@ -338,9 +338,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git pull --rebase origin main || true
           git add player_cards_pipeline/data/cache/transfer_projection/ || true
-          git add player_cards_pipeline/output/transfer_projection_${INPUT_SEASON}_all_conferences.csv || true
           if git diff --cached --quiet; then
             echo "No merged transfer projection changes to commit"
             exit 0
