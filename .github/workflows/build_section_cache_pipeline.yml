@@ -246,6 +246,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          rm -rf player_cards_pipeline/output .tmp/section_merge
           git pull --rebase origin main || true
           git add -f player_cards_pipeline/data/cache/section_payloads/ || true
           if git diff --cached --quiet; then
