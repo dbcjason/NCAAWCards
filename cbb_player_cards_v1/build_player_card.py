@@ -51,6 +51,16 @@ BIO_ALIAS_MAP = {
 }
 
 CACHE_SCHEMA_VERSION = 1
+SECTION_JSON_KEYS = [
+    "grade_boxes_html",
+    "bt_percentiles_html",
+    "self_creation_html",
+    "playstyles_html",
+    "team_impact_html",
+    "shot_diet_html",
+    "player_comparisons_html",
+    "draft_projection_html",
+]
 ENRICHED_GENDER = "Women"
 _TRANSFER_PROJECTION_DATA_CACHE: dict[int, dict[str, Any]] = {}
 _ENRICHED_LOOKUP_META: dict[int, dict[str, Any]] = {}
@@ -198,11 +208,62 @@ def default_card_cache_db_path(season: str) -> Path:
     )
 
 
+def _section_cache_path(section: str, season: str | int) -> Path:
+    return (
+        Path(__file__).resolve().parent.parent
+        / "player_cards_pipeline"
+        / "data"
+        / "cache"
+        / "section_payloads"
+        / section
+        / f"{norm_season(season)}.json"
+    )
+
+
+_SECTION_PAYLOAD_CACHE: dict[tuple[str, str], dict[str, Any]] = {}
+
+
+def _load_section_payload_map(section: str, season: str | int) -> dict[str, Any]:
+    cache_key = (section, norm_season(season))
+    if cache_key in _SECTION_PAYLOAD_CACHE:
+        return _SECTION_PAYLOAD_CACHE[cache_key]
+    path = _section_cache_path(section, season)
+    if not path.exists():
+        _SECTION_PAYLOAD_CACHE[cache_key] = {}
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        rows = payload.get("rows") if isinstance(payload, dict) else {}
+        if isinstance(rows, dict):
+            _SECTION_PAYLOAD_CACHE[cache_key] = rows
+            return rows
+    except Exception:
+        pass
+    _SECTION_PAYLOAD_CACHE[cache_key] = {}
+    return {}
+
+
+def _load_cached_sections_from_json(target: PlayerGameStats) -> dict[str, Any] | None:
+    ck = card_cache_key(target.player, target.team, target.season)
+    payload: dict[str, Any] = {}
+    for section in SECTION_JSON_KEYS:
+        rows = _load_section_payload_map(section, target.season)
+        if not rows:
+            continue
+        value = rows.get(ck)
+        if isinstance(value, str) and value.strip():
+            payload[section] = value
+    return payload or None
+
+
 def load_cached_card_sections(
     cache_db_path: Path,
     target: PlayerGameStats,
     min_games: int,
 ) -> dict[str, Any] | None:
+    section_payloads = _load_cached_sections_from_json(target)
+    if section_payloads:
+        return section_payloads
     if not cache_db_path.exists():
         return None
     key = card_cache_key(target.player, target.team, target.season)
@@ -5467,9 +5528,19 @@ def main() -> None:
             if pps_oe_pct is not None:
                 p_rank = max(1, min(99, int(round(pps_oe_pct))))
                 pps_line = f"Points per Shot Over Expectation: {pps_oe:+.1f}% ({ordinal(p_rank)} Percentile)"
+        else:
+            pps_line = f"Points per Shot Over Expectation: {pps_oe:+.1f}% (Percentile N/A)"
+        per_game_pcts = build_per_game_percentiles(players, target, args.min_games, bt_rows=bt_rows)
+    if not per_game_pcts:
+        per_game_pcts = build_per_game_percentiles(players, target, args.min_games, bt_rows=bt_rows)
+    if pps_line == "Points per Shot Over Expectation: N/A":
+        act_pps, exp_pps, pps_oe, pps_oe_pct = pps_over_expected_from_enriched(target)
+        if pps_oe is not None:
+            if pps_oe_pct is not None:
+                p_rank = max(1, min(99, int(round(pps_oe_pct))))
+                pps_line = f"Points per Shot Over Expectation: {pps_oe:+.1f}% ({ordinal(p_rank)} Percentile)"
             else:
                 pps_line = f"Points per Shot Over Expectation: {pps_oe:+.1f}% (Percentile N/A)"
-        per_game_pcts = build_per_game_percentiles(players, target, args.min_games, bt_rows=bt_rows)
     if args.transfer_up:
         draft_projection_html = build_transfer_projection_html(target, args.destination_conference, bt_rows)
     else:

@@ -112,7 +112,8 @@ def load_target_keys(bpc: Any, project_root: Path, targets_file: str) -> set[str
     if not path.is_absolute():
         path = project_root / path
     if not path.exists():
-        raise FileNotFoundError(f"targets file not found: {path}")
+        print(f"[batch-transfer] targets file not found; continuing without target filter: {path}", flush=True)
+        return None
     payload = json.loads(path.read_text(encoding="utf-8"))
     if isinstance(payload, list):
         keys = {
