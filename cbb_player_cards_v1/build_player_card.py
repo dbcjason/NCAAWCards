@@ -5261,12 +5261,17 @@ def build_player_team_hint_map(bt_rows: list[dict[str, str]]) -> dict[tuple[str,
 
 def build_player_pool_from_bt(bt_rows: list[dict[str, str]]) -> list[PlayerGameStats]:
     out: list[PlayerGameStats] = []
+    seen_keys: set[str] = set()
     for r in bt_rows:
         player = bt_get(r, ["player_name"]).strip()
         team = bt_get(r, ["team"]).strip()
         season = norm_season(bt_get(r, ["year"]))
         if not player or not team or not season:
             continue
+        cache_key = card_cache_key(player, team, season)
+        if cache_key in seen_keys:
+            continue
+        seen_keys.add(cache_key)
 
         gp = bt_num(r, ["GP", "gp"]) or 0.0
         if gp <= 0:
