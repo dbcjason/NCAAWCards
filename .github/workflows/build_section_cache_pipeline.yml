@@ -1,0 +1,258 @@
+name: Build NCAAW Section Cache Pipeline
+
+on:
+  workflow_call:
+    inputs:
+      section:
+        required: true
+        type: string
+      season:
+        required: true
+        type: string
+      start_date:
+        required: false
+        type: string
+        default: ""
+      end_date:
+        required: false
+        type: string
+        default: ""
+      chunk_count:
+        required: false
+        type: string
+        default: "10"
+      bootstrap_all:
+        required: false
+        type: boolean
+        default: false
+    secrets:
+      CBBD_API_KEY:
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  generate-targets:
+    if: ${{ inputs.bootstrap_all != true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    outputs:
+      season: ${{ steps.window.outputs.season }}
+      start_date: ${{ steps.window.outputs.start_date }}
+      end_date: ${{ steps.window.outputs.end_date }}
+      target_count: ${{ steps.count.outputs.target_count }}
+    steps:
+      - name: Checkout (sparse)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          filter: blob:none
+          sparse-checkout: |
+            .github
+            player_cards_pipeline
+            cbb_player_cards_v1
+            cbbd_seasons
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve target window
+        id: window
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          from datetime import date, timedelta
+          import os
+
+          today = date.today()
+          yesterday = today - timedelta(days=1)
+          season = os.environ.get("INPUT_SEASON") or "2026"
+          start_date = (os.environ.get("INPUT_START_DATE") or "").strip() or yesterday.isoformat()
+          end_date = (os.environ.get("INPUT_END_DATE") or "").strip() or today.isoformat()
+          print(f"season={season}")
+          print(f"start_date={start_date}")
+          print(f"end_date={end_date}")
+          PY
+        env:
+          INPUT_SEASON: ${{ inputs.season }}
+          INPUT_START_DATE: ${{ inputs.start_date }}
+          INPUT_END_DATE: ${{ inputs.end_date }}
+
+      - name: Build changed-player targets
+        run: |
+          mkdir -p .tmp/section_targets
+          python3 player_cards_pipeline/scripts/build_changed_player_targets.py \
+            --project-root "." \
+            --season "${{ steps.window.outputs.season }}" \
+            --start-date "${{ steps.window.outputs.start_date }}" \
+            --end-date "${{ steps.window.outputs.end_date }}" \
+            --output-file ".tmp/section_targets/changed_targets.json" \
+            --summary-file ".tmp/section_targets/changed_targets_summary.json"
+        env:
+          CBBD_API_KEY: ${{ secrets.CBBD_API_KEY }}
+
+      - name: Count targets
+        id: count
+        run: |
+          python3 - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          path = Path('.tmp/section_targets/changed_targets.json')
+          payload = json.loads(path.read_text(encoding='utf-8')) if path.exists() else []
+          print(f"target_count={len(payload) if isinstance(payload, list) else 0}")
+          PY
+
+      - name: Upload targets
+        uses: actions/upload-artifact@v4
+        with:
+          name: section-targets-${{ steps.window.outputs.season }}
+          path: |
+            .tmp/section_targets/changed_targets.json
+            .tmp/section_targets/changed_targets_summary.json
+            .tmp/section_targets/changed_targets_summary.csv
+          if-no-files-found: error
+
+  build-section-caches:
+    needs: [generate-targets]
+    if: ${{ always() && (inputs.bootstrap_all == true || needs.generate-targets.result == 'success') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      max-parallel: 10
+      matrix:
+        shard: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+
+    steps:
+      - name: Skip inactive shard
+        if: ${{ matrix.shard >= fromJson(inputs.chunk_count) }}
+        run: echo "Skipping shard ${{ matrix.shard }}"
+
+      - name: Checkout
+        if: ${{ matrix.shard < fromJson(inputs.chunk_count) }}
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python
+        if: ${{ matrix.shard < fromJson(inputs.chunk_count) }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Download targets
+        if: ${{ matrix.shard < fromJson(inputs.chunk_count) && inputs.bootstrap_all != true }}
+        uses: actions/download-artifact@v4
+        with:
+          name: section-targets-${{ inputs.season }}
+          path: .tmp/section_targets
+
+      - name: Build section shard
+        if: ${{ matrix.shard < fromJson(inputs.chunk_count) }}
+        run: |
+          mkdir -p player_cards_pipeline/output/section_shards
+          OUT_JSON="player_cards_pipeline/output/section_shards/${{ inputs.section }}_${{ inputs.season }}_shard_${{ matrix.shard }}.json"
+          TARGET_ARG=""
+          if [ "${{ inputs.bootstrap_all }}" != "true" ]; then
+            TARGET_ARG="--targets-file \".tmp/section_targets/changed_targets.json\""
+          fi
+          echo "[section-cache] section=${{ inputs.section }} shard=${{ matrix.shard }}/${{ inputs.chunk_count }}"
+          # shellcheck disable=SC2086
+          eval "python3 player_cards_pipeline/scripts/build_section_cache_json.py \
+            --project-root . \
+            --years \"${{ inputs.season }}\" \
+            --season \"${{ inputs.season }}\" \
+            --section \"${{ inputs.section }}\" \
+            --chunk-count \"${{ inputs.chunk_count }}\" \
+            --chunk-index \"${{ matrix.shard }}\" \
+            ${TARGET_ARG} \
+            --out-json \"${OUT_JSON}\""
+
+      - name: Upload shard artifact
+        if: ${{ matrix.shard < fromJson(inputs.chunk_count) }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: section-cache-${{ inputs.section }}-${{ inputs.season }}-${{ matrix.shard }}
+          path: player_cards_pipeline/output/section_shards/${{ inputs.section }}_${{ inputs.season }}_shard_${{ matrix.shard }}.json
+          if-no-files-found: error
+
+  merge-section-caches:
+    needs: build-section-caches
+    if: ${{ always() && needs.build-section-caches.result == 'success' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download shard artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: .tmp/section_merge/${{ inputs.section }}
+          pattern: section-cache-${{ inputs.section }}-${{ inputs.season }}-*
+          merge-multiple: true
+
+      - name: Merge section shards
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import time
+          from pathlib import Path
+
+          section = os.environ["INPUT_SECTION"]
+          season = os.environ["INPUT_SEASON"]
+          root = Path(".tmp/section_merge") / section
+          shard_files = sorted(root.glob("*.json"))
+          if not shard_files:
+              raise SystemExit(f"No shard JSON files found for {section}")
+          rows = {}
+          for path in shard_files:
+              payload = json.loads(path.read_text(encoding="utf-8"))
+              shard_rows = payload.get("rows") if isinstance(payload, dict) else {}
+              print(f"[merge] {section} file={path} rows={len(shard_rows) if isinstance(shard_rows, dict) else 0}")
+              if isinstance(shard_rows, dict):
+                  rows.update(shard_rows)
+          out_dir = Path("player_cards_pipeline/data/cache/section_payloads") / section
+          out_dir.mkdir(parents=True, exist_ok=True)
+          out_json = out_dir / f"{season}.json"
+          out_json.write_text(
+              json.dumps(
+                  {
+                      "season": season,
+                      "section": section,
+                      "chunk_count": int(os.environ.get("INPUT_CHUNK_COUNT") or "10"),
+                      "row_count": len(rows),
+                      "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                      "rows": rows,
+                  },
+                  ensure_ascii=True,
+                  indent=2,
+              ),
+              encoding="utf-8",
+          )
+          print(f"[merge] wrote {out_json} rows={len(rows)}")
+          PY
+        env:
+          INPUT_SECTION: ${{ inputs.section }}
+          INPUT_SEASON: ${{ inputs.season }}
+          INPUT_CHUNK_COUNT: ${{ inputs.chunk_count }}
+
+      - name: Commit merged section cache
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git pull --rebase origin main || true
+          git add player_cards_pipeline/data/cache/section_payloads/ || true
+          if git diff --cached --quiet; then
+            echo "No section cache changes to commit"
+            exit 0
+          fi
+          git commit -m "Refresh section cache (${INPUT_SECTION})"
+          git push origin main
+        env:
+          INPUT_SECTION: ${{ inputs.section }}

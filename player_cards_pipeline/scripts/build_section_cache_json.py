@@ -92,6 +92,7 @@ def compute_section_html(
     bt_playerstat_rows: list[dict[str, Any]],
     bio_lookup: dict[tuple[str, str, str], dict[str, str]],
     rsci_map: dict[str, int],
+    wnba_draft_map: dict[str, int] | None = None,
 ) -> str:
     if section == "grade_boxes_html":
         return bpc.build_grade_boxes_html(target, bt_rows)
@@ -110,7 +111,7 @@ def compute_section_html(
     if section == "draft_projection_html":
         sig = inspect.signature(bpc.build_draft_projection_html)
         if len(sig.parameters) >= 5:
-            return bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map, {})
+            return bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map, wnba_draft_map or {})
         return bpc.build_draft_projection_html(target, bt_rows, bio_lookup, rsci_map)
     raise ValueError(f"Unsupported section: {section}")
 
@@ -156,6 +157,23 @@ def main() -> int:
 
     rsci_path = project_root / "player_cards_pipeline" / "data" / "manual" / "rsci" / "rsci_rankings.csv"
     rsci_map = bpc.load_rsci_rankings(rsci_path) if rsci_path.exists() else {}
+    wnba_draft_map: dict[str, int] | None = None
+    if getattr(bpc, "ENRICHED_GENDER", "") == "Women":
+        draft_csv = settings.get("wnba_draft_csv", "") or ""
+        if draft_csv:
+            draft_path = project_root / "player_cards_pipeline" / draft_csv
+            if draft_path.exists():
+                try:
+                    wnba_draft_map = bpc.load_wnba_draft_lookup(draft_path)
+                except Exception:
+                    wnba_draft_map = {}
+        if not wnba_draft_map:
+            default_draft_csv = project_root / "player_cards_pipeline" / "data" / "manual" / "wnba_draft" / "wnba_draft.csv"
+            if default_draft_csv.exists():
+                try:
+                    wnba_draft_map = bpc.load_wnba_draft_lookup(default_draft_csv)
+                except Exception:
+                    wnba_draft_map = {}
 
     adv_rows_by_year: dict[str, list[dict[str, str]]] = {}
     adv_map = settings.get("advgames_csv_by_year", {}) or {}
@@ -215,11 +233,12 @@ def main() -> int:
                 section=args.section,
                 target=target,
                 bt_rows=bt_rows,
-                adv_rows=adv_rows_by_year.get(ys, []),
-                bt_playerstat_rows=bt_playerstat_rows,
-                bio_lookup=bio_lookup,
-                rsci_map=rsci_map,
-            )
+            adv_rows=adv_rows_by_year.get(ys, []),
+            bt_playerstat_rows=bt_playerstat_rows,
+            bio_lookup=bio_lookup,
+            rsci_map=rsci_map,
+            wnba_draft_map=wnba_draft_map,
+        )
             out_rows[cache_key] = html
             if idx == 1 or idx % 100 == 0 or idx == len(shard_players):
                 print(f"[section-cache] {args.section} {ys} {idx}/{len(shard_players)}", flush=True)
