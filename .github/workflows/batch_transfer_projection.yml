@@ -2,7 +2,7 @@ name: Batch Transfer Projection
 
 on:
   schedule:
-    - cron: "50 10 * * *" # Daily 6:50 AM ET (approx, DST-aware by UTC)
+    - cron: "45 10 * * *"
   workflow_dispatch:
     inputs:
       season:
@@ -261,7 +261,7 @@ jobs:
           pattern: transfer-projection-shard-${{ github.event.inputs.season || '2026' }}-*
           merge-multiple: true
 
-      - name: Merge shards into final JSON
+      - name: Merge shards into two JSON parts
         env:
           INPUT_SEASON: ${{ github.event.inputs.season || '2026' }}
           INPUT_CHUNK_COUNT: ${{ github.event.inputs.chunk_count || '10' }}
@@ -269,8 +269,8 @@ jobs:
           python3 - <<'PY'
           import csv
           import json
-          import re
           import os
+          import re
           import time
           from pathlib import Path
 
@@ -294,32 +294,37 @@ jobs:
               source_files.append(path.name)
 
           rows.sort(key=lambda row: (str(row.get("team", "")), str(row.get("player", ""))))
+          mid = (len(rows) + 1) // 2
+          parts = [rows[:mid], rows[mid:]]
           out_dir = Path("player_cards_pipeline/data/cache/transfer_projection")
           out_dir.mkdir(parents=True, exist_ok=True)
-          out_json = out_dir / f"{season}.json"
           out_csv = Path("player_cards_pipeline/output") / f"transfer_projection_{season}_all_conferences.csv"
           out_csv.parent.mkdir(parents=True, exist_ok=True)
 
-          merged = {
-              "season": season,
-              "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-              "section": "transfer_projection",
-              "chunk_count": chunk_count,
-              "chunk_files": source_files,
-              "row_count": len(rows),
-              "rows": rows,
-          }
-          out_json.write_text(json.dumps(merged, ensure_ascii=True, indent=2), encoding="utf-8")
+          for idx, part_rows in enumerate(parts, start=1):
+              out_json = out_dir / f"{season}_part{idx}.json"
+              merged = {
+                  "season": season,
+                  "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                  "section": "transfer_projection",
+                  "chunk_count": chunk_count,
+                  "chunk_files": source_files,
+                  "part_index": idx,
+                  "part_count": 2,
+                  "row_count": len(part_rows),
+                  "rows": part_rows,
+              }
+              out_json.write_text(json.dumps(merged, ensure_ascii=True, indent=2), encoding="utf-8")
+              print(f"[merge] wrote {out_json} rows={len(part_rows)}")
+
           headers = ["season", "player", "team", "source_conference", "class"]
           if rows:
-              projection_keys = sorted(
-                  {
-                      key
-                      for row in rows
-                      for key in row.keys()
-                      if key not in {"season", "player", "team", "source_conference", "class", "projections"}
-                  }
-              )
+              projection_keys = sorted({
+                  key
+                  for row in rows
+                  for key in row.keys()
+                  if key not in {"season", "player", "team", "source_conference", "class", "projections"}
+              })
               headers.extend(projection_keys)
           with out_csv.open("w", encoding="utf-8", newline="") as handle:
               writer = csv.DictWriter(handle, fieldnames=headers)
@@ -327,12 +332,10 @@ jobs:
               for row in rows:
                   flat = {k: v for k, v in row.items() if k != "projections"}
                   writer.writerow(flat)
-          print(f"[merge] wrote {out_json}")
-          print(f"[merge] wrote {out_csv}")
           print(f"[merge] total_rows={len(rows)} from {len(shard_files)} shards")
           PY
 
-      - name: Commit merged JSON
+      - name: Commit merged JSON parts
         env:
           INPUT_SEASON: ${{ github.event.inputs.season || '2026' }}
         run: |
@@ -344,4 +347,19 @@ jobs:
             exit 0
           fi
           git commit -m "Refresh transfer projection cache (${INPUT_SEASON})"
-          git push origin main
+          git stash push -u -m "transfer-projection-pre-push" >/dev/null 2>&1 || true
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git merge --no-edit origin/main; then
+              git merge --abort >/dev/null 2>&1 || true
+              echo "Merge conflict while syncing transfer projection ${INPUT_SEASON} with origin/main"
+              exit 1
+            fi
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "Push rejected for transfer projection ${INPUT_SEASON}; retrying (${attempt}/3)"
+            sleep 5
+          done
+          echo "Failed to push transfer projection ${INPUT_SEASON} after retries"
+          exit 1
