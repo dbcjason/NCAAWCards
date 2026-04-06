@@ -247,7 +247,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull --rebase origin main || true
-          git add player_cards_pipeline/data/cache/section_payloads/ || true
+          git add -f player_cards_pipeline/data/cache/section_payloads/ || true
           if git diff --cached --quiet; then
             echo "No section cache changes to commit"
             exit 0
