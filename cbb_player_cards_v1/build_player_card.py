@@ -52,6 +52,7 @@ BIO_ALIAS_MAP = {
 
 CACHE_SCHEMA_VERSION = 1
 ENRICHED_GENDER = "Women"
+_TRANSFER_PROJECTION_DATA_CACHE: dict[int, dict[str, Any]] = {}
 _ENRICHED_LOOKUP_META: dict[int, dict[str, Any]] = {}
 _ENRICHED_LOOKUP_CACHE: dict[tuple[str, str], dict[tuple[str, str, str], dict[str, Any]]] = {}
 _ENRICHED_PLAYERS_CACHE: dict[tuple[str, str], list[dict[str, Any]]] = {}
@@ -3032,6 +3033,84 @@ def _transfer_grade_from_percentile(pct: float | None) -> str:
     return "F"
 
 
+def _transfer_projection_data_path(season: str | int) -> Path:
+    return (
+        Path(__file__).resolve().parent.parent
+        / "player_cards_pipeline"
+        / "data"
+        / "cache"
+        / "transfer_projection"
+        / f"{norm_season(season)}.json"
+    )
+
+
+def _get_transfer_projection_data(season: str | int) -> dict[str, Any]:
+    season_key = int(norm_season(season) or "0")
+    cached = _TRANSFER_PROJECTION_DATA_CACHE.get(season_key)
+    if cached is not None:
+        return cached
+    path = _transfer_projection_data_path(season)
+    if not path.exists():
+        _TRANSFER_PROJECTION_DATA_CACHE[season_key] = {}
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        payload = {}
+    rows = payload.get("rows") if isinstance(payload, dict) else []
+    lookup: dict[str, Any] = {}
+    if isinstance(rows, list):
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            key = card_cache_key(
+                str(row.get("player", "")),
+                str(row.get("team", "")),
+                str(row.get("season", season)),
+            )
+            lookup[key] = row
+    _TRANSFER_PROJECTION_DATA_CACHE[season_key] = lookup
+    return lookup
+
+
+def _render_transfer_projection_panel(
+    dest_conf_raw: str,
+    predicted: dict[str, float],
+    transfer_grade: str,
+    weighted_count: int,
+) -> str:
+    def row_html(label: str, key: str, digits: int = 1) -> str:
+        if key not in predicted:
+            return f'<div class="draft-odd-row"><div class="draft-odd-k">{html.escape(label)}</div><div class="draft-odd-v">-</div></div>'
+        return f'<div class="draft-odd-row"><div class="draft-odd-k">{html.escape(label)}</div><div class="draft-odd-v">{predicted[key]:.{digits}f}</div></div>'
+
+    per_game_rows = "".join(
+        [
+            row_html("AST%", "ast_per", 1),
+            row_html("OREB%", "orb_per", 1),
+            row_html("DREB%", "drb_per", 1),
+            row_html("STL%", "stl_per", 1),
+            row_html("BLK%", "blk_per", 1),
+            row_html("FG%", "fg_pct", 1),
+            row_html("3P%", "tp_pct", 1),
+            row_html("FT%", "ft_pct", 1),
+        ]
+    )
+    return f"""
+      <div class="panel draft-proj-panel">
+        <h3>Transfer Projection</h3>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)} Transfer Grade: {transfer_grade}</div>
+        <div class="draft-proj-sub">Projected next-season statline vs historical transfer comps ({weighted_count} comps weighted)</div>
+        <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Projected Rates</div>
+        <div class="draft-odds-grid transfer-two-col">
+          {per_game_rows}
+        </div>
+        <div class="draft-proj-sub" style="margin-top:8px;">The model examines historical cross-conference transfers, weighting similar pre-transfer profiles more heavily. Using those weighted historical stat translations, it projects statistical outcomes for the new player in the selected conference.</div>
+        <div class="draft-proj-sub">Transfer Grade compares the player’s projected impact to historical transfer-up outcomes into the selected conference.</div>
+      </div>
+"""
+
+
 def build_transfer_projection_html(target: PlayerGameStats, destination_conference: str, bt_rows: list[dict[str, str]]) -> str:
     if not bt_rows:
         return '<div class="panel"><h3>Transfer Projection</h3><div class="shot-meta">No Bart Torvik CSV loaded.</div></div>'
@@ -3101,6 +3180,26 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
         <div class="shot-meta">Not enough source stats for this player to project.</div>
       </div>
 """
+
+    cached_row = _get_transfer_projection_data(target.season).get(card_cache_key(target.player, target.team, target.season))
+    cached_projection = {}
+    if isinstance(cached_row, dict):
+        projections = cached_row.get("projections")
+        if isinstance(projections, dict):
+            cached_projection = projections.get(dest_conf, {})
+    if isinstance(cached_projection, dict) and cached_projection.get("projected_stats"):
+        predicted = {
+            str(k): float(v)
+            for k, v in (cached_projection.get("projected_stats") or {}).items()
+            if isinstance(v, (int, float)) and math.isfinite(float(v))
+        }
+        if predicted:
+            return _render_transfer_projection_panel(
+                dest_conf_raw,
+                predicted,
+                str(cached_projection.get("transfer_grade", "") or "").strip(),
+                int(cached_projection.get("weighted_comp_count", 0) or 0),
+            )
 
     source_conf = _conference_key(bt_get(target_row, ["conf", "conference"]))
     same_dest = [e for e in examples if e["dst_conf"] == dest_conf]

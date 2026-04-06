@@ -104,7 +104,7 @@ def build_target_row_index(bpc: Any, bt_rows: list[dict[str, str]]) -> dict[tupl
     return idx
 
 
-def project_transfer_grade(
+def project_transfer_bundle(
     bpc: Any,
     source: dict[str, float],
     source_conf: str,
@@ -112,15 +112,15 @@ def project_transfer_grade(
     model: dict[str, Any],
     feat_keys: list[str],
     impact_keys: list[str],
-) -> str:
+) -> dict[str, Any]:
     if len(source) < 8:
-        return ""
+        return {"transfer_grade": "", "projected_stats": {}, "weighted_comp_count": 0}
 
     pool = model["pool"]
     scales = model["scales"]
     cohort_scores = model["cohort_scores"]
     if not pool or not cohort_scores:
-        return ""
+        return {"transfer_grade": "", "projected_stats": {}, "weighted_comp_count": 0}
 
     weighted_examples: list[tuple[float, dict[str, Any]]] = []
     for e in pool:
@@ -152,10 +152,15 @@ def project_transfer_grade(
     weighted_examples.sort(key=lambda x: x[0], reverse=True)
     weighted_examples = weighted_examples[:450]
     if not weighted_examples:
-        return ""
+        return {"transfer_grade": "", "projected_stats": {}, "weighted_comp_count": 0}
 
-    pred_impact_vals: list[float] = []
-    for k in impact_keys:
+    out_keys = [
+        "mpg", "ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct",
+        "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
+        "stl_per", "blk_per", "orb_per", "drb_per", "rapm", "net_pts", "onoff_net_rating",
+    ]
+    predicted: dict[str, float] = {}
+    for k in out_keys:
         num = 0.0
         den = 0.0
         for w, e in weighted_examples:
@@ -172,13 +177,47 @@ def project_transfer_grade(
             num += w * val
             den += w
         if den > 0:
-            pred_impact_vals.append(float(num / den))
+            predicted[k] = float(num / den)
+
+    if not predicted:
+        return {"transfer_grade": "", "projected_stats": {}, "weighted_comp_count": len(weighted_examples)}
+
+    pred_impact_vals: list[float] = []
+    for k in impact_keys:
+        if k in predicted and predicted[k] == predicted[k]:
+            pred_impact_vals.append(float(predicted[k]))
     if not pred_impact_vals:
-        return ""
+        return {"transfer_grade": "", "projected_stats": predicted, "weighted_comp_count": len(weighted_examples)}
 
     pred_impact_score = sum(pred_impact_vals) / len(pred_impact_vals)
     impact_pct = bpc.percentile(pred_impact_score, cohort_scores)
-    return bpc._transfer_grade_from_percentile(impact_pct)
+    return {
+        "transfer_grade": bpc._transfer_grade_from_percentile(impact_pct),
+        "projected_stats": predicted,
+        "weighted_comp_count": len(weighted_examples),
+    }
+
+
+def project_transfer_grade(
+    bpc: Any,
+    source: dict[str, float],
+    source_conf: str,
+    dest_conf: str,
+    model: dict[str, Any],
+    feat_keys: list[str],
+    impact_keys: list[str],
+) -> str:
+    return str(
+        project_transfer_bundle(
+            bpc=bpc,
+            source=source,
+            source_conf=source_conf,
+            dest_conf=dest_conf,
+            model=model,
+            feat_keys=feat_keys,
+            impact_keys=impact_keys,
+        ).get("transfer_grade", "")
+    )
 
 
 def conference_display(key: str) -> str:
@@ -297,6 +336,11 @@ def main() -> int:
     ap.add_argument("--team", default="", help="Optional source team filter.")
     ap.add_argument("--limit", type=int, default=0, help="Optional cap on players (0 = no cap).")
     ap.add_argument(
+        "--out-json",
+        default="",
+        help="Optional structured JSON output path. Defaults to player_cards_pipeline/data/cache/transfer_projection/<season>.json",
+    )
+    ap.add_argument(
         "--conferences",
         default="",
         help="Optional comma-separated destination conferences (e.g. SEC,ACC,Big 12). Blank = all.",
@@ -319,6 +363,10 @@ def main() -> int:
 
     players = bpc.build_player_pool_from_bt(bt_rows)
     season_norm = bpc.norm_season(args.season)
+    out_json = Path(args.out_json) if args.out_json else project_root / "player_cards_pipeline" / "data" / "cache" / "transfer_projection" / f"{season_norm}.json"
+    if not out_json.is_absolute():
+        out_json = project_root / out_json
+    out_json.parent.mkdir(parents=True, exist_ok=True)
     team_norm = bpc.norm_team(args.team) if args.team else ""
 
     filtered: list[tuple[Any, dict[str, str]]] = []
@@ -337,9 +385,6 @@ def main() -> int:
             continue
         row = row_idx.get(key)
         if not row:
-            continue
-        klass = player_class_from_row(bpc, row)
-        if klass.strip().lower() == "senior":
             continue
         gp = bpc.bt_num(row, ["GP", "gp"])
         if gp is not None and gp < args.min_games:
@@ -418,6 +463,7 @@ def main() -> int:
 
     conf_cols = [conference_display(k) for k in dest_keys]
     headers = ["season", "player", "team", "source_conference", "class"] + conf_cols
+    json_rows: list[dict[str, Any]] = []
     with out_csv.open("w", encoding="utf-8", newline="") as f:
         w = csv.DictWriter(f, fieldnames=headers)
         w.writeheader()
@@ -432,8 +478,9 @@ def main() -> int:
                 "source_conference": bpc.bt_get(row, ["conf", "conference"]),
                 "class": player_class_from_row(bpc, row),
             }
+            projection_by_conf: dict[str, Any] = {}
             for conf_key, col_name in zip(dest_keys, conf_cols):
-                rec[col_name] = project_transfer_grade(
+                bundle = project_transfer_bundle(
                     bpc=bpc,
                     source=source,
                     source_conf=source_conf,
@@ -442,11 +489,32 @@ def main() -> int:
                     feat_keys=feat_keys,
                     impact_keys=impact_keys,
                 )
+                rec[col_name] = str(bundle.get("transfer_grade", ""))
+                projection_by_conf[conf_key] = {
+                    "conference": col_name,
+                    "transfer_grade": str(bundle.get("transfer_grade", "")),
+                    "weighted_comp_count": int(bundle.get("weighted_comp_count", 0) or 0),
+                    "projected_stats": dict(bundle.get("projected_stats", {}) or {}),
+                }
             w.writerow(rec)
+            json_rows.append({**rec, "projections": projection_by_conf})
             if idx == 1 or idx % 100 == 0 or idx == total:
                 print(f"[batch-transfer] {idx}/{total} written")
 
+    out_json.write_text(
+        json.dumps(
+            {
+                "season": season_norm,
+                "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+                "rows": json_rows,
+            },
+            ensure_ascii=True,
+            indent=2,
+        ),
+        encoding="utf-8",
+    )
     print(f"[batch-transfer] done: rows={len(filtered)} out={out_csv}")
+    print(f"[batch-transfer] json written: {out_json}")
     return 0
 
 
