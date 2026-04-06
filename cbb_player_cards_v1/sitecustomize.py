@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import io
 import json
-import pathlib
 from pathlib import Path
 from typing import Any
 
-_ORIG_EXISTS = pathlib.PosixPath.exists
-_ORIG_IS_FILE = pathlib.PosixPath.is_file
-_ORIG_READ_TEXT = pathlib.PosixPath.read_text
-_ORIG_OPEN = pathlib.PosixPath.open
+_CONCRETE_PATH = type(Path())
+_ORIG_EXISTS = _CONCRETE_PATH.exists
+_ORIG_IS_FILE = _CONCRETE_PATH.is_file
+_ORIG_READ_TEXT = _CONCRETE_PATH.read_text
+_ORIG_OPEN = _CONCRETE_PATH.open
 
 
 def _transfer_projection_target(path: Path) -> tuple[str, Path] | None:
@@ -100,15 +100,7 @@ def open(self: Path, *args: Any, **kwargs: Any):
     return _ORIG_OPEN(self, *args, **kwargs)
 
 
-def _patch_path_class(cls: type[Path] | None) -> None:
-    if cls is None:
-        return
-    cls.exists = exists  # type: ignore[assignment]
-    cls.is_file = is_file  # type: ignore[assignment]
-    cls.read_text = read_text  # type: ignore[assignment]
-    cls.open = open  # type: ignore[assignment]
-
-
-_patch_path_class(getattr(pathlib, "PosixPath", None))
-_patch_path_class(getattr(pathlib, "WindowsPath", None))
-_patch_path_class(getattr(pathlib, "Path", None))
+_CONCRETE_PATH.exists = exists  # type: ignore[assignment]
+_CONCRETE_PATH.is_file = is_file  # type: ignore[assignment]
+_CONCRETE_PATH.read_text = read_text  # type: ignore[assignment]
+_CONCRETE_PATH.open = open  # type: ignore[assignment]
