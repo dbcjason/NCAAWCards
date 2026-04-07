@@ -209,41 +209,64 @@ jobs:
 
           section = os.environ["INPUT_SECTION"]
           season = os.environ["INPUT_SEASON"]
+          bootstrap_all = str(os.environ.get("INPUT_BOOTSTRAP_ALL", "")).strip().lower() == "true"
           root = Path(".tmp/section_merge") / section
           shard_files = sorted(root.glob("*.json"))
           if not shard_files:
               raise SystemExit(f"No shard JSON files found for {section}")
-          rows = {}
+          merged_rows = {}
           for path in shard_files:
               payload = json.loads(path.read_text(encoding="utf-8"))
               shard_rows = payload.get("rows") if isinstance(payload, dict) else {}
               print(f"[merge] {section} file={path} rows={len(shard_rows) if isinstance(shard_rows, dict) else 0}")
               if isinstance(shard_rows, dict):
-                  rows.update(shard_rows)
+                  merged_rows.update(shard_rows)
           out_dir = Path("player_cards_pipeline/data/cache/section_payloads") / section
           out_dir.mkdir(parents=True, exist_ok=True)
           out_json = out_dir / f"{season}.json"
+          existing_rows = {}
+          if out_json.exists():
+              try:
+                  existing_payload = json.loads(out_json.read_text(encoding="utf-8"))
+                  current_rows = existing_payload.get("rows") if isinstance(existing_payload, dict) else {}
+                  if isinstance(current_rows, dict):
+                      existing_rows = current_rows
+              except Exception as exc:
+                  print(f"[merge] warning: could not read existing cache {out_json}: {exc}")
+
+          if bootstrap_all:
+              final_rows = merged_rows
+              print(f"[merge] bootstrap_all=true; replacing cache with shard rows ({len(final_rows)})")
+          else:
+              final_rows = dict(existing_rows)
+              final_rows.update(merged_rows)
+              print(
+                  f"[merge] bootstrap_all=false; preserving existing rows={len(existing_rows)} "
+                  f"and upserting shard rows={len(merged_rows)} -> final_rows={len(final_rows)}"
+              )
+
           out_json.write_text(
               json.dumps(
                   {
                       "season": season,
                       "section": section,
                       "chunk_count": int(os.environ.get("INPUT_CHUNK_COUNT") or "10"),
-                      "row_count": len(rows),
+                      "row_count": len(final_rows),
                       "generated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-                      "rows": rows,
+                      "rows": final_rows,
                   },
                   ensure_ascii=True,
                   indent=2,
               ),
               encoding="utf-8",
           )
-          print(f"[merge] wrote {out_json} rows={len(rows)}")
+          print(f"[merge] wrote {out_json} rows={len(final_rows)}")
           PY
         env:
           INPUT_SECTION: ${{ inputs.section }}
           INPUT_SEASON: ${{ inputs.season }}
           INPUT_CHUNK_COUNT: ${{ inputs.chunk_count }}
+          INPUT_BOOTSTRAP_ALL: ${{ inputs.bootstrap_all }}
 
       - name: Commit merged section cache
         run: |
@@ -256,16 +279,21 @@ jobs:
             exit 0
           fi
           git commit -m "Refresh section cache (${INPUT_SECTION})"
-          for attempt in 1 2 3 4 5; do
+          git stash push -u -m "section-cache-pre-push" >/dev/null 2>&1 || true
+          for attempt in 1 2 3; do
+            git fetch origin main
+            if ! git merge --no-edit origin/main; then
+              git merge --abort >/dev/null 2>&1 || true
+              echo "Merge conflict while syncing section cache ${INPUT_SECTION} with origin/main"
+              exit 1
+            fi
             if git push origin HEAD:main; then
               exit 0
             fi
-            echo "Push attempt ${attempt} failed, rebasing and retrying in 10s"
-            git fetch origin main
-            git rebase origin/main
-            sleep 10
+            echo "Push rejected for section cache ${INPUT_SECTION}; retrying (${attempt}/3)"
+            sleep 5
           done
-          echo "Failed to push section cache after retries"
+          echo "Failed to push section cache ${INPUT_SECTION} after retries"
           exit 1
         env:
           INPUT_SECTION: ${{ inputs.section }}
