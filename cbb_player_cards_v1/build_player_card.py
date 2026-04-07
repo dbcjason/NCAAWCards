@@ -3105,22 +3105,32 @@ def _transfer_projection_data_path(season: str | int) -> Path:
     )
 
 
+def _transfer_projection_data_paths(season: str | int) -> list[Path]:
+    base = _transfer_projection_data_path(season)
+    if base.exists():
+        return [base]
+    return sorted(base.parent.glob(f"{norm_season(season)}_part*.json"))
+
+
 def _get_transfer_projection_data(season: str | int) -> dict[str, Any]:
     season_key = int(norm_season(season) or "0")
     cached = _TRANSFER_PROJECTION_DATA_CACHE.get(season_key)
     if cached is not None:
         return cached
-    path = _transfer_projection_data_path(season)
-    if not path.exists():
+    paths = _transfer_projection_data_paths(season)
+    if not paths:
         _TRANSFER_PROJECTION_DATA_CACHE[season_key] = {}
         return {}
-    try:
-        payload = json.loads(path.read_text(encoding="utf-8"))
-    except Exception:
-        payload = {}
-    rows = payload.get("rows") if isinstance(payload, dict) else []
+
     lookup: dict[str, Any] = {}
-    if isinstance(rows, list):
+    for path in paths:
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        rows = payload.get("rows") if isinstance(payload, dict) else []
+        if not isinstance(rows, list):
+            continue
         for row in rows:
             if not isinstance(row, dict):
                 continue
@@ -3173,81 +3183,16 @@ def _render_transfer_projection_panel(
 
 
 def build_transfer_projection_html(target: PlayerGameStats, destination_conference: str, bt_rows: list[dict[str, str]]) -> str:
-    if not bt_rows:
-        return '<div class="panel"><h3>Transfer Projection</h3><div class="shot-meta">No Bart Torvik CSV loaded.</div></div>'
-    target_row = bt_find_target_row(bt_rows, target)
-    if not target_row:
-        return '<div class="panel"><h3>Transfer Projection</h3><div class="shot-meta">No matching Bart row found for this player/team/season.</div></div>'
-
     dest_conf_raw = (destination_conference or "").strip()
     if not dest_conf_raw:
         return '<div class="panel"><h3>Transfer Projection</h3><div class="shot-meta">Destination conference is required.</div></div>'
     dest_conf = _conference_key(dest_conf_raw)
-
-    by_player_year: dict[str, dict[int, dict[str, str]]] = defaultdict(dict)
-    for r in bt_rows:
-        p = norm_player_name(bt_get(r, ["player_name"]))
-        ys = norm_season(bt_get(r, ["year"]))
-        if not p or not ys.isdigit():
-            continue
-        y = int(ys)
-        prev = by_player_year[p].get(y)
-        if prev is None:
-            by_player_year[p][y] = r
-            continue
-        prev_gp = bt_num(prev, ["GP", "gp"]) or 0.0
-        cur_gp = bt_num(r, ["GP", "gp"]) or 0.0
-        if cur_gp > prev_gp:
-            by_player_year[p][y] = r
-
-    examples: list[dict[str, Any]] = []
-    for _p, season_map in by_player_year.items():
-        years = sorted(season_map.keys())
-        for y in years:
-            if (y + 1) not in season_map:
-                continue
-            src = season_map[y]
-            dst = season_map[y + 1]
-            src_conf = _conference_key(bt_get(src, ["conf", "conference"]))
-            dst_conf = _conference_key(bt_get(dst, ["conf", "conference"]))
-            src_m = _row_transfer_metrics(src)
-            dst_m = _row_transfer_metrics(dst)
-            if len(src_m) < 8 or len(dst_m) < 8:
-                continue
-            examples.append(
-                {
-                    "src_conf": src_conf,
-                    "dst_conf": dst_conf,
-                    "src": src_m,
-                    "dst": dst_m,
-                }
-            )
-
-    if len(examples) < 200:
-        return f"""
-      <div class="panel draft-proj-panel">
-        <h3>Transfer Projection</h3>
-        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
-        <div class="shot-meta">Not enough historical transfer samples to project.</div>
-      </div>
-"""
-
-    source = _row_transfer_metrics(target_row)
-    if len(source) < 8:
-        return f"""
-      <div class="panel draft-proj-panel">
-        <h3>Transfer Projection</h3>
-        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
-        <div class="shot-meta">Not enough source stats for this player to project.</div>
-      </div>
-"""
-
     cached_row = _get_transfer_projection_data(target.season).get(card_cache_key(target.player, target.team, target.season))
-    cached_projection = {}
+    cached_projection: dict[str, Any] = {}
     if isinstance(cached_row, dict):
         projections = cached_row.get("projections")
         if isinstance(projections, dict):
-            cached_projection = projections.get(dest_conf, {})
+            cached_projection = projections.get(dest_conf, {}) or {}
     if isinstance(cached_projection, dict) and cached_projection.get("projected_stats"):
         predicted = {
             str(k): float(v)
@@ -3262,136 +3207,11 @@ def build_transfer_projection_html(target: PlayerGameStats, destination_conferen
                 int(cached_projection.get("weighted_comp_count", 0) or 0),
             )
 
-    source_conf = _conference_key(bt_get(target_row, ["conf", "conference"]))
-    same_dest = [e for e in examples if e["dst_conf"] == dest_conf]
-    pool = same_dest if len(same_dest) >= 35 else examples
-
-    feat_keys = [
-        "mpg", "ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct",
-        "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
-        "stl_per", "blk_per", "orb_per", "drb_per", "rapm", "net_pts", "onoff_net_rating",
-    ]
-    scales: dict[str, float] = {}
-    for k in feat_keys:
-        vals = sorted([float(e["src"][k]) for e in pool if k in e["src"] and math.isfinite(float(e["src"][k]))])
-        if len(vals) >= 12:
-            lo = vals[max(0, int(0.1 * (len(vals) - 1)))]
-            hi = vals[min(len(vals) - 1, int(0.9 * (len(vals) - 1)))]
-            spread = hi - lo
-            scales[k] = spread if spread > 1e-6 else 1.0
-        else:
-            scales[k] = 1.0
-
-    weighted_examples: list[tuple[float, dict[str, Any]]] = []
-    for e in pool:
-        diffs: list[float] = []
-        for k in feat_keys:
-            tv = source.get(k)
-            ev = e["src"].get(k)
-            if tv is None or ev is None or not math.isfinite(tv) or not math.isfinite(ev):
-                continue
-            s = scales.get(k, 1.0)
-            diffs.append(abs(float(tv) - float(ev)) / max(1e-6, s))
-        if len(diffs) < 8:
-            continue
-        d = sum(diffs) / len(diffs)
-        if dest_conf and e["dst_conf"] == dest_conf:
-            d *= 0.86
-        elif dest_conf:
-            d *= 1.10
-        if source_conf and e["src_conf"] == source_conf:
-            d *= 0.92
-        w = math.exp(-1.35 * d)
-        if w > 1e-9:
-            weighted_examples.append((w, e))
-
-    weighted_examples.sort(key=lambda x: x[0], reverse=True)
-    weighted_examples = weighted_examples[:450]
-    if not weighted_examples:
-        return f"""
-      <div class="panel draft-proj-panel">
-        <h3>Transfer Projection</h3>
-        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
-        <div class="shot-meta">No similar transfer comps found for projection.</div>
-      </div>
-"""
-
-    out_keys = [
-        "mpg", "ppg", "rpg", "apg", "spg", "bpg", "fg_pct", "tp_pct", "ft_pct",
-        "bpm", "usg", "ts_per", "rim_pct", "ast_per", "ast_tov",
-        "stl_per", "blk_per", "orb_per", "drb_per", "rapm", "net_pts", "onoff_net_rating",
-    ]
-    predicted: dict[str, float] = {}
-    for k in out_keys:
-        num = 0.0
-        den = 0.0
-        for w, e in weighted_examples:
-            sv = e["src"].get(k)
-            dv = e["dst"].get(k)
-            if sv is None or dv is None or not math.isfinite(float(sv)) or not math.isfinite(float(dv)):
-                continue
-            if k in source and math.isfinite(float(source[k])):
-                val = float(source[k]) + (float(dv) - float(sv))
-            else:
-                val = float(dv)
-            num += w * val
-            den += w
-        if den > 0:
-            predicted[k] = _clip_transfer_metric(k, num / den)
-
-    if not predicted:
-        return f"""
-      <div class="panel draft-proj-panel">
-        <h3>Transfer Projection</h3>
-        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
-        <div class="shot-meta">Projection failed due to missing comparable stat fields.</div>
-      </div>
-"""
-
-    # Transfer grade is based on core impact signals (exclude On/Off NetR per request).
-    impact_keys = ["bpm", "rapm", "net_pts"]
-    pred_impact = [predicted[k] for k in impact_keys if k in predicted and math.isfinite(predicted[k])]
-    impact_pct: float | None = None
-    if pred_impact:
-        pred_impact_score = sum(pred_impact) / len(pred_impact)
-        grade_pool = same_dest if len(same_dest) >= 20 else examples
-        cohort_scores: list[float] = []
-        for e in grade_pool:
-            vals = [e["dst"][k] for k in impact_keys if k in e["dst"] and math.isfinite(float(e["dst"][k]))]
-            if vals:
-                cohort_scores.append(sum(float(v) for v in vals) / len(vals))
-        if cohort_scores:
-            impact_pct = percentile(pred_impact_score, cohort_scores)
-    transfer_grade = _transfer_grade_from_percentile(impact_pct)
-
-    def row_html(label: str, key: str, digits: int = 1) -> str:
-        if key not in predicted:
-            return f'<div class="draft-odd-row"><div class="draft-odd-k">{html.escape(label)}</div><div class="draft-odd-v">-</div></div>'
-        return f'<div class="draft-odd-row"><div class="draft-odd-k">{html.escape(label)}</div><div class="draft-odd-v">{predicted[key]:.{digits}f}</div></div>'
-
-    per_game_rows = "".join(
-        [
-            row_html("AST%", "ast_per", 1),
-            row_html("OREB%", "orb_per", 1),
-            row_html("DREB%", "drb_per", 1),
-            row_html("STL%", "stl_per", 1),
-            row_html("BLK%", "blk_per", 1),
-            row_html("FG%", "fg_pct", 1),
-            row_html("3P%", "tp_pct", 1),
-            row_html("FT%", "ft_pct", 1),
-        ]
-    )
     return f"""
       <div class="panel draft-proj-panel">
         <h3>Transfer Projection</h3>
-        <div class="draft-proj-main">{html.escape(dest_conf_raw)} Transfer Grade: {transfer_grade}</div>
-        <div class="draft-proj-sub">Projected next-season statline vs historical transfer comps ({len(weighted_examples)} comps weighted)</div>
-        <div class="draft-proj-sub" style="font-weight:700;margin-top:6px;">Projected Rates</div>
-        <div class="draft-odds-grid transfer-two-col">
-          {per_game_rows}
-        </div>
-        <div class="draft-proj-sub" style="margin-top:8px;">The model examines historical cross-conference transfers, weighting similar pre-transfer profiles more heavily. Using those weighted historical stat translations, it projects statistical outcomes for the new player in the selected conference.</div>
-        <div class="draft-proj-sub">Transfer Grade compares the player’s projected impact to historical transfer-up outcomes into the selected conference.</div>
+        <div class="draft-proj-main">{html.escape(dest_conf_raw)}</div>
+        <div class="shot-meta">Transfer projection cache is missing or incomplete.</div>
       </div>
 """
 
@@ -5340,7 +5160,12 @@ def main() -> None:
     ap.add_argument("--rsci-csv", default="", help="Optional RSCI rankings CSV path.")
     ap.add_argument("--wnba-draft-csv", default="", help="Optional WNBA draft CSV path (pick in col 1, player in col 3).")
     ap.add_argument("--gender", default="Women", help="Enriched dataset gender token: Women or Men.")
-    ap.add_argument("--transfer-up", action="store_true", help="Render Transfer Projection instead of draft projection.")
+    ap.add_argument(
+        "--transfer-up",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Render Transfer Projection instead of draft projection (default: enabled). Use --no-transfer-up for draft projection.",
+    )
     ap.add_argument("--destination-conference", default="", help="Destination conference for Transfer Up projection.")
     ap.add_argument("--bt-playerstat-json", default="", help="Optional Bart playerstat JSON file path or URL.")
     ap.add_argument(
