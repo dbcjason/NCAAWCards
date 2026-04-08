@@ -265,6 +265,7 @@ jobs:
         env:
           INPUT_SEASON: ${{ github.event.inputs.season || '2026' }}
           INPUT_CHUNK_COUNT: ${{ github.event.inputs.chunk_count || '10' }}
+          INPUT_BOOTSTRAP_ALL: ${{ github.event.inputs.bootstrap_all || 'false' }}
         run: |
           python3 - <<'PY'
           import csv
@@ -276,12 +277,13 @@ jobs:
 
           season = str(os.environ["INPUT_SEASON"])
           chunk_count = int(os.environ["INPUT_CHUNK_COUNT"] or "10")
+          bootstrap_all = str(os.environ.get("INPUT_BOOTSTRAP_ALL", "false")).lower() == "true"
           root = Path(".tmp/transfer_projection_shards")
           shard_files = sorted(root.glob(f"transfer_projection_{season}_shard_*.json"))
           if not shard_files:
               raise SystemExit("No shard JSON files were downloaded.")
 
-          rows = []
+          changed_rows = []
           source_files = []
           for path in shard_files:
               match = re.search(r"_shard_(\d+)\.json$", path.name)
@@ -290,14 +292,43 @@ jobs:
               shard_rows = payload.get("rows") if isinstance(payload, dict) else []
               print(f"[merge] shard={shard_idx} rows={len(shard_rows) if isinstance(shard_rows, list) else 0} file={path}")
               if isinstance(shard_rows, list):
-                  rows.extend(shard_rows)
+                  changed_rows.extend(shard_rows)
               source_files.append(path.name)
 
+          def row_key(row):
+              return (
+                  str(row.get("season", season)).strip(),
+                  str(row.get("player", "")).strip().lower(),
+                  str(row.get("team", "")).strip().lower(),
+              )
+
+          rows_map = {}
+          out_dir = Path("player_cards_pipeline/data/cache/transfer_projection")
+          out_dir.mkdir(parents=True, exist_ok=True)
+          if not bootstrap_all:
+              for idx in (1, 2):
+                  existing_path = out_dir / f"{season}_part{idx}.json"
+                  if not existing_path.exists():
+                      continue
+                  try:
+                      existing_payload = json.loads(existing_path.read_text(encoding="utf-8"))
+                      existing_rows = existing_payload.get("rows") if isinstance(existing_payload, dict) else []
+                      if isinstance(existing_rows, list):
+                          for row in existing_rows:
+                              if isinstance(row, dict):
+                                  rows_map[row_key(row)] = row
+                  except Exception as exc:
+                      print(f"[merge] warning: failed to load existing {existing_path}: {exc}")
+
+          for row in changed_rows:
+              if not isinstance(row, dict):
+                  continue
+              rows_map[row_key(row)] = row
+
+          rows = list(rows_map.values())
           rows.sort(key=lambda row: (str(row.get("team", "")), str(row.get("player", ""))))
           mid = (len(rows) + 1) // 2
           parts = [rows[:mid], rows[mid:]]
-          out_dir = Path("player_cards_pipeline/data/cache/transfer_projection")
-          out_dir.mkdir(parents=True, exist_ok=True)
           out_csv = Path("player_cards_pipeline/output") / f"transfer_projection_{season}_all_conferences.csv"
           out_csv.parent.mkdir(parents=True, exist_ok=True)
 
