@@ -1,0 +1,22 @@
+{
+  "season": "2020",
+  "generated_at": "2026-04-08T21:49:05Z",
+  "section": "transfer_projection",
+  "chunk_count": 10,
+  "chunk_files": [
+    "transfer_projection_2020_shard_0.json",
+    "transfer_projection_2020_shard_1.json",
+    "transfer_projection_2020_shard_2.json",
+    "transfer_projection_2020_shard_3.json",
+    "transfer_projection_2020_shard_4.json",
+    "transfer_projection_2020_shard_5.json",
+    "transfer_projection_2020_shard_6.json",
+    "transfer_projection_2020_shard_7.json",
+    "transfer_projection_2020_shard_8.json",
+    "transfer_projection_2020_shard_9.json"
+  ],
+  "part_index": 2,
+  "part_count": 2,
+  "row_count": 0,
+  "rows": []
+}
