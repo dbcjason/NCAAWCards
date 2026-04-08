@@ -1,0 +1,44 @@
+name: Build Draft Projection Cache
+
+on:
+  schedule:
+    - cron: "0 11 * * *"
+  workflow_dispatch:
+    inputs:
+      season:
+        description: "Script season (e.g. 2026)"
+        required: true
+        default: "2026"
+      start_date:
+        description: "Optional YYYY-MM-DD start date."
+        required: false
+        default: ""
+      end_date:
+        description: "Optional YYYY-MM-DD end date."
+        required: false
+        default: ""
+      chunk_count:
+        description: "Parallel shard count"
+        required: true
+        default: "10"
+      bootstrap_all:
+        description: "Rebuild all players instead of the daily changed-team target set"
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  call-pipeline:
+    uses: ./.github/workflows/build_section_cache_pipeline.yml
+    with:
+      section: draft_projection_html
+      season: ${{ github.event.inputs.season || '2026' }}
+      start_date: ${{ github.event.inputs.start_date || '' }}
+      end_date: ${{ github.event.inputs.end_date || '' }}
+      chunk_count: ${{ github.event.inputs.chunk_count || '10' }}
+      bootstrap_all: ${{ github.event.inputs.bootstrap_all == 'true' }}
+    secrets:
+      CBBD_API_KEY: ${{ secrets.CBBD_API_KEY }}

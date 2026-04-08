@@ -26,7 +26,7 @@ on:
         default: false
         type: boolean
       transfer_up:
-        description: "Render Transfer Up Projection instead of draft projection"
+        description: "Render Transfer Up Projection instead of draft projection (default keeps draft projection)"
         required: false
         default: false
         type: boolean
@@ -53,6 +53,7 @@ jobs:
             cbb_player_cards_v1
             player_cards_pipeline/config
             player_cards_pipeline/data/bt
+            player_cards_pipeline/data/cache/section_payloads
             player_cards_pipeline/data/manual/bio
             player_cards_pipeline/data/manual/rsci
             player_cards_pipeline/data/manual/wnba_draft
