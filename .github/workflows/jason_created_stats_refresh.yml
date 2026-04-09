@@ -28,6 +28,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          sparse-checkout: |
+            player_cards_pipeline/scripts
+            player_cards_pipeline/data/bt
+            player_cards_pipeline/data/manual/enriched_players/by_script_season
+            player_cards_pipeline/data/manual/rimfluence
+            player_cards_pipeline/output
+          sparse-checkout-cone-mode: true
 
       - name: Setup Python
         uses: actions/setup-python@v5
