@@ -48,6 +48,7 @@ class Row:
     rimfluence: float | None
     rimfluence_off: float | None
     rimfluence_def: float | None
+    poss_created_100: float | None
     a_to: float | None
     oreb: float | None
     stl_foul: float | None
@@ -494,6 +495,18 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
             stl_foul = stl / fouls
 
         ftr = to_float(r.get("ftr"))
+        usg = to_float(r.get("usg"))
+        ast_per = to_float(r.get("AST_per"))
+        to_per = to_float(r.get("TO_per"))
+        poss_created_100 = None
+        if usg is not None and math.isfinite(usg):
+            to_component = 1.0 - (max(0.0, to_per or 0.0) / 100.0)
+            to_component = max(0.0, to_component)
+            poss_created_100 = usg * to_component
+            if ast_per is not None and math.isfinite(ast_per):
+                poss_created_100 += 0.35 * ast_per
+        elif ast_per is not None and math.isfinite(ast_per):
+            poss_created_100 = 0.35 * ast_per
 
         stat_height = str(hm.get("predicted_height", "")).strip() or "N/A"
         delta = to_float(hm.get("delta"))
@@ -541,6 +554,7 @@ def build_rows(root: Path, bt_csv: Path, gender: str, seasons: set[int], min_gam
                 rimfluence=rimfluence,
                 rimfluence_off=rimfluence_off,
                 rimfluence_def=rimfluence_def,
+                poss_created_100=poss_created_100,
                 a_to=a_to,
                 oreb=oreb,
                 stl_foul=stl_foul,
@@ -589,6 +603,7 @@ def build_jason_stats(rows: list[Row]) -> list[dict[str, Any]]:
 
         feel_vals = [x for x in feel_scores if x is not None]
         rim_vals = [r.rimfluence for r in srows if r.rimfluence is not None]
+        poss_vals = [r.poss_created_100 for r in srows if r.poss_created_100 is not None]
         h_vals = [r.height_delta for r in srows if r.height_delta is not None]
 
         for i, r in enumerate(srows):
@@ -612,6 +627,8 @@ def build_jason_stats(rows: list[Row]) -> list[dict[str, Any]]:
                     "rimfluence_off": "N/A" if r.rimfluence_off is None else round(r.rimfluence_off, 3),
                     "rimfluence_def": "N/A" if r.rimfluence_def is None else round(r.rimfluence_def, 3),
                     "rimfluence_percentile": "" if r.rimfluence is None else round(percentile(r.rimfluence, rim_vals) or 0.0, 2),
+                    "poss_created_100": "" if r.poss_created_100 is None else round(r.poss_created_100, 2),
+                    "poss_created_100_percentile": "" if r.poss_created_100 is None else round(percentile(r.poss_created_100, poss_vals) or 0.0, 2),
                     "gp": round(r.gp, 1),
                     "mpg": "" if r.mpg is None else round(r.mpg, 1),
                     "min_pct": round(r.min_per, 2),
@@ -682,6 +699,8 @@ def main() -> None:
         "rimfluence_off",
         "rimfluence_def",
         "rimfluence_percentile",
+        "poss_created_100",
+        "poss_created_100_percentile",
         "gp",
         "mpg",
         "min_pct",
