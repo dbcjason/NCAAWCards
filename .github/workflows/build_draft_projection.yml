@@ -20,7 +20,7 @@ on:
       chunk_count:
         description: "Parallel shard count"
         required: true
-        default: "10"
+        default: "20"
       bootstrap_all:
         description: "Rebuild all players instead of the daily changed-team target set"
         required: true
