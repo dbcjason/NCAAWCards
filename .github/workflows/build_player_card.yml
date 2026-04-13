@@ -182,6 +182,7 @@ jobs:
             --gender "Women" \
             --bt-csv "$BT_CSV" \
             --bt-playerstat-url-template "$BT_PLAYERSTAT_URL_TEMPLATE" \
+            --no-transfer-up \
             --disable-card-cache \
             --out-html "$OUT_HTML")
 
