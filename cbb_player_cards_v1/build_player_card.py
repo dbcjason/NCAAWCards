@@ -261,46 +261,42 @@ def load_cached_card_sections(
     target: PlayerGameStats,
     min_games: int,
 ) -> dict[str, Any] | None:
-    section_payloads = _load_cached_sections_from_json(target) or {}
-
-    sqlite_payload: dict[str, Any] | None = None
-    if cache_db_path.exists():
-        key = card_cache_key(target.player, target.team, target.season)
-        try:
-            conn = sqlite3.connect(str(cache_db_path))
-            conn.row_factory = sqlite3.Row
-        except Exception:
-            conn = None
-        if conn is not None:
-            try:
-                row = conn.execute(
-                    "SELECT value FROM metadata WHERE key='schema_version'"
-                ).fetchone()
-                if row and int(str(row["value"])) == CACHE_SCHEMA_VERSION:
-                    row = conn.execute(
-                        "SELECT value FROM metadata WHERE key='min_games'"
-                    ).fetchone()
-                    if row and int(str(row["value"])) == int(min_games):
-                        row = conn.execute(
-                            "SELECT payload_json FROM card_cache WHERE cache_key=?",
-                            (key,),
-                        ).fetchone()
-                        if row:
-                            payload = json.loads(str(row["payload_json"]))
-                            if isinstance(payload, dict):
-                                sqlite_payload = payload
-            except Exception:
-                sqlite_payload = None
-            finally:
-                conn.close()
-
-    if sqlite_payload and section_payloads:
-        merged = dict(sqlite_payload)
-        merged.update(section_payloads)
-        return merged
+    section_payloads = _load_cached_sections_from_json(target)
     if section_payloads:
         return section_payloads
-    return sqlite_payload
+    if not cache_db_path.exists():
+        return None
+    key = card_cache_key(target.player, target.team, target.season)
+    try:
+        conn = sqlite3.connect(str(cache_db_path))
+        conn.row_factory = sqlite3.Row
+    except Exception:
+        return None
+    try:
+        row = conn.execute(
+            "SELECT value FROM metadata WHERE key='schema_version'"
+        ).fetchone()
+        if not row or int(str(row["value"])) != CACHE_SCHEMA_VERSION:
+            return None
+        row = conn.execute(
+            "SELECT value FROM metadata WHERE key='min_games'"
+        ).fetchone()
+        if not row or int(str(row["value"])) != int(min_games):
+            return None
+        row = conn.execute(
+            "SELECT payload_json FROM card_cache WHERE cache_key=?",
+            (key,),
+        ).fetchone()
+        if not row:
+            return None
+        payload = json.loads(str(row["payload_json"]))
+        if not isinstance(payload, dict):
+            return None
+        return payload
+    except Exception:
+        return None
+    finally:
+        conn.close()
 
 
 def norm_season(v: Any) -> str:
@@ -5167,8 +5163,8 @@ def main() -> None:
     ap.add_argument(
         "--transfer-up",
         action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Render Transfer Projection instead of draft projection (default: enabled). Use --no-transfer-up for draft projection.",
+        default=False,
+        help="Render Transfer Projection instead of draft projection (default: disabled).",
     )
     ap.add_argument("--destination-conference", default="", help="Destination conference for Transfer Up projection.")
     ap.add_argument("--bt-playerstat-json", default="", help="Optional Bart playerstat JSON file path or URL.")
