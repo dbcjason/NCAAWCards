@@ -25,8 +25,21 @@ on:
         required: false
         default: false
         type: boolean
+      projection_mode:
+        description: "Projection mode"
+        required: false
+        default: "wnba_draft"
+        type: choice
+        options:
+          - wnba_draft
+          - transfer_up
+      draft_projection:
+        description: "Force WNBA Draft projection (recommended)"
+        required: false
+        default: true
+        type: boolean
       transfer_up:
-        description: "Render Transfer Up Projection instead of draft projection (default keeps draft projection)"
+        description: "Deprecated: use projection_mode (transfer_up/wnba_draft)"
         required: false
         default: false
         type: boolean
@@ -53,7 +66,6 @@ jobs:
             cbb_player_cards_v1
             player_cards_pipeline/config
             player_cards_pipeline/data/bt
-            player_cards_pipeline/data/cache/section_payloads
             player_cards_pipeline/data/manual/bio
             player_cards_pipeline/data/manual/rsci
             player_cards_pipeline/data/manual/wnba_draft
@@ -170,6 +182,7 @@ jobs:
             --gender "Women" \
             --bt-csv "$BT_CSV" \
             --bt-playerstat-url-template "$BT_PLAYERSTAT_URL_TEMPLATE" \
+            --disable-card-cache \
             --out-html "$OUT_HTML")
 
           if [ -n "${PLAYS_CSV:-}" ] && [ -f "$PLAYS_CSV" ]; then
@@ -188,13 +201,25 @@ jobs:
           if [ -n "${PBP_METRICS_CSV:-}" ] && [ -f "$PBP_METRICS_CSV" ]; then
             CMD+=(--pbp-metrics-csv "$PBP_METRICS_CSV")
           fi
-          if [ "${{ github.event.inputs.transfer_up }}" = "true" ]; then
+          PROJECTION_MODE="${{ github.event.inputs.projection_mode }}"
+          # Explicit draft button wins for clarity in the workflow UI.
+          if [ "${{ github.event.inputs.draft_projection }}" = "true" ]; then
+            PROJECTION_MODE="wnba_draft"
+          elif [ -z "$PROJECTION_MODE" ]; then
+            if [ "${{ github.event.inputs.transfer_up }}" = "true" ]; then
+              PROJECTION_MODE="transfer_up"
+            else
+              PROJECTION_MODE="wnba_draft"
+            fi
+          fi
+          if [ "$PROJECTION_MODE" = "transfer_up" ]; then
             CMD+=(--transfer-up)
           fi
           if [ -n "${{ github.event.inputs.destination_conference }}" ]; then
             CMD+=(--destination-conference "${{ github.event.inputs.destination_conference }}")
           fi
 
+          echo "Projection mode: $PROJECTION_MODE"
           echo "Running: ${CMD[*]}"
           "${CMD[@]}"
 
