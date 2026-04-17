@@ -34,9 +34,9 @@ on:
           - wnba_draft
           - transfer_up
       draft_projection:
-        description: "Force WNBA Draft projection (recommended)"
+        description: "Legacy override: force WNBA Draft projection (normally leave false)"
         required: false
-        default: true
+        default: false
         type: boolean
       transfer_up:
         description: "Deprecated: use projection_mode (transfer_up/wnba_draft)"
@@ -203,15 +203,15 @@ jobs:
             CMD+=(--pbp-metrics-csv "$PBP_METRICS_CSV")
           fi
           PROJECTION_MODE="${{ github.event.inputs.projection_mode }}"
-          # Explicit draft button wins for clarity in the workflow UI.
+          # projection_mode is primary. Legacy booleans only override when explicitly set true.
+          if [ "${{ github.event.inputs.transfer_up }}" = "true" ]; then
+            PROJECTION_MODE="transfer_up"
+          fi
           if [ "${{ github.event.inputs.draft_projection }}" = "true" ]; then
             PROJECTION_MODE="wnba_draft"
-          elif [ -z "$PROJECTION_MODE" ]; then
-            if [ "${{ github.event.inputs.transfer_up }}" = "true" ]; then
-              PROJECTION_MODE="transfer_up"
-            else
-              PROJECTION_MODE="wnba_draft"
-            fi
+          fi
+          if [ -z "$PROJECTION_MODE" ]; then
+            PROJECTION_MODE="wnba_draft"
           fi
           if [ "$PROJECTION_MODE" = "transfer_up" ]; then
             CMD+=(--transfer-up)
